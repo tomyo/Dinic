@@ -1,9 +1,9 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-#include <edge.h>
-#include <stdio.h>
+#include "edge.h"
 
-Edge parse_edge(FILE *f)
+/* Lee una arista de fh, si no es valida devulve null */
+Edge parse_edge(FILE *fh)
 
 #endif

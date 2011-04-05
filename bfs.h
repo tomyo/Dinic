@@ -8,7 +8,7 @@
   Source: Node s
   Sink: Node t
   */
-GList execute(Network self, Node s, Node t)
+GList *execute(Network self, Node s, Node t)
 
 
 #endif
