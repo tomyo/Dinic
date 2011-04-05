@@ -18,7 +18,7 @@ Edge edge_create(Node x1, Node x2, Weight w) {
         result->x2 = x2;
         result->w  = w;
     }
-    
+
     return result;
 }
 

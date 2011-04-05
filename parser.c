@@ -7,10 +7,10 @@ Edge parse_edge(FILE *fh) {
     Node x1 = 0, x2 = 0;
     Weigth w = 0;
     Edge *result = NULL;
-    
+
     if(fscanf(fh, FORMAT, &x1, &w, &x2) != 3) {
         /* La entrada no era valida */
-        result = NULL;    
+        result = NULL;
     } else {
         result = edge_create(x1, x2, w);
         /* Manejando falta de memoria */
@@ -19,6 +19,6 @@ Edge parse_edge(FILE *fh) {
             exit(1);
         }
     }
-    
+
     return result;
 }
