@@ -7,18 +7,19 @@ struct s_Edge {
     Node x1;
     Node x2;
     Weight w;
+    unsigned int reference_counter;
 };
 
-Edge edge_create(Node x1, Node x2, Weight w) {
+Edge *edge_create(Node x1, Node x2, Weight w) {
     Edge *result = NULL;
     result = calloc(1, sizeof(*result));
 
     if (result != NULL) {
-        result->x1                = x1;
-        result->x2                = x2;
-        result->w                 = w;
+        result->x1 = x1;
+        result->x2 = x2;
+        result->w = w;
         result->reference_counter = 0;
-    }                                  
+    }
 
     return result;
 }
@@ -40,7 +41,7 @@ Node *edge_get_second(Edge *self) {
 
 void edge_increment_reference(Edge *self) {
     assert(self != NULL);
-    self->rederence_counter++;
+    self->reference_counter++;
 }
 
 void edge_destroy(Edge *self) {
