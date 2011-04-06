@@ -17,7 +17,7 @@ struct s_Network {
 void destroy_glist(gpointer list) {
     /* GList *to_free = (GList *) list; */
 
-    /* g_list_free_full(to_free, ) */
+    /* g_list_free_full(to_free, destroy_edge) */
 }
 
 void destroy_edge(gpointer edge) {
@@ -49,12 +49,6 @@ void network_add_edge(Network *self, Edge *e) {
 
     edges = (GList *) g_hash_table_lookup(self->node_to_edges, first_node);
 
-    /* TODO: en realidad primero deberia checkear que el edge no este en
-     * la lista, y dps incrementar el contador de referencia */
-
-    /* Aumentamos el contador de referencia de e */
-    edge_increment_reference(e);
-
     if(edges == NULL) {
         /* El elemento no existia en la hash table */
 
@@ -63,9 +57,21 @@ void network_add_edge(Network *self, Edge *e) {
                             (gpointer) edges);
     } else {
         /* Agregamos el nuevo elemento al final de la lista */
-        /* TODO: Comprobar que esto anda como suponemos, agregando un elemento
-         * al final de la lista y no importa lo que devuelve. */
-        edges = g_list_append(edges, (gpointer) e);
+
+        /* Buscamos el edge e en la lista */
+        if(g_list_find(edges, e) != NULL) {
+            /* Ya esta en la lista */
+
+            /* Aumentamos el contador de referencia de e */
+            edge_increment_reference(e);
+        } else {
+            /* Agregamos el nuevo edge a la lista */
+
+            /* TODO: Comprobar que esto anda como suponemos, agregando un elemento
+             * al final de la lista y no importa lo que devuelve. */
+            edges = g_list_append(edges, (gpointer) e);
+
+        }
     }
 }
 
