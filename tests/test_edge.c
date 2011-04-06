@@ -3,9 +3,6 @@
 
 #include <signal.h>
 #include <assert.h>
-#include <string.h> /* para strcmp */
-#include <stdlib.h> /* para calloc */
-#include <stdio.h> /* para sprintf */
 
 #include "edge.h"
 
@@ -100,8 +97,7 @@ END_TEST
 
 
 /* Armado de la test suite */
-Suite *edge_suite (void)
-{
+Suite *edge_suite(void){
     Suite *s = suite_create("edge");
     TCase *tc_preconditions = tcase_create("Precondition");
     TCase *tc_creation = tcase_create("Creation");
@@ -130,7 +126,6 @@ Suite *edge_suite (void)
 }
 
 /* Para testing de memoria */
-void edge_memory_test (void) {
+void edge_memory_test(void){
     /* Codigo que deberia correr sin memory leaks */
 }
-

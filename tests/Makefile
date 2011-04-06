@@ -10,7 +10,7 @@ MEM_SOURCES=$(shell echo test*.c) leaktest.c
 TEST_OBJECTS= $(TEST_SOURCES:.c=.o)
 MEM_OBJECTS= $(MEM_SOURCES:.c=.o)
 # Aquí no usamos un wildcard para no traer el main
-TESTED_OBJECTS=../edge.o
+TESTED_OBJECTS=../edge.o ../network.o
 
 test: $(TARGET)
 	./$^
@@ -24,12 +24,6 @@ $(TARGET): $(TEST_OBJECTS) $(TESTED_OBJECTS)
 
 $(TARGET_MEM): $(MEM_OBJECTS) $(TESTED_OBJECTS)
 	$(CC) $^ -o $@ $(LDFLAGS)
-
-#El modulo ejecutor lo reemplazamos por uno que usa los mocks
-../execute-test.o: ../execute.c
-	$(CC) -c $^ -o $@ $(CFLAGS)  -DREPLACE_SYSCALLS=1
-../builtin-test.o: ../builtin.c
-	$(CC) -c $^ -o $@ $(CFLAGS)  -DREPLACE_SYSCALLS=1
 
 clean:
 	rm -f $(TARGET) $(TARGET_MEM) $(OBJECTS) $(MEM_OBJECTS) test.log .depend *~

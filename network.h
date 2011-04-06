@@ -11,7 +11,7 @@ typedef struct s_Network Network;
 Network *create_network(void);
 
 /* Agregar arista al network */
-void network_add_edge(Network *self, Edge e);
+void network_add_edge(Network *self, Edge *e);
 
 /* Devuelve la lista con punteros a los vecinos del nodo n */
 GList *network_neighbours(Network *self, Node n);
@@ -20,7 +20,10 @@ GList *network_neighbours(Network *self, Node n);
 GList *network_get_edges(Network *self, Node n);
 
 /* Imprime un network en f*/
-void network_pretty_print(Network *self, FILE *f)
+void network_pretty_print(Network *self, FILE *f);
+
+/* Destruye un network */
+void network_destroy(Network *self);
 
 #endif
 

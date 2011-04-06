@@ -1,7 +1,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
+#include <glib/ghash.h>
 #include "network.h"
+
+void destroy_glist(gpointer list);
+void destroy_edge(gpointer edge);
 
 struct s_Network {
     /* Mapea  el numero de nodo con todas las aristas forward desde el nodo */
@@ -10,16 +14,14 @@ struct s_Network {
 
 /* Funciones Auxiliares */
 /* Destructoras */
-void destroy_glist (gpointer list) {
-    GList *to_free = (Glist *) list;
-    
-    g_list_free_full(to_free, )
+void destroy_glist(gpointer list) {
+    /* GList *to_free = (GList *) list; */
+
+    /* g_list_free_full(to_free, ) */
 }
 
-void destroy_edge (gpointer edge) {
-    Edge *to_free = (Edge *) edge;
-    
-    edge_destroy(to_free);
+void destroy_edge(gpointer edge) {
+    edge_destroy((Edge *) edge);
 }
 
 /* Crea un network vacio */
@@ -28,7 +30,7 @@ Network *create_network(void) {
 
     result = calloc(1, sizeof(*result));
     if(result != NULL) {
-        result->node_to_edges = g_hash_table_new_full(g_int_hash, g_int_equa,
+        result->node_to_edges = g_hash_table_new_full(g_int_hash, g_int_equal,
                                                       NULL, destroy_glist);
     }
 
@@ -46,10 +48,10 @@ void network_add_edge(Network *self, Edge *e) {
     first_node = (gpointer) edge_get_first(e);
 
     edges = (GList *) g_hash_table_lookup(self->node_to_edges, first_node);
-    
+
     /* TODO: en realidad primero deberia checkear que el edge no este en
      * la lista, y dps incrementar el contador de referencia */
-     
+
     /* Aumentamos el contador de referencia de e */
     edge_increment_reference(e);
 
@@ -57,7 +59,7 @@ void network_add_edge(Network *self, Edge *e) {
         /* El elemento no existia en la hash table */
 
         edges = g_list_append(edges, (gpointer) e);
-        g_hash_table_insert(self->node_to_list, (gpointer) first_node,
+        g_hash_table_insert(self->node_to_edges, (gpointer) first_node,
                             (gpointer) edges);
     } else {
         /* Agregamos el nuevo elemento al final de la lista */
@@ -91,8 +93,12 @@ GList *network_get_edges(Network *self, Node n) {
     /* Checkeo de precondiciones */
     assert(self != NULL);
 
-    result = g_hash_table_lookup(self->nodes_to_edges, (gpointer)&n);
+    result = g_hash_table_lookup(self->node_to_edges, (gpointer)&n);
 
     return result;
+}
+
+void network_destroy(Network *self) {
+
 }
 
