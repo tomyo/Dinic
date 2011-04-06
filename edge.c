@@ -45,11 +45,11 @@ void edge_increment_reference(Edge *self) {
 }
 
 void edge_destroy(Edge *self) {
-    if(self != NULL) {
-        if(self->reference_counter <= 1) {
-            free(self);
-        } else {
-            self->reference_counter--;
-        }
+    assert(self != NULL);
+
+    if(self->reference_counter <= 1) {
+        free(self);
+    } else {
+        self->reference_counter--;
     }
 }
