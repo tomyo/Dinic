@@ -7,8 +7,8 @@ CFLAGS+= -I.. -ansi -Wall -Wextra -Wdeclaration-after-statement -Wbad-function-c
 LDFLAGS=-lcheck `pkg-config --libs glib-2.0`
 TEST_SOURCES=$(shell echo test*.c) run_tests.c
 MEM_SOURCES=$(shell echo test*.c) leaktest.c
-TEST_OBJECTS=$(TEST_SOURCES:.c=.o)
-MEM_OBJECTS=$(MEM_SOURCES:.c=.o)
+TEST_OBJECTS= $(TEST_SOURCES:.c=.o)
+MEM_OBJECTS= $(MEM_SOURCES:.c=.o)
 # Aquí no usamos un wildcard para no traer el main
 TESTED_OBJECTS=../edge.o
 
