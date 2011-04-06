@@ -9,7 +9,18 @@ struct s_Network {
 };
 
 /* Funciones Auxiliares */
-/* TODO: destroy_glist */
+/* Destructoras */
+void destroy_glist (gpointer list) {
+    GList *to_free = (Glist *) list;
+    
+    g_list_free_full(to_free, )
+}
+
+void destroy_edge (gpointer edge) {
+    Edge *to_free = (Edge *) edge;
+    
+    edge_destroy(to_free);
+}
 
 /* Crea un network vacio */
 Network *create_network(void) {
@@ -35,6 +46,12 @@ void network_add_edge(Network *self, Edge *e) {
     first_node = (gpointer) edge_get_first(e);
 
     edges = (GList *) g_hash_table_lookup(self->node_to_edges, first_node);
+    
+    /* TODO: en realidad primero deberia checkear que el edge no este en
+     * la lista, y dps incrementar el contador de referencia */
+     
+    /* Aumentamos el contador de referencia de e */
+    edge_increment_reference(e);
 
     if(edges == NULL) {
         /* El elemento no existia en la hash table */
