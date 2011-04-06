@@ -18,6 +18,24 @@ START_TEST(test_destroy_null)
 }
 END_TEST
 
+START_TEST(test_get_first_null)
+{
+    edge_get_first(NULL);
+}
+END_TEST
+
+START_TEST(test_get_second_null)
+{
+    edge_get_second(NULL);
+}
+END_TEST
+
+START_TEST(test_increment_reference_null)
+{
+    edge_increment_reference(NULL);
+}
+END_TEST
+
 START_TEST(test_invalid_nodes)
 {
     /* No deberia tener una arista de un nodo a si mismo */
@@ -91,6 +109,9 @@ Suite *edge_suite (void)
     /* Precondiciones */
     tcase_add_test_raise_signal(tc_preconditions, test_invalid_nodes, SIGABRT);
     tcase_add_test_raise_signal(tc_preconditions, test_destroy_null, SIGABRT);
+    tcase_add_test_raise_signal(tc_preconditions, test_get_first_null, SIGABRT);
+    tcase_add_test_raise_signal(tc_preconditions, test_get_second_null, SIGABRT);
+    tcase_add_test_raise_signal(tc_preconditions, test_increment_reference_null, SIGABRT);
     suite_add_tcase(s, tc_preconditions);
 
     /* Creation */
