@@ -56,6 +56,7 @@ START_TEST(test_destroy_multiple_reference)
 {
     edge = edge_create(3, 14, 159);
     edge_increment_reference(edge);
+    edge_increment_reference(edge);
     edge_destroy(edge);
     edge_destroy(edge);
 }

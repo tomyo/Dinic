@@ -21,7 +21,7 @@ Edge *edge_create(Node x1, Node x2, Weight w) {
         result->x1 = x1;
         result->x2 = x2;
         result->w = w;
-        result->reference_counter = 1;
+        result->reference_counter = 0;
     }
 
     return result;
