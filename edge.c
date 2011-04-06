@@ -12,6 +12,9 @@ struct s_Edge {
 
 Edge *edge_create(Node x1, Node x2, Weight w) {
     Edge *result = NULL;
+
+    assert(x1 != x2); /* No se puede hacer una arista a si mismo */
+
     result = calloc(1, sizeof(*result));
 
     if (result != NULL) {
