@@ -1,0 +1,4 @@
+*.o
+.depend
+tests/runner
+tests/test.log
