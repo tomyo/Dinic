@@ -16,6 +16,13 @@ Node *edge_get_first(Edge *self);
 /* Devuelve un puntero al segundo nodo de una arista */
 Node *edge_get_second(Edge *self);
 
+/* Indica que self es ahora referenciado por alguien mas. 
+ * Esta funcion debe ser llamada cada vez que self se guarda     
+ * en alguna estructura de datos, y vamos a querer (mas          
+ * adelante) llamar a edge_destroy(self) dentro de esa estructura
+ */
+void edge_increment_reference(Edge *self);
+
 /* Libera una arista */
 void edge_destroy(Edge *self);
 

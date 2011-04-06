@@ -14,10 +14,11 @@ Edge edge_create(Node x1, Node x2, Weight w) {
     result = calloc(1, sizeof(*result));
 
     if (result != NULL) {
-        result->x1 = x1;
-        result->x2 = x2;
-        result->w  = w;
-    }
+        result->x1                = x1;
+        result->x2                = x2;
+        result->w                 = w;
+        result->reference_counter = 0;
+    }                                  
 
     return result;
 }
@@ -37,8 +38,17 @@ Node *edge_get_second(Edge *self) {
     return &self->x2;
 }
 
+void edge_increment_reference(Edge *self) {
+    assert(self != NULL);
+    self->rederence_counter++;
+}
+
 void edge_destroy(Edge *self) {
     if(self != NULL) {
-        free(self);
+        if(self->reference_counter <= 1) {
+            free(self);
+        } else {
+            self->reference_counter--;
+        }
     }
 }
