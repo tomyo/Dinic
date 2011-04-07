@@ -103,7 +103,7 @@ GList *network_neighbours(Network *self, Node n) {
     while (tmp != NULL) {
         /* Tomamos la cabeza de la lista */
         e = (Edge *) g_list_nth_data(tmp, 0);
-        result = g_list_append(result, (gpointer) edge_get_first(e));
+        result = g_list_append(result, (gpointer) edge_get_second(e));
         tmp = g_list_next(tmp);
     }
 
