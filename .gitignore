@@ -2,3 +2,4 @@
 .depend
 tests/runner
 tests/test.log
+tests/leaktest

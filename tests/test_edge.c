@@ -27,12 +27,6 @@ START_TEST(test_get_second_null)
 }
 END_TEST
 
-START_TEST(test_increment_reference_null)
-{
-    edge_increment_reference(NULL);
-}
-END_TEST
-
 START_TEST(test_invalid_nodes)
 {
     /* No deberia tener una arista de un nodo a si mismo */
@@ -45,16 +39,6 @@ END_TEST
 START_TEST(test_new_destroy)
 {
     edge = edge_create(0, 1, 1);
-    edge_destroy(edge);
-}
-END_TEST
-
-START_TEST(test_destroy_multiple_reference)
-{
-    edge = edge_create(3, 14, 159);
-    edge_increment_reference(edge);
-    edge_increment_reference(edge);
-    edge_destroy(edge);
     edge_destroy(edge);
 }
 END_TEST
@@ -108,12 +92,10 @@ Suite *edge_suite(void){
     tcase_add_test_raise_signal(tc_preconditions, test_destroy_null, SIGABRT);
     tcase_add_test_raise_signal(tc_preconditions, test_get_first_null, SIGABRT);
     tcase_add_test_raise_signal(tc_preconditions, test_get_second_null, SIGABRT);
-    tcase_add_test_raise_signal(tc_preconditions, test_increment_reference_null, SIGABRT);
     suite_add_tcase(s, tc_preconditions);
 
     /* Creation */
     tcase_add_test(tc_creation, test_new_destroy);
-    tcase_add_test(tc_creation, test_destroy_multiple_reference);
     suite_add_tcase(s, tc_creation);
 
     /* Funcionalidad */
@@ -128,4 +110,14 @@ Suite *edge_suite(void){
 /* Para testing de memoria */
 void edge_memory_test(void){
     /* Codigo que deberia correr sin memory leaks */
+    Edge *edge = NULL;
+    unsigned int *first = NULL, *second = 0;
+    unsigned int weight = 0;
+
+    edge = edge_create(3, 14, 15);
+    first = edge_get_first(edge);
+    second = edge_get_second(edge);
+    weight = edge_get_weight(edge);
+
+    edge_destroy(edge);
 }
