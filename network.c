@@ -105,6 +105,7 @@ GList *network_get_edges(Network *self, Node n) {
 }
 
 void network_destroy(Network *self) {
+    assert(self != NULL);
 
 }
 
