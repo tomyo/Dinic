@@ -43,8 +43,14 @@ Node *edge_get_second(Edge *self) {
 
 bool edge_cmp(const Edge *e1, const Edge *e2) {
     assert(e1 != NULL && e2 != NULL);
-    
+
     return (e1->x1 == e2->x1 && e1->x2 == e2->x2);
+}
+
+void edge_pprint(const Edge *self){
+    assert(self != NULL);
+
+    printf("(%d) --%d-- (%d)\n", self->x1, self->w, self->x2);
 }
 
 void edge_destroy(Edge *self) {

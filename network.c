@@ -81,7 +81,7 @@ void network_add_edge(Network *self, Edge *e) {
         edges = g_list_append(edges, (gpointer) e);
         g_hash_table_insert(self->node_to_edges, (gpointer) first_node,
                             (gpointer) edges);
-    } else if(g_list_find_custom(edges, NULL, compare_edges) == NULL) {
+    } else if(g_list_find_custom(edges, e, compare_edges) == NULL) {
         /* El elemento no esta en la lista */
         /* Agregamos el nuevo edge a la lista */
 

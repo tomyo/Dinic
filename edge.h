@@ -25,6 +25,9 @@ Node *edge_get_second(Edge *self);
  */
 bool edge_cmp(const Edge *e1, const Edge *e2);
 
+/* Imprime por pantalla un edge */
+void edge_pprint(const Edge *self);
+
 /* Libera una arista */
 void edge_destroy(Edge *self);
 
