@@ -8,7 +8,7 @@
 typedef struct s_Network Network;
 
 /* Crea un network vacio */
-Network *create_network(void);
+Network *network_create(void);
 
 /* Agregar arista al network */
 void network_add_edge(Network *self, Edge *e);

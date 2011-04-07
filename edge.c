@@ -7,7 +7,6 @@ struct s_Edge {
     Node x1;
     Node x2;
     Weight w;
-    unsigned int reference_counter;
 };
 
 Edge *edge_create(Node x1, Node x2, Weight w) {
@@ -21,7 +20,6 @@ Edge *edge_create(Node x1, Node x2, Weight w) {
         result->x1 = x1;
         result->x2 = x2;
         result->w = w;
-        result->reference_counter = 0;
     }
 
     return result;
@@ -42,17 +40,14 @@ Node *edge_get_second(Edge *self) {
     return &self->x2;
 }
 
-void edge_increment_reference(Edge *self) {
-    assert(self != NULL);
-    self->reference_counter++;
+
+bool edge_cmp(const Edge *e1, const Edge *e2) {
+    assert(e1 != NULL && e2 != NULL);
+    
+    return (e1->x1 == e2->x1 && e1->x2 == e2->x2);
 }
 
 void edge_destroy(Edge *self) {
     assert(self != NULL);
-
-    if(self->reference_counter <= 1) {
-        free(self);
-    } else {
-        self->reference_counter--;
-    }
+    free(self);
 }

@@ -1,6 +1,7 @@
 #ifndef EDGE_H
 #define EDGE_H
 
+#include <stdbool.h>
 #include "node.h"
 
 typedef struct s_Edge Edge;
@@ -18,12 +19,11 @@ Node *edge_get_first(Edge *self);
 /* Devuelve un puntero al segundo nodo de una arista */
 Node *edge_get_second(Edge *self);
 
-/* Indica que self es ahora referenciado por alguien mas.
- * Esta funcion debe ser llamada cada vez que self se guarda
- * en alguna estructura de datos, y vamos a querer (mas
- * adelante) llamar a edge_destroy(self) dentro de esa estructura
+/* Decimos que dos aristas de la forma xy, zw son iguales
+ * si x == z e y == w. Es decir son iguales si los nodos
+ * son iguales, sin importar el peso.
  */
-void edge_increment_reference(Edge *self);
+bool edge_cmp(const Edge *e1, const Edge *e2);
 
 /* Libera una arista */
 void edge_destroy(Edge *self);
