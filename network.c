@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
-#include <glib/ghash.h>
+#include <glib/glib.h>
 #include "network.h"
 
 void destroy_glist(gpointer list);

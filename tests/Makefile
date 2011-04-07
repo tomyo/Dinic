@@ -3,8 +3,8 @@
 TARGET=runner
 TARGET_MEM=leaktest
 CC=gcc
-CFLAGS+= -I.. -ansi -Wall -Wextra -Wdeclaration-after-statement -Wbad-function-cast -Wcast-qual -Wstrict-prototypes -Wmissing-declarations -Wmissing-prototypes -Wno-unused-parameter -Werror -pedantic -g
-LDFLAGS=-lcheck `pkg-config --libs glib-2.0`
+LDFLAGS=-lcheck `pkg-config --cflags --libs glib-2.0`
+CFLAGS+= -I.. -ansi -Wall -Wextra -Wdeclaration-after-statement -Wbad-function-cast -Wcast-qual -Wstrict-prototypes -Wmissing-declarations -Wmissing-prototypes -Wno-unused-parameter -Werror -pedantic -g $(LDFLAGS)
 TEST_SOURCES=$(shell echo test*.c) run_tests.c
 MEM_SOURCES=$(shell echo test*.c) leaktest.c
 TEST_OBJECTS= $(TEST_SOURCES:.c=.o)
@@ -20,10 +20,10 @@ memtest: $(TARGET_MEM)
 	G_SLICE=always-malloc valgrind --leak-check=full --show-reachable=yes ./$^
 
 $(TARGET): $(TEST_OBJECTS) $(TESTED_OBJECTS)
-	$(CC) $^ -o $@ $(LDFLAGS)
+	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
 
 $(TARGET_MEM): $(MEM_OBJECTS) $(TESTED_OBJECTS)
-	$(CC) $^ -o $@ $(LDFLAGS)
+	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
 
 clean:
 	rm -f $(TARGET) $(TARGET_MEM) $(OBJECTS) $(MEM_OBJECTS) test.log .depend *~
