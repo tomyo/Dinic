@@ -17,13 +17,13 @@ struct s_Network {
 /*----- De Comparacion */
 int compare_edges(gconstpointer a, gconstpointer b) {
     int result = 0;
-      
+
     if(edge_cmp(a, b)) {
         result = 0;
     } else {
         result = 1;
     }
-    
+
     return result;
 }
 
@@ -31,18 +31,18 @@ int compare_edges(gconstpointer a, gconstpointer b) {
 void destroy_glist(gpointer list) {
     GList *to_free = (GList *) list, *tmp;
     gpointer edge = NULL;
-    
+
     /* Precondicion */
     assert(to_free != NULL);
-    
+
     tmp = to_free;
-    
+
     while (tmp != NULL) {
         edge = g_list_nth_data (tmp, 0);
         edge_destroy(edge);
         tmp = g_list_next(tmp);
     }
-    
+
     g_list_free(to_free);
 }
 
@@ -124,4 +124,6 @@ GList *network_get_edges(Network *self, Node n) {
 void network_destroy(Network *self) {
     assert(self != NULL);
 
+    g_hash_table_destroy(self->node_to_edges);
+    free(self); self = NULL;
 }
