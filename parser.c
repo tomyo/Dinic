@@ -1,11 +1,14 @@
 #include <stdio.h>
-#include "parser.h"
+#include <stdlib.h>
 
-#define FORMAT "%d %d %d"
+#include "parser.h"
+#include "edge.h"
+
+#define FORMAT "%o %o %o"
 
 Edge *parse_edge(FILE *fh) {
     Node x1 = 0, x2 = 0;
-    Weigth w = 0;
+    Weight w = 0;
     Edge *result = NULL;
 
     if(fscanf(fh, FORMAT, &x1, &x2, &w) != 3) {

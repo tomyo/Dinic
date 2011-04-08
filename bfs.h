@@ -16,6 +16,4 @@ typedef struct s_bfs_result {
 
 bfs_result bfs(Network *self, Node s, Node t);
 
-
 #endif
-
