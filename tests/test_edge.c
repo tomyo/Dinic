@@ -2,7 +2,10 @@
 #include "test_edge.h"
 
 #include <signal.h>
+#include <stdio.h>
 #include <assert.h>
+#include <math.h>
+#include <limits.h>
 
 #include "edge.h"
 
@@ -79,6 +82,21 @@ START_TEST(test_edge_get_second_node)
 }
 END_TEST
 
+START_TEST(test_edge_big_edge)
+{
+    Node *node = NULL;
+    unsigned int p = 0;
+
+    p = UINT_MAX;
+    edge = edge_create(p, 0, 10);
+
+    node = edge_get_first(edge);
+
+    fail_unless(*node == p);
+    edge_destroy(edge);
+}
+END_TEST
+
 
 /* Armado de la test suite */
 Suite *edge_suite(void){
@@ -102,6 +120,7 @@ Suite *edge_suite(void){
     tcase_add_test(tc_functionality, test_edge_get_weight);
     tcase_add_test(tc_functionality, test_edge_get_first_node);
     tcase_add_test(tc_functionality, test_edge_get_second_node);
+    tcase_add_test(tc_functionality, test_edge_big_edge);
     suite_add_tcase(s, tc_functionality);
 
     return s;
@@ -110,14 +129,23 @@ Suite *edge_suite(void){
 /* Para testing de memoria */
 void edge_memory_test(void){
     /* Codigo que deberia correr sin memory leaks */
-    Edge *edge = NULL;
+    Edge *edge = NULL, *edge2 = NULL;
     unsigned int *first = NULL, *second = 0;
     unsigned int weight = 0;
 
     edge = edge_create(3, 14, 15);
+    edge2 = edge_create(1, 2, 5);
+
     first = edge_get_first(edge);
-    second = edge_get_second(edge);
     weight = edge_get_weight(edge);
 
+    second = edge_get_second(edge2);
+
+    if(!edge_cmp(edge, edge2)){
+        edge_pprint(edge);
+        edge_pprint(edge2);
+    }
+
     edge_destroy(edge);
+    edge_destroy(edge2);
 }
