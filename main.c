@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdbool.h>
-#include <glib/glib.h>
+#include <glib-2.0/glib.h>
 #include "bfs.h"
 #include "parser.h"
 #include "defs.h"

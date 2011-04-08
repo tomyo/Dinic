@@ -1,0 +1,5 @@
+hace falta instalar:
+
+check - para los tests
+
+libglib2.0-dev para usar colas, listas y hash de glib

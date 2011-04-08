@@ -2,7 +2,7 @@
 #define BFS_H
 
 #include "network.h"
-#include <glib/glib.h>
+#include <glib-2.0/glib.h>
 
 /*Corre bfs sobre el network self
   Source: Node s

@@ -2,7 +2,7 @@
 #define NETWORK_H
 
 #include <stdio.h>
-#include <glib/glib.h>
+#include <glib-2.0/glib.h>
 #include "edge.h"
 
 typedef struct s_Network Network;
