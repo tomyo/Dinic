@@ -107,16 +107,16 @@ bfs_result bfs(Network *self, Node s, Node t) {
         curr_node = *dady;
         result_path = g_list_prepend(result_path, dady);
     }
-    
-    printf("%d", g_list_length(result_path));
+
+    /* printf("%d", g_list_length(result_path)); */
 
     flow = step->max_flow;
     result.path = result_path;
     result.flow = flow;
-    
+
     /* liberamos memomria usada */
     g_hash_table_destroy (visited);
     g_queue_free (queue);
-    
-    return result  ;    
+
+    return result  ;
 }
