@@ -57,7 +57,7 @@ START_TEST(test_network_get_edges)
 {
     Edge *e1 = NULL, *e2 = NULL, *e3 = NULL, *etmp = NULL;
     GList *el = NULL, *tmp = NULL;
-    unsigned int i = 0;
+    Node ntmp = 0;
 
     e1 = edge_create(0, 1, 1);
     e2 = edge_create(0, 2, 1);
@@ -71,12 +71,10 @@ START_TEST(test_network_get_edges)
     el = network_get_edges(net, 0);
 
     tmp = el;
-    i = 1;
     while(tmp != NULL){
         etmp = (Edge *) g_list_nth_data(tmp, 0);
-
-        fail_unless(*edge_get_second(etmp) == i);
-        i++;
+        ntmp = *edge_get_second(etmp);
+        fail_unless(ntmp == 1 || ntmp == 2);
 
         tmp = g_list_next(tmp);
     }
