@@ -3,12 +3,12 @@
 
 #define FORMAT "%d %d %d"
 
-Edge parse_edge(FILE *fh) {
+Edge *parse_edge(FILE *fh) {
     Node x1 = 0, x2 = 0;
     Weigth w = 0;
     Edge *result = NULL;
 
-    if(fscanf(fh, FORMAT, &x1, &w, &x2) != 3) {
+    if(fscanf(fh, FORMAT, &x1, &x2, &w) != 3) {
         /* La entrada no era valida */
         result = NULL;
     } else {

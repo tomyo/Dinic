@@ -4,6 +4,6 @@
 #include "edge.h"
 
 /* Lee una arista de fh, si no es valida devulve null */
-Edge parse_edge(FILE *fh)
+Edge *parse_edge(FILE *fh);
 
 #endif

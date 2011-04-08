@@ -10,7 +10,7 @@
   */
 
 typedef struct s_bfs_result {
-    Glist *path;
+    GList *path;
     Weight flow;
 } bfs_result;
 
