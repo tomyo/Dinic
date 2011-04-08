@@ -24,11 +24,11 @@ bfs_result bfs(Network *self, Node s, Node t) {
     Node curr_node;
     Weight flow;
     bool found_t = false;
-    GHashTable *visited = NULL; /* Visited nodes */
-    GQueue *queue = NULL;       /* BFS queue */
-    GList *result_path = NULL;       /* Shortest path */
-    GList *forward_edges = NULL;
-    bfs_step *state = NULL, *step = NULL;;
+    GHashTable *visited = NULL;  /* Visited nodes */
+    GQueue *queue = NULL;        /* BFS queue */
+    GList *result_path = NULL;   /* Shortest path */
+    GList *forward_edges = NULL; /* value de network hashtable */
+    bfs_step *state = NULL, *step = NULL;
 
     visited = g_hash_table_new_full(g_int_hash, g_int_equal,
                                     NULL, destroy_step);
@@ -100,18 +100,24 @@ bfs_result bfs(Network *self, Node s, Node t) {
     
     /* Ya encontramos camino, lo ponemos en una lista y lo devolvemos. */
     curr_node = t;
+    printf("%d", t);
+    result_path = g_list_prepend(result_path, &t);
     while (curr_node != s) {
         Node *dady;
-        
         step = (bfs_step *) g_hash_table_lookup(visited, (gpointer) &curr_node);
+        assert(step != NULL);
         dady = step->father;
-        result_path = g_list_append(result_path, dady);
+        result_path = g_list_prepend(result_path, dady);
         curr_node = *dady;
     }
     step = (bfs_step *)g_hash_table_lookup(visited, (gpointer) &t);
     flow = step->max_flow;
     result.path = result_path;
     result.flow = flow;
+    
+    /* liberamos memomria usada */
+    g_hash_table_destroy (visited);
+    g_queue_free (queue);
     
     return result  ;    
 }
