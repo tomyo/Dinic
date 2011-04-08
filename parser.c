@@ -4,7 +4,7 @@
 #include "parser.h"
 #include "edge.h"
 
-#define FORMAT "%o %o %o"
+#define FORMAT "%u %u %u"
 
 Edge *parse_edge(FILE *fh) {
     Node x1 = 0, x2 = 0;
