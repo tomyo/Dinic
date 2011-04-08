@@ -4,6 +4,7 @@
 #include <glib/glib.h>
 #include "network.h"
 
+int compare_edges(gconstpointer a, gconstpointer b);
 void destroy_glist(gpointer list);
 void destroy_edge(gpointer edge);
 
@@ -12,20 +13,46 @@ struct s_Network {
     GHashTable *node_to_edges;
 };
 
-/* Funciones Auxiliares */
-/* Destructoras */
-void destroy_glist(gpointer list) {
-    /* GList *to_free = (GList *) list; */
+/*--------------- Funciones Auxiliares */
+/*----- De Comparacion */
+int compare_edges(gconstpointer a, gconstpointer b) {
+    int result = 0;
 
-    /* g_list_free_full(to_free, destroy_edge) */
+    if(edge_cmp(a, b)) {
+        result = 0;
+    } else {
+        result = 1;
+    }
+
+    return result;
+}
+
+/*----- Destructoras */
+void destroy_glist(gpointer list) {
+    GList *to_free = (GList *) list, *tmp;
+    gpointer edge = NULL;
+
+    /* Precondicion */
+    assert(to_free != NULL);
+
+    tmp = to_free;
+
+    while (tmp != NULL) {
+        edge = g_list_nth_data (tmp, 0);
+        edge_destroy(edge);
+        tmp = g_list_next(tmp);
+    }
+
+    g_list_free(to_free);
 }
 
 void destroy_edge(gpointer edge) {
     edge_destroy((Edge *) edge);
 }
 
+
 /* Crea un network vacio */
-Network *create_network(void) {
+Network *network_create(void) {
     Network *result = NULL;
 
     result = calloc(1, sizeof(*result));
@@ -46,7 +73,6 @@ void network_add_edge(Network *self, Edge *e) {
     assert(e != NULL);
 
     first_node = (gpointer) edge_get_first(e);
-
     edges = (GList *) g_hash_table_lookup(self->node_to_edges, first_node);
 
     if(edges == NULL) {
@@ -55,25 +81,16 @@ void network_add_edge(Network *self, Edge *e) {
         edges = g_list_append(edges, (gpointer) e);
         g_hash_table_insert(self->node_to_edges, (gpointer) first_node,
                             (gpointer) edges);
-    } else {
-        /* Agregamos el nuevo elemento al final de la lista */
+    } else if(g_list_find_custom(edges, e, compare_edges) == NULL) {
+        /* El elemento no esta en la lista */
+        /* Agregamos el nuevo edge a la lista */
 
-        /* Buscamos el edge e en la lista */
-        if(g_list_find(edges, e) != NULL) {
-            /* Ya esta en la lista */
-
-            /* Aumentamos el contador de referencia de e */
-            edge_increment_reference(e);
-        } else {
-            /* Agregamos el nuevo edge a la lista */
-
-            /* TODO: Comprobar que esto anda como suponemos, agregando un elemento
-             * al final de la lista y no importa lo que devuelve. */
-            edges = g_list_append(edges, (gpointer) e);
-
-        }
+        /* TODO: Comprobar que esto anda como suponemos, agregando un elemento
+         * al final de la lista y, no importa lo que devuelve. */
+        edges = g_list_append(edges, (gpointer) e);
     }
 }
+
 
 GList *network_neighbours(Network *self, Node n) {
     GList *result = NULL, *tmp = NULL;
@@ -86,7 +103,7 @@ GList *network_neighbours(Network *self, Node n) {
     while (tmp != NULL) {
         /* Tomamos la cabeza de la lista */
         e = (Edge *) g_list_nth_data(tmp, 0);
-        result = g_list_append(result, (gpointer) edge_get_first(e));
+        result = g_list_append(result, (gpointer) edge_get_second(e));
         tmp = g_list_next(tmp);
     }
 
@@ -109,5 +126,6 @@ void network_destroy(Network *self) {
     assert(self != NULL);
     /*TODO*/
 
+    g_hash_table_destroy(self->node_to_edges);
+    free(self); self = NULL;
 }
-

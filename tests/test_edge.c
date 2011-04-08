@@ -9,31 +9,25 @@
 Edge *edge = NULL; /* Para crear edges temporales */
 
 /* Testeo precondiciones. */
-START_TEST(test_destroy_null)
+START_TEST(test_edge_destroy_null)
 {
     edge_destroy(NULL);
 }
 END_TEST
 
-START_TEST(test_get_first_null)
+START_TEST(test_edge_get_first_null)
 {
     edge_get_first(NULL);
 }
 END_TEST
 
-START_TEST(test_get_second_null)
+START_TEST(test_edge_get_second_null)
 {
     edge_get_second(NULL);
 }
 END_TEST
 
-START_TEST(test_increment_reference_null)
-{
-    edge_increment_reference(NULL);
-}
-END_TEST
-
-START_TEST(test_invalid_nodes)
+START_TEST(test_edge_invalid_nodes)
 {
     /* No deberia tener una arista de un nodo a si mismo */
     edge = edge_create(0, 0, 1);
@@ -42,25 +36,15 @@ START_TEST(test_invalid_nodes)
 END_TEST
 
 /* Crear y destruir */
-START_TEST(test_new_destroy)
+START_TEST(test_edge_new_destroy)
 {
     edge = edge_create(0, 1, 1);
     edge_destroy(edge);
 }
 END_TEST
 
-START_TEST(test_destroy_multiple_reference)
-{
-    edge = edge_create(3, 14, 159);
-    edge_increment_reference(edge);
-    edge_increment_reference(edge);
-    edge_destroy(edge);
-    edge_destroy(edge);
-}
-END_TEST
-
 /* Testeo de funcionalidad */
-START_TEST(test_get_weight)
+START_TEST(test_edge_get_weight)
 {
     int w = 0;
 
@@ -71,7 +55,7 @@ START_TEST(test_get_weight)
 }
 END_TEST
 
-START_TEST(test_get_first_node)
+START_TEST(test_edge_get_first_node)
 {
     Node *node = NULL;
     edge = edge_create(13, 37, 1337);
@@ -83,7 +67,7 @@ START_TEST(test_get_first_node)
 }
 END_TEST
 
-START_TEST(test_get_second_node)
+START_TEST(test_edge_get_second_node)
 {
     Node *node = NULL;
     edge = edge_create(13, 37, 1337);
@@ -104,22 +88,20 @@ Suite *edge_suite(void){
     TCase *tc_functionality = tcase_create("Functionality");
 
     /* Precondiciones */
-    tcase_add_test_raise_signal(tc_preconditions, test_invalid_nodes, SIGABRT);
-    tcase_add_test_raise_signal(tc_preconditions, test_destroy_null, SIGABRT);
-    tcase_add_test_raise_signal(tc_preconditions, test_get_first_null, SIGABRT);
-    tcase_add_test_raise_signal(tc_preconditions, test_get_second_null, SIGABRT);
-    tcase_add_test_raise_signal(tc_preconditions, test_increment_reference_null, SIGABRT);
+    tcase_add_test_raise_signal(tc_preconditions, test_edge_invalid_nodes, SIGABRT);
+    tcase_add_test_raise_signal(tc_preconditions, test_edge_destroy_null, SIGABRT);
+    tcase_add_test_raise_signal(tc_preconditions, test_edge_get_first_null, SIGABRT);
+    tcase_add_test_raise_signal(tc_preconditions, test_edge_get_second_null, SIGABRT);
     suite_add_tcase(s, tc_preconditions);
 
     /* Creation */
-    tcase_add_test(tc_creation, test_new_destroy);
-    tcase_add_test(tc_creation, test_destroy_multiple_reference);
+    tcase_add_test(tc_creation, test_edge_new_destroy);
     suite_add_tcase(s, tc_creation);
 
     /* Funcionalidad */
-    tcase_add_test(tc_functionality, test_get_weight);
-    tcase_add_test(tc_functionality, test_get_first_node);
-    tcase_add_test(tc_functionality, test_get_second_node);
+    tcase_add_test(tc_functionality, test_edge_get_weight);
+    tcase_add_test(tc_functionality, test_edge_get_first_node);
+    tcase_add_test(tc_functionality, test_edge_get_second_node);
     suite_add_tcase(s, tc_functionality);
 
     return s;
@@ -128,4 +110,14 @@ Suite *edge_suite(void){
 /* Para testing de memoria */
 void edge_memory_test(void){
     /* Codigo que deberia correr sin memory leaks */
+    Edge *edge = NULL;
+    unsigned int *first = NULL, *second = 0;
+    unsigned int weight = 0;
+
+    edge = edge_create(3, 14, 15);
+    first = edge_get_first(edge);
+    second = edge_get_second(edge);
+    weight = edge_get_weight(edge);
+
+    edge_destroy(edge);
 }
