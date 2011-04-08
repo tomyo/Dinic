@@ -26,7 +26,7 @@ int main(void) {
     Network *network = NULL;
     bool reach_EOF = false;
     bfs_result result;
-    GList *result_path = NULL, *iter = NULL;
+    GSList *result_path = NULL, *iter = NULL;
     Weight result_flow = 0;
     Node *node = NULL;
 
@@ -57,15 +57,15 @@ int main(void) {
         /* Mostremos el camino*/
         iter = result_path;
         while(iter != NULL) {
-                node = (Node *) g_list_nth_data(iter, 0);
-                iter = g_list_next(iter);
+                node = (Node *) g_slist_nth_data(iter, 0);
+                iter = g_slist_next(iter);
                 printf(" %d", *node);
         }
         puts("");
         printf("Con flujo: %d\n", result_flow);
 
         /* Liberemos la lista */
-        g_list_free(result_path);
+        g_slist_free(result_path);
     }
 
     /* Liberar la memoria alocada por los programas */

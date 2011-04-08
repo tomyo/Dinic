@@ -56,7 +56,7 @@ END_TEST
 START_TEST(test_network_get_edges)
 {
     Edge *e1 = NULL, *e2 = NULL, *e3 = NULL, *etmp = NULL;
-    GList *el = NULL, *tmp = NULL;
+    GSList *el = NULL, *tmp = NULL;
     Node ntmp = 0;
 
     e1 = edge_create(0, 1, 1);
@@ -72,11 +72,11 @@ START_TEST(test_network_get_edges)
 
     tmp = el;
     while(tmp != NULL){
-        etmp = (Edge *) g_list_nth_data(tmp, 0);
+        etmp = (Edge *) g_slist_nth_data(tmp, 0);
         ntmp = *edge_get_second(etmp);
         fail_unless(ntmp == 1 || ntmp == 2);
 
-        tmp = g_list_next(tmp);
+        tmp = g_slist_next(tmp);
     }
 
     network_destroy(net);
@@ -87,7 +87,7 @@ START_TEST(test_network_get_neightbours)
 {
     Edge *e1 = NULL, *e2 = NULL, *e3 = NULL;
     Node *ntmp = NULL;
-    GList *el = NULL, *tmp = NULL;
+    GSList *el = NULL, *tmp = NULL;
 
     e1 = edge_create(2, 3, 1);
     e2 = edge_create(1, 4, 1);
@@ -102,14 +102,14 @@ START_TEST(test_network_get_neightbours)
 
     tmp = el;
     while(tmp != NULL){
-        ntmp = (Node *) g_list_nth_data(tmp, 0);
+        ntmp = (Node *) g_slist_nth_data(tmp, 0);
 
         fail_unless(*ntmp == 3 || *ntmp == 1);
 
-        tmp = g_list_next(tmp);
+        tmp = g_slist_next(tmp);
     }
 
-    g_list_free(el);
+    g_slist_free(el);
     network_destroy(net);
 }
 END_TEST
@@ -147,7 +147,7 @@ void network_memory_test(void){
 
     Edge *e1 = NULL, *e2 = NULL, *e3 = NULL, *e4 = NULL, *etmp = NULL;
     Node *ntmp = NULL;
-    GList *el = NULL, *nl = NULL, *tmp = NULL;
+    GSList *el = NULL, *nl = NULL, *tmp = NULL;
 
     e1 = edge_create(0, 1, 1);
     e2 = edge_create(0, 2, 4);
@@ -164,9 +164,9 @@ void network_memory_test(void){
 
     tmp = el;
     while(tmp != NULL){
-        etmp = (Edge *) g_list_nth_data(tmp, 0);
+        etmp = (Edge *) g_slist_nth_data(tmp, 0);
         edge_pprint(etmp);
-        tmp = g_list_next(tmp);
+        tmp = g_slist_next(tmp);
     }
 
     nl = network_neighbours(net, 2);
@@ -174,12 +174,12 @@ void network_memory_test(void){
 
     tmp = nl;
     while(tmp != NULL){
-        ntmp = (Node *) g_list_nth_data(tmp, 0);
-        tmp = g_list_next(tmp);
+        ntmp = (Node *) g_slist_nth_data(tmp, 0);
+        tmp = g_slist_next(tmp);
 
         printf("  %d\n", *ntmp);
     }
 
-    g_list_free(nl);
+    g_slist_free(nl);
     network_destroy(net);
 }

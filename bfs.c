@@ -35,8 +35,8 @@ bfs_result bfs(Network *self, Node s, Node t) {
     bool found_t = false;
     GHashTable *visited = NULL;  /* Visited nodes */
     GQueue *queue = NULL;        /* BFS queue */
-    GList *result_path = NULL;   /* Shortest path */
-    GList *forward_edges = NULL; /* value de network hashtable */
+    GSList *result_path = NULL;   /* Shortest path */
+    GSList *forward_edges = NULL; /* value de network hashtable */
     bfs_step *state = NULL, *step = NULL;
 
     visited = g_hash_table_new_full(g_int_hash, g_int_equal, NULL, destroy_step);
@@ -72,7 +72,7 @@ bfs_result bfs(Network *self, Node s, Node t) {
             Weight curr_weigth = 0;
             Node *neighbour = NULL;
 
-            curr_edge = (Edge *) g_list_nth_data(forward_edges, 0);
+            curr_edge = (Edge *) g_slist_nth_data(forward_edges, 0);
             neighbour = edge_get_second(curr_edge);
 
             /* Si no hemos visitado este nodo, entonces no hay registro
@@ -96,7 +96,7 @@ bfs_result bfs(Network *self, Node s, Node t) {
                 }
             }
 
-            forward_edges = g_list_next(forward_edges);
+            forward_edges = g_slist_next(forward_edges);
         }
 
     }
@@ -112,7 +112,7 @@ bfs_result bfs(Network *self, Node s, Node t) {
          * paso por valor, por lo que fuera de esta funcion esa direccion no
          * tiene sentido alguno
          */
-        result_path = g_list_prepend(result_path, pointer_to_t);
+        result_path = g_slist_prepend(result_path, pointer_to_t);
         while (curr_node != s) {
             Node *predecessor;
             step = (bfs_step *) g_hash_table_lookup(visited,
@@ -121,7 +121,7 @@ bfs_result bfs(Network *self, Node s, Node t) {
             predecessor = step->father;
             assert(predecessor != NULL);
             curr_node = *predecessor;
-            result_path = g_list_prepend(result_path, predecessor);
+            result_path = g_slist_prepend(result_path, predecessor);
         }
 
         result.path = result_path;
