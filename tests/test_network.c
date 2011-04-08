@@ -56,7 +56,7 @@ END_TEST
 START_TEST(test_network_get_edges)
 {
     Edge *e1 = NULL, *e2 = NULL, *e3 = NULL, *etmp = NULL;
-    GList *es = NULL, *tmp = NULL;
+    GList *el = NULL, *tmp = NULL;
     unsigned int i = 0;
 
     e1 = edge_create(0, 1, 1);
@@ -68,9 +68,9 @@ START_TEST(test_network_get_edges)
     network_add_edge(net, e2);
     network_add_edge(net, e3);
 
-    es = network_get_edges(net, 0);
+    el = network_get_edges(net, 0);
 
-    tmp = es;
+    tmp = el;
     i = 1;
     while(tmp != NULL){
         etmp = (Edge *) g_list_nth_data(tmp, 0);
@@ -89,7 +89,7 @@ START_TEST(test_network_get_neightbours)
 {
     Edge *e1 = NULL, *e2 = NULL, *e3 = NULL;
     Node *ntmp = NULL;
-    GList *es = NULL, *tmp = NULL;
+    GList *el = NULL, *tmp = NULL;
 
     e1 = edge_create(2, 3, 1);
     e2 = edge_create(1, 4, 1);
@@ -100,9 +100,9 @@ START_TEST(test_network_get_neightbours)
     network_add_edge(net, e2);
     network_add_edge(net, e3);
 
-    es = network_neighbours(net, 2);
+    el = network_neighbours(net, 2);
 
-    tmp = es;
+    tmp = el;
     while(tmp != NULL){
         ntmp = (Node *) g_list_nth_data(tmp, 0);
 
@@ -111,6 +111,7 @@ START_TEST(test_network_get_neightbours)
         tmp = g_list_next(tmp);
     }
 
+    g_list_free(el);
     network_destroy(net);
 }
 END_TEST
@@ -146,26 +147,41 @@ Suite *network_suite(void){
 void network_memory_test(void){
     /* Codigo que deberia correr sin memory leaks */
 
-    Edge *e1 = NULL, *e2 = NULL, *e3 = NULL, *etmp = NULL;
-    GList *es = NULL, *tmp = NULL;
+    Edge *e1 = NULL, *e2 = NULL, *e3 = NULL, *e4 = NULL, *etmp = NULL;
+    Node *ntmp = NULL;
+    GList *el = NULL, *nl = NULL, *tmp = NULL;
 
     e1 = edge_create(0, 1, 1);
-    e2 = edge_create(0, 2, 1);
-    e3 = edge_create(2, 3, 1);
+    e2 = edge_create(0, 2, 4);
+    e3 = edge_create(2, 3, 6);
+    e4 = edge_create(2, 0, 0);
 
     net = network_create();
     network_add_edge(net, e1);
     network_add_edge(net, e2);
     network_add_edge(net, e3);
+    network_add_edge(net, e4);
 
-    es = network_get_edges(net, 0);
+    el = network_get_edges(net, 0);
 
-    tmp = es;
+    tmp = el;
     while(tmp != NULL){
         etmp = (Edge *) g_list_nth_data(tmp, 0);
         edge_pprint(etmp);
         tmp = g_list_next(tmp);
     }
 
+    nl = network_neighbours(net, 2);
+    printf("Vecinos del nodo: 2\n");
+
+    tmp = nl;
+    while(tmp != NULL){
+        ntmp = (Node *) g_list_nth_data(tmp, 0);
+        tmp = g_list_next(tmp);
+
+        printf("  %d\n", *ntmp);
+    }
+
+    g_list_free(nl);
     network_destroy(net);
 }
