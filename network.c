@@ -66,6 +66,7 @@ Network *network_create(void) {
 
 void network_add_edge(Network *self, Edge *e) {
     GList *edges = NULL;
+    gboolean must_be_true = TRUE;
     gpointer first_node = NULL;
 
     /* Precondiciones */
@@ -85,9 +86,23 @@ void network_add_edge(Network *self, Edge *e) {
         /* El elemento no esta en la lista */
         /* Agregamos el nuevo edge a la lista */
 
-        /* TODO: Comprobar que esto anda como suponemos, agregando un elemento
-         * al final de la lista y, no importa lo que devuelve. */
-        edges = g_list_append(edges, (gpointer) e);
+        /* Hacemos un prepend, pues es O(1), append es O(n)*/
+        edges = g_list_prepend(edges, (gpointer) e);
+        /* Reinsertamos en la hash */
+        /* ---- Primero retiremos el valor anterior */
+        must_be_true = g_hash_table_steal(self->node_to_edges, 
+                                          (gpointer) first_node);
+        assert(must_be_true == TRUE);
+        /* ----- Insertamos el elemento modificado */
+        g_hash_table_insert(self->node_to_edges, (gpointer) first_node,
+                            (gpointer) edges);
+    } else {
+        /* Arista repetida.
+         * Le avisamos al usuario, liberamos la arista y continuamos con la
+         * ejecucion
+         */
+        fprintf(stderr, "Arista Repetida\n");
+        edge_destroy(e);
     }
 }
 
@@ -124,7 +139,6 @@ GList *network_get_edges(Network *self, Node n) {
 
 void network_destroy(Network *self) {
     assert(self != NULL);
-    /*TODO*/
 
     g_hash_table_destroy(self->node_to_edges);
     free(self); self = NULL;
