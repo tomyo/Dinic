@@ -1,4 +1,4 @@
-TARGET=befese
+TARGET=bfsNet
 CC=gcc
 CFLAGS+= -Wall -ansi -Wextra -Wdeclaration-after-statement -Wbad-function-cast -Wcast-qual -Wstrict-prototypes -Wmissing-declarations -Wmissing-prototypes -Wno-unused-parameter -Werror -pedantic -g `pkg-config --cflags glib-2.0`
 LDFLAGS=`pkg-config --cflags --libs glib-2.0`

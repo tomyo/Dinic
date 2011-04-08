@@ -3,3 +3,4 @@
 tests/runner
 tests/test.log
 tests/leaktest
+bfsNet

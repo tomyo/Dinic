@@ -33,14 +33,6 @@ int main(void) {
     /* Creamos network vacio */
     network = network_create();
 
-    /* Imprimimos la bienvenida */
-    printf("\n");
-    printf("*** Bienvenido a: Befese *************************************\n"
-           "* Ingrese las aristas del network una abajo de la otra con   *\n"
-           "* el formato <origne> <destino> <capasidad> y para finalizar *\n"
-           "* ingrese algo que no cumpla este formato.                   *\n"
-           "**************************************************************\n");
-
     /* Parsear entrada estandar */
     while(not reach_EOF) {
         edge = parse_edge(stdin);
