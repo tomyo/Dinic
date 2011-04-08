@@ -12,15 +12,15 @@
 
 /* Que hace este main? Basicamente se ingresan por la entrada estandar aristas
  * de la forma nodo_origen nodo_destino capacidad, hasta que se ingrese algo
- * que no cumpla con este formato, eso va a definir un Network, luego 
- * correremos bfs sobre ese Network para encontrar un camino de distancia 
+ * que no cumpla con este formato, eso va a definir un Network, luego
+ * correremos bfs sobre ese Network para encontrar un camino de distancia
  * minima de s (nodo 0) a t (nodo 1).
  * El resultado sera:
  * 1) "Existe el camino: " s nodo_1 ... nodo_n t
  *    "Con flujo:" flujo
  * 2) "No existe el camino :'("
  */
- 
+
 int main(void) {
     Edge *edge = NULL;
     Network *network = NULL;
@@ -29,10 +29,18 @@ int main(void) {
     GList *result_path = NULL, *iter = NULL;
     Weight result_flow = 0;
     Node *node = NULL;
-    
+
     /* Creamos network vacio */
     network = network_create();
-    
+
+    /* Imprimimos la bienvenida */
+    printf("\n");
+    printf("*** Bienvenido a: Befese *************************************\n"
+           "* Ingrese las aristas del network una abajo de la otra con   *\n"
+           "* el formato <origne> <destino> <capasidad> y para finalizar *\n"
+           "* ingrese algo que no cumpla este formato.                   *\n"
+           "**************************************************************\n");
+
     /* Parsear entrada estandar */
     while(not reach_EOF) {
         edge = parse_edge(stdin);
@@ -42,12 +50,12 @@ int main(void) {
             network_add_edge(network, edge);
         }
     }
-    
+
     /* Ya tenemos el network, a correrle BFS ahora */
     result = bfs(network, s, t);
     result_path = result.path;
     result_flow = result.flow;
-    
+
     if(result_path == NULL) {
         /* El camino no existia */
         puts(FAIL_RESULT);
@@ -63,13 +71,13 @@ int main(void) {
         }
         puts("");
         printf("Con flujo: %d\n", result_flow);
-        
+
         /* Liberemos la lista */
         g_list_free(result_path);
     }
-    
+
     /* Liberar la memoria alocada por los programas */
     network_destroy(network);
-    
+
     return 0;
  }

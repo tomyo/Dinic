@@ -11,6 +11,7 @@ Edge *parse_edge(FILE *fh) {
     Weight w = 0;
     Edge *result = NULL;
 
+    printf("> ");
     if(fscanf(fh, FORMAT, &x1, &x2, &w) != 3) {
         /* La entrada no era valida */
         result = NULL;
