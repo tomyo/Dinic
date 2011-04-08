@@ -133,7 +133,7 @@ void edge_memory_test(void){
     unsigned int *first = NULL, *second = 0;
     unsigned int weight = 0;
 
-    edge = edge_create(3, 14, 15);
+    edge = edge_create(UINT_MAX, 14, 15);
     edge2 = edge_create(1, 2, 5);
 
     first = edge_get_first(edge);
