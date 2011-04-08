@@ -31,15 +31,18 @@ void memory_check(gpointer m){
 bfs_result bfs(Network *self, Node s, Node t) {
     bfs_result result;
     Node curr_node = 0, *pointer_to_t = NULL;
-    Weight flow = 0;
+    Weight final_flow = 0;
     bool found_t = false;
     GHashTable *visited = NULL;  /* Visited nodes */
     GQueue *queue = NULL;        /* BFS queue */
     GList *result_path = NULL;   /* Shortest path */
     GList *forward_edges = NULL; /* value de network hashtable */
     bfs_step *state = NULL, *step = NULL;
+
     visited = g_hash_table_new_full(g_int_hash, g_int_equal, NULL, destroy_step);
     memory_check((gpointer) visited);
+
+    printf("%s\n", (min(5,3))==3?"Esto anda":"nop");
 
     queue = g_queue_new();
     memory_check((gpointer) queue);
@@ -89,6 +92,7 @@ bfs_result bfs(Network *self, Node s, Node t) {
 
                 if(*neighbour == t) {
                     pointer_to_t = neighbour;
+                    final_flow = state->max_flow;
                     found_t = true;
                 }
             }
@@ -121,9 +125,8 @@ bfs_result bfs(Network *self, Node s, Node t) {
             result_path = g_list_prepend(result_path, predecessor);
         }
 
-        flow = step->max_flow;
         result.path = result_path;
-        result.flow = flow;
+        result.flow = final_flow;
     }
     
     /* liberamos memomria usada */
