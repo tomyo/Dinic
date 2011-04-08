@@ -42,13 +42,11 @@ bfs_result bfs(Network *self, Node s, Node t) {
     visited = g_hash_table_new_full(g_int_hash, g_int_equal, NULL, destroy_step);
     memory_check((gpointer) visited);
 
-    printf("%s\n", (min(5,3))==3?"Esto anda":"nop");
-
     queue = g_queue_new();
     memory_check((gpointer) queue);
-    
+
     g_queue_push_tail(queue, &s);
-    
+
     state = calloc(1, sizeof(*state));
     memory_check((gpointer) state);
 
@@ -80,7 +78,8 @@ bfs_result bfs(Network *self, Node s, Node t) {
             /* Si no hemos visitado este nodo, entonces no hay registro
              * en la hashtable y un lookup devuelve NULL */
             if(g_hash_table_lookup(visited, neighbour) == NULL) {
-                /* TODO: Bueno, esta operacion es de O(n) */
+                /* TODO: esta operacion es de O(n), habria que ver si se puede
+                 * mejorar */
                 g_queue_push_tail(queue, neighbour);
                 state = calloc(1, sizeof(*state));
                 memory_check((gpointer) state);
@@ -101,7 +100,7 @@ bfs_result bfs(Network *self, Node s, Node t) {
         }
 
     }
-    
+
     /* Que paso con la corrida de BFS ? */
     if(not found_t) {
         result.path = NULL;
@@ -116,7 +115,7 @@ bfs_result bfs(Network *self, Node s, Node t) {
         result_path = g_list_prepend(result_path, pointer_to_t);
         while (curr_node != s) {
             Node *predecessor;
-            step = (bfs_step *) g_hash_table_lookup(visited, 
+            step = (bfs_step *) g_hash_table_lookup(visited,
                                                     (gpointer) &curr_node);
             assert(step != NULL);
             predecessor = step->father;
@@ -128,7 +127,7 @@ bfs_result bfs(Network *self, Node s, Node t) {
         result.path = result_path;
         result.flow = final_flow;
     }
-    
+
     /* liberamos memomria usada */
     g_hash_table_destroy (visited);
     g_queue_free (queue);

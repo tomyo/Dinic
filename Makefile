@@ -21,6 +21,9 @@ test: $(OBJECTS)
 memtest: $(OBJECTS)
 	make -C tests memtest
 
+run: $(TARGET)
+	./$^ < $(NETFILE)
+
 memrun: $(TARGET)
 	G_SLICE=always-malloc valgrind --leak-check=full --show-reachable=yes ./$^ < $(NETFILE)
 
