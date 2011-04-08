@@ -8,6 +8,7 @@
 #define INF -1 /* Funciona porque los pesos son unsigned */
 #define min(x,y) x < y ? x : y
 
+void destroy_step(gpointer bfs_step);
 void destroy_step(gpointer bfs_step) {
     assert(bfs_step != NULL);
     free(bfs_step);
@@ -20,14 +21,14 @@ typedef struct bfs_t {
 
 bfs_result bfs(Network *self, Node s, Node t) {
     bfs_result result;
+    Node curr_node;
+    Weight flow;
+    bool found_t = false;
     GHashTable *visited = NULL; /* Visited nodes */
     GQueue *queue = NULL;       /* BFS queue */
     GList *result_path = NULL;       /* Shortest path */
     GList *forward_edges = NULL;
     bfs_step *state = NULL, *step = NULL;;
-    bool found_t = false;
-    Node curr_node;
-    Weight flow;
 
     visited = g_hash_table_new_full(g_int_hash, g_int_equal,
                                     NULL, destroy_step);
