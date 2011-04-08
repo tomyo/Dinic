@@ -4,6 +4,7 @@ CFLAGS+= -Wall -ansi -Wextra -Wdeclaration-after-statement -Wbad-function-cast -
 LDFLAGS=`pkg-config --cflags --libs glib-2.0`
 SOURCES=$(shell echo *.c)
 OBJECTS= $(SOURCES:.c=.o)
+NETFILE = example.network
 
 all: $(TARGET)
 
@@ -19,6 +20,9 @@ test: $(OBJECTS)
 
 memtest: $(OBJECTS)
 	make -C tests memtest
+
+memrun: $(TARGET)
+	G_SLICE=always-malloc valgrind --leak-check=full --show-reachable=yes ./$^ < $(NETFILE)
 
 .depend: *.[ch]
 	$(CC) -MM $(SOURCES) >.depend
