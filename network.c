@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
-#include <glib/glib.h>
 #include "network.h"
 
 int compare_edges(gconstpointer a, gconstpointer b);
