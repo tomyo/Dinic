@@ -27,6 +27,9 @@ run: $(TARGET)
 memrun: $(TARGET)
 	G_SLICE=always-malloc valgrind --leak-check=full --show-reachable=yes ./$^ < $(NETFILE)
 
+docs:
+	doxygen Doxyfile
+
 .depend: *.[ch]
 	$(CC) -MM $(SOURCES) >.depend
 
