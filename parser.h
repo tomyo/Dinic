@@ -3,7 +3,12 @@
 
 #include "edge.h"
 
-/* Lee una arista de fh, si no es valida devulve null */
+/**
+ * @file parser.h
+ * Modulo que se utiliza para parsear y devolver una arista
+ */
+
+/** Lee una arista de fh, si no es valida devulve null */
 Edge *parse_edge(FILE *fh);
 
 #endif

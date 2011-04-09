@@ -4,16 +4,21 @@
 #include "network.h"
 #include <glib-2.0/glib.h>
 
-/*Corre bfs sobre el network self
-  Source: Node s
-  Sink: Node t
-  */
+/**
+ * @file bfs.h
+ * Modulo que corre el algoritmo BFS sobre un network y devuelve el camino
+ * mas corto de el nodo s al nodo t y el flujo que se puede enviar por
+ * este camino
+ */
 
+/** El resultado sera devuelto en esta estructura que contiene una lista
+ * con los nodos del camino y el flujo que se puede enviar */
 typedef struct s_bfs_result {
     GSList *path;
     Weight flow;
 } bfs_result;
 
-bfs_result bfs(Network *self, Node s, Node t);
+/** Corre DFS sobre net y devuelve el camino mas corto de s a t */
+bfs_result bfs(Network *net, Node s, Node t);
 
 #endif

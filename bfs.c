@@ -28,7 +28,7 @@ void memory_check(gpointer m){
     }
 }
 
-bfs_result bfs(Network *self, Node s, Node t) {
+bfs_result bfs(Network *net, Node s, Node t) {
     bfs_result result;
     Node curr_node = 0, *pointer_to_t = NULL;
     Weight final_flow = 0;
@@ -65,7 +65,7 @@ bfs_result bfs(Network *self, Node s, Node t) {
         assert(priot_step != NULL);
 
         flow_to_first = priot_step->max_flow;
-        forward_edges = network_get_edges(self, *first);
+        forward_edges = network_get_edges(net, *first);
 
         while(forward_edges != NULL and not found_t) {
             Edge *curr_edge = NULL;
