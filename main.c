@@ -10,7 +10,24 @@
 #define SUCCESS_RESULT "Existe el camino:"
 #define FAIL_RESULT    "No existe camino :'("
 
-/* Que hace este main? Basicamente se ingresan por la entrada estandar aristas
+/**
+ * \mainpage My personal main page
+ * \section una seccion
+ * texto texto texto
+ * texto loco
+ *
+ * \section otra seccion
+ * texto re re re loco
+ * texto
+ */
+
+/**
+ * @file main.c
+ *
+ * \brief Lee los datos de la entrada, carga el network, corre BFS y muestra
+ * el resultado
+ *
+ * Se ingresan por la entrada estandar las aristas
  * de la forma nodo_origen nodo_destino capacidad, hasta que se ingrese algo
  * que no cumpla con este formato, eso va a definir un Network, luego
  * correremos bfs sobre ese Network para encontrar un camino de distancia

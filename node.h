@@ -3,7 +3,9 @@
 
 /**
  * @file node.h
- * Modulo donde se define la abstracción de un nodo del network
+ * \brief Especifica la abstracción de un nodo del network
+ *
+ * Es representado por un entero sin signo solamente
  */
 
 /** Un nodo va a ser representado por un entero sin signo */

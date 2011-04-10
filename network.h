@@ -3,7 +3,7 @@
 
 /**
  * @file network.h
- * Aqui se define como va a ser representado un network, junto
+ * \brief Define como va a ser representado un network, junto
  * con las operaciones que posee
  */
 

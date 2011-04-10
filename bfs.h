@@ -6,9 +6,10 @@
 
 /**
  * @file bfs.h
- * Modulo que corre el algoritmo BFS sobre un network y devuelve el camino
- * mas corto de el nodo s al nodo t y el flujo que se puede enviar por
- * este camino
+ * \brief Modulo para correr el algoritmo BFS sobre networks
+ *
+ * Devuelve el camino mas corto de el nodo s al nodo t y el flujo
+ * que se puede enviar por este camino
  */
 
 /** El resultado sera devuelto en esta estructura que contiene una lista

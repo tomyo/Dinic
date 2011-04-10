@@ -3,8 +3,10 @@
 
 /**
  * @file edge.h
- * Modulo donde se define la estructura de una arista, basicamente
- * va a ser una 3-upla que contiene 2 nodos y la capacidad de la arista.
+ * \brief Modulo donde se define la estructura de una arista.
+ *
+ * Basicamente va a ser una 3-upla que contiene 2 nodos y la
+ * capacidad de la arista.
  */
 
 #include <stdbool.h>
