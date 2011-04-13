@@ -9,7 +9,8 @@ void destroy_edge(gpointer edge);
 
 /**
  * \brief
- * Tabla Hash con el network
+ * Tabla Hash (node_to_edges) con el network
+ *
  */
 struct s_Network {
     /* Mapea  el numero de nodo con todas las aristas forward desde el nodo */

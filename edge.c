@@ -6,7 +6,9 @@
 
 /**
  * \brief
- * Arista Node x1 -- Weigth w -- Node x2.
+ * Arista: Node (x1) -- Weigth (w) -- Node (x2).
+ *
+ * Contiene los Nodos y el peso de una arista.
  */
   
 struct s_Edge {
