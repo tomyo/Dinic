@@ -14,26 +14,26 @@
  * \mainpage bfsNET
  *
  * \section Introduction
- * El siguiente proyecto implementa BFS para encontrar algun
+ * El proyecto implementa BFS para encontrar algun
  * camino de longitud minima (en caso de que exista) entre dos vertices de un network.
  *
- * El programa parsea por la linea de comandos una serie de aristas, 
+ * El programa lee por la linea de comandos una serie de aristas,
  * segun el formato definido por el parser.
- * 
+ *
  * Existen dos posibles resultados:
  *
- * <b>1)</b> Una lista con los vertices de dicho camino, junto con el
+ * \b 1) Una lista con los vertices de dicho camino, junto con el
  * flujo maximo del mismo.
  *
- * <b>2)</b> Un mensaje de error, en caso de que el camino no exista. 
+ * \b 2) Un mensaje de error, en caso de que el camino no exista.
  *
  * \section Implementacion
- * Hemos optado por utilizar algunos TADs de la libreria GLib (GHash, GList y GQueue) 
+ * Hemos optado por utilizar algunos TADs de la libreria GLib (GHash, GList y GQueue)
  * por encontrarnos ya familiarizados con la misma y su correcto funcionamiento. Ademas,<BR>
- *  esta decision acelero en gran medida el desarollo del proyecto, utilizando 
+ *  esta decision acelero en gran medida el desarollo del proyecto, utilizando
  * herramientas ya probadas y ahorrando tiempo en depuracion.
  *
- * Para representar el network utilizamos una tabla Hash (GHash), que mappea cada nodo  
+ * Para representar el network utilizamos una tabla Hash (GHash), que mappea cada nodo
  * a una lista (GList) de las aristas conectadas al mismo.
  *
  * La Eleccion de dicha tabla se debe a que el orden de acceso a los vecinos es
@@ -41,17 +41,25 @@
  * el algoritmo bfs, se logra obtener un buen rendimiento.
  *
  * En el algoritmo de BFS, utilizamos:
- * 
- * 1) Una Hash Table (GHash) para mappear un nodo con su padre y el flujo maximo
- * que se envia hasta ese vertice, que al final utilizamos para recrear el camino y el flujo. 
- * 
- * 2) Una Cola (GQueue) para recorrer el network.
  *
- * \section Other_Aspects
- * Se han incluido, con el fin de asegurar un desarollo mas confiable, una 
- * bateria de tests y un generador de networks (make_network.py). Pudiendo de 
+ * \b 1) Una Hash Table (GHash) para mappear un nodo con su padre y el flujo maximo
+ * que se envia hasta ese vertice, que al final utilizamos para recrear el camino y el flujo.
+ *
+ * \b 2) Una Cola (GQueue) para recorrer el network.
+ *
+ * \section other_aspects Otros Aspectos
+ * Se han incluido, con el fin de asegurar un desarollo mas confiable, una
+ * bateria de tests y un generador de networks (make_network.py). Pudiendo de
  * esta manera identificar errores prematuramente (ahorrando tiempo en depuracion)
  * y coroborando que cumple con la semantica deseada.
+ *
+ * La bateria de tests utiliza el Framwork check y si se tiene correctamente
+ * instalada se puede correr el comando $ make test esperando un resultado de %%100
+ * el cual significa que todos los tests han sido  aprobados.
+ * Dichos tests fueron escritos sin pensar en la implentacion
+ * interna sino sabiendo el comportamiento que deberia tener cada uno de los
+ * modulos a probar. El codigo que se ejecuta en cada test puede ser visto en los
+ * archivos tests/test_<nombre_modulo>.c
  */
 
 /**
@@ -62,7 +70,7 @@
  *
  * Se ingresan por la entrada estandar las aristas con el formato
  * "Nodo_origen Nodo_destino Capacidad", hasta que se ingrese algo
- * que no lo cumpla, eso va a definir un network. 
+ * que no lo cumpla, eso va a definir un network.
  *
  * Luego se corre bfs (sobre el network creado) para encontrar un camino de distancia
  * minima entre el nodo 's' (nodo 0) y el nodo 't' (nodo 1).
