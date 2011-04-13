@@ -11,6 +11,11 @@
 void destroy_step(gpointer bfs_step);
 void memory_check(gpointer m);
 
+/**
+ * \brief
+ * Paso de bfs: contiene un padre y el flujo hasta entonces.
+ *
+ */
 typedef struct {
     Node *father;
     Weight max_flow;

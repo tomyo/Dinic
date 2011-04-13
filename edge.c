@@ -4,6 +4,11 @@
 #include "edge.h"
 #include "defs.h"
 
+/**
+ * \brief
+ * Arista Node x1 -- Weigth w -- Node x2.
+ */
+  
 struct s_Edge {
     Node x1;
     Node x2;

@@ -7,6 +7,10 @@ int compare_edges(gconstpointer a, gconstpointer b);
 void destroy_glist(gpointer list);
 void destroy_edge(gpointer edge);
 
+/**
+ * \brief
+ * Tabla Hash con el network
+ */
 struct s_Network {
     /* Mapea  el numero de nodo con todas las aristas forward desde el nodo */
     GHashTable *node_to_edges;
@@ -86,7 +90,7 @@ void network_add_edge(Network *self, Edge *e) {
         /* Agregamos el nuevo edge a la lista */
 
         /* Hacemos un prepend, pues es O(1), append es O(n)*/
-        edges = g_slist_prepend(edges, (gpointer) e);
+        edges = g_slist_append(edges, (gpointer) e);
         /* Reinsertamos en la hash */
         /* ---- Primero retiremos el valor anterior */
         must_be_true = g_hash_table_steal(self->node_to_edges,

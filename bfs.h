@@ -12,14 +12,17 @@
  * que se puede enviar por este camino
  */
 
-/** El resultado sera devuelto en esta estructura que contiene una lista
- * con los nodos del camino y el flujo que se puede enviar */
+/** 
+ * \brief Una lista con el camino y el flujo que se puede enviar.
+ *
+ * Este es el resultado del programa.
+ */
 typedef struct s_bfs_result {
     GSList *path;
     Weight flow;
 } bfs_result;
 
-/** Corre DFS sobre net y devuelve el camino mas corto de s a t */
+/** Corre DFS sobre el network net y devuelve el camino mas corto de s a t */
 bfs_result bfs(Network *net, Node s, Node t);
 
 #endif
