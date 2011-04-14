@@ -25,6 +25,8 @@ run: $(TARGET)
 	./$^ < $(NETFILE)
 
 memrun: $(TARGET)
+	# Hay que definir la variable G_SLICE por que el uso interno de alocacion de memoria
+	# de la libreria GLIB hace que valgrind diga que hay memory leaks cuando no los hay
 	G_SLICE=always-malloc valgrind --leak-check=full --show-reachable=yes ./$^ < $(NETFILE)
 
 docs:
