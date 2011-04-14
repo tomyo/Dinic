@@ -83,8 +83,6 @@ bfs_result bfs(Network *net, Node s, Node t) {
             /* Si no hemos visitado este nodo, entonces no hay registro
              * en la hashtable y un lookup devuelve NULL */
             if(g_hash_table_lookup(visited, neighbour) == NULL) {
-                /* TODO: esta operacion es de O(n), habria que ver si se puede
-                 * mejorar */
                 g_queue_push_tail(queue, neighbour);
                 state = calloc(1, sizeof(*state));
                 memory_check((gpointer) state);
