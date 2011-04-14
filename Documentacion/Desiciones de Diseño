@@ -2,7 +2,7 @@ Hemos optado por utilizar algunos TADs de la librería GLib (GHash, GList y GQue
 por encontrarnos ya familiarizados con la misma y su correcto funcionamiento.
 
 Para representar el network utilizamos una tabla Hash (GHash), que mappea cada
-nodo a una lista (GList) de las aristas conectadas al mismo.
+nodo a una lista (GList) de las aristas que salen del mismo.
 
 La Elección de dicha tabla se debe a que el orden de acceso a los vecinos es
 de orden constante, y al ser esta, una de las operaciones mas utilizadas en
