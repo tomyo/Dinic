@@ -1,7 +1,8 @@
 Los networks en esta carpeta fueron utilizados para probar
 el funcionamiento del programa.
 
-1.txt es el network que se presenta de ejemplo en el enunciado
+1.txt: es el network que se presenta de ejemplo en el enunciado
 del laboratorio, por lo que es básico que funcione.
 
-2.txt
+2.txt y 3.txt: estos grafos los obtuvimos de la página personal de Daniel Penazzi
+y nos sirvieron para probar como se comportaba el programa con grafos muy grandes.
