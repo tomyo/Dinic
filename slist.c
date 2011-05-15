@@ -46,9 +46,6 @@ SList *slist_append(SList *self, void *data) {
     SList *result = NULL;
     SList *toAdd = NULL;
 
-    /* Precondition */
-    assert(data != NULL);
-
     toAdd = slist_alloc();
     result = self;
     if(toAdd != NULL) {
@@ -76,9 +73,6 @@ SList *slist_prepend(SList *self, void *data) {
     SList *result = self;
     SList *toAdd = NULL;
 
-    /* Precondition */
-    assert(data != NULL);
-
     toAdd = slist_alloc();
     result = self;
     if(toAdd != NULL) {
@@ -93,7 +87,6 @@ SList *slist_insert(SList *self, void *data, int position) {
     SList *result = NULL;
 
     /* Precondition */
-    assert(data != NULL);
     assert(position >= 0);
     assert(position <= slist_length(self));
 
@@ -130,9 +123,6 @@ SList *slist_insert(SList *self, void *data, int position) {
 
 SList *slist_insert_sorted(SList *self, void *data, CompareFunc(func)) {
 
-    /* Precondition */
-    assert(data != NULL);
-
     /* TODO: Complete*/
     return NULL;
 }
@@ -140,28 +130,17 @@ SList *slist_insert_sorted(SList *self, void *data, CompareFunc(func)) {
 SList *slist_insert_sorted_with_data(SList *self, void *data,
                                      CompareDataFunc(func), void *user_data) {
 
-    /* Precondition */
-    assert(data != NULL);
-    assert(user_data != NULL);
-
     /* TODO: Complete*/
     return NULL;
 }
 
 SList *slist_insert_before(SList *self, SList *sibling, void *data) {
-    /* Precondition */
-    assert(sibling != NULL);
-    assert(data != NULL);
-
     /* TODO: Complete*/
     return NULL;
 }
 
 SList *slist_concat(SList *self, SList *concat) {
     SList *result = self;
-
-    /* Precondition */
-    assert(concat != NULL);
 
     if(self == NULL) {
         result = concat;
@@ -246,9 +225,6 @@ SList *slist_nth(SList *self, int n) {
 SList *slist_find(SList *self, const void *data) {
     SList *result;
 
-    /* Precondition */
-    assert(data != NULL);
-
     result = self;
     while(result != NULL && (result->data != data)) {
         result = slist_next(result);
@@ -258,9 +234,6 @@ SList *slist_find(SList *self, const void *data) {
 
 SList *slist_find_custom(SList *self, const void *data, CompareFunc(func)) {
     SList *result = NULL;
-
-    /* Precondition */
-    assert(data != NULL);
 
     while(result != NULL && func(result->data, data) != 0) {
         result = slist_next(result);
@@ -286,9 +259,6 @@ int slist_position(SList *self, SList *llink) {
 int slist_index(SList *self, const void *data) {
     int result = 0;
     SList *iter = self;
-
-    /* Precondition */
-    assert(data != NULL);
 
     while((iter != NULL) && (iter->data != data)) {
         result++;
@@ -331,9 +301,6 @@ int slist_length(SList *self) {
 void slist_foreach(SList *self, Func(func), void *user_data) {
     SList *iter = self;
 
-    /* Precondition */
-    assert(user_data != NULL);
-
     while(iter != NULL) {
         func(iter->data);
         iter = slist_next(iter);
@@ -347,9 +314,6 @@ SList *slist_sort(SList *self, CompareFunc(compare_func)) {
 
 SList *slist_sort_with_data(SList *self, CompareDataFunc(compare_func),
                             void *user_data) {
-    /* Precondition */
-    assert(user_data != NULL);
-
     /*TODO: Implement a sorting algorithm*/
     return NULL;
 }
