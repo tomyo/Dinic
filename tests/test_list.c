@@ -20,9 +20,7 @@ END_TEST
 
 START_TEST(test_slist_free_null)
 {
-    /* Esto rompe todo no entiendo por cuuuaaaaa
-        slist_free(NULL);
-    */
+    slist_free(NULL);
 }
 END_TEST
 

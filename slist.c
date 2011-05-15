@@ -7,20 +7,21 @@ SList, emulando las SList de la Glib
 #include <assert.h>
 #include "slist.h"
 
-SList* slist_alloc(void) {
+SList *slist_alloc(void) {
     SList *result = NULL;
     result = calloc(1, sizeof(SList));
     return result;
 }
 
-void slist_free_1(SList *list) {
-    if(list != NULL) {
-        free(list);
+void slist_free_1(SList *self) {
+    if(self != NULL) {
+        free(self);
     }
 }
 
-void slist_free(SList *list) {
-    SList *iter, *next;
+void slist_free(SList *self) {
+    SList *iter = self;
+    SList *next = NULL;
 
     while(iter != NULL) {
         next = slist_next(iter);
@@ -29,7 +30,7 @@ void slist_free(SList *list) {
     }
 }
 
-void slist_free_full(SList *list, DestroyDataFunc(free_func)) {
+void slist_free_full(SList *self, DestroyDataFunc(free_func)) {
     SList *iter, *next;
 
     while(iter != NULL) {
@@ -40,21 +41,21 @@ void slist_free_full(SList *list, DestroyDataFunc(free_func)) {
     }
 }
 
-SList* slist_append(SList *list, void* data) {
+SList *slist_append(SList *self, void* data) {
     SList *result, *toAdd;
 
     toAdd = slist_alloc();
-    result = list;
+    result = self;
     if(toAdd != NULL) {
         toAdd->data = data;
         toAdd->next = NULL;
 
         /* Check case of empy list and non-empy list */
-        if(list == NULL) {
+        if(self == NULL) {
             result = toAdd;
         } else {
-            SList *iter = list;
-            result = list;
+            SList *iter = self;
+            result = self;
             while(slist_next(iter) != NULL) {
                 iter = slist_next(iter);
             }
@@ -65,31 +66,31 @@ SList* slist_append(SList *list, void* data) {
     return result;
 }
 
-SList* slist_prepend(SList *list, void* data) {
+SList *slist_prepend(SList *self, void* data) {
     SList *result, *toAdd;
 
     toAdd = slist_alloc();
-    result = list;
+    result = self;
     if(toAdd != NULL) {
         toAdd->data = data;
-        toAdd->next = list;
+        toAdd->next = self;
         result = toAdd;
     }
     return result;
 }
 
-SList* slist_insert(SList *list, void* data, int position) {
+SList *slist_insert(SList *self, void* data, int position) {
     SList *result;
 
     if(position == 0) {
-        result = slist_prepend(list, data);
+        result = slist_prepend(self, data);
     } else {
         SList *toAdd;
-        result = list;
+        result = self;
         toAdd = slist_alloc();
         if(toAdd != NULL) {
             int currPos = 0, previous = position - 1;
-            SList *next = list;
+            SList *next = self;
             toAdd->data = data;
             assert(position >= 0);
             while(currPos != previous && (next != NULL)) {
@@ -111,32 +112,32 @@ SList* slist_insert(SList *list, void* data, int position) {
     return result;
 }
 
-SList* slist_insert_sorted (SList *list, void* data, CompareFunc(func)) {
+SList *slist_insert_sorted(SList *self, void* data, CompareFunc(func)) {
     /* TODO: Complete*/
     return NULL;
 }
 
-SList* slist_insert_sorted_with_data (SList *list, void* data,
+SList *slist_insert_sorted_with_data(SList *self, void* data,
 CompareDataFunc(func), void* user_data) {
     /* TODO: Complete*/
     return NULL;
 }
 
-SList* slist_insert_before (SList *slist, SList *sibling, void* data) {
+SList *slist_insert_before(SList *self, SList *sibling, void* data) {
     /* TODO: Complete*/
     return NULL;
 }
 
-SList* slist_concat (SList *list1, SList *list2) {
+SList *slist_concat(SList *self, SList *concat) {
     SList *result;
 
-    result = list1;
-    if(list1 == NULL) {
-        result = list2;
+    result = self;
+    if(self == NULL) {
+        result = concat;
     } else {
         SList *last1;
-        last1 = slist_last(list1);
-        last1->next = list2;
+        last1 = slist_last(self);
+        last1->next = concat;
     }
     return result;
 }
@@ -145,11 +146,11 @@ SList* slist_concat (SList *list1, SList *list2) {
 -----------------------
 */
 
-SList* slist_reverse (SList *list) {
+SList *slist_reverse(SList *self) {
     SList *result, *iter;
 
     result = NULL;
-    iter = list;
+    iter = self;
     while(iter != NULL) {
         slist_prepend(result, iter->data);
         iter = slist_next(iter);
@@ -157,18 +158,18 @@ SList* slist_reverse (SList *list) {
     return result;
 }
 
-SList* slist_copy (SList *list) {
+SList *slist_copy(SList *self) {
     SList *result;
 
     result = NULL;
-    if(list != NULL) {
+    if(self != NULL) {
         /* I'm actually gonna create a new list*/
         result = slist_alloc();
         if(result != NULL) {
             SList *iter1, *iter2;
-            result->data = list->data;
+            result->data = self->data;
             iter1 = result;
-            iter2 = slist_next(list);
+            iter2 = slist_next(self);
             while(iter2 != NULL) {
                 SList *cpy;
                 cpy = slist_alloc();
@@ -191,11 +192,11 @@ SList* slist_copy (SList *list) {
     return result;
 }
 
-SList* slist_nth(SList *list, int n) {
+SList *slist_nth(SList *self, int n) {
     SList *result;
     int currPos = 0;
 
-    result = list;
+    result = self;
     while((currPos != n) && (slist_next(result) != NULL)) {
         result = slist_next(result);
         currPos++;
@@ -204,17 +205,17 @@ SList* slist_nth(SList *list, int n) {
     return result;
 }
 
-SList* slist_find (SList *list, const void* data) {
+SList *slist_find(SList *self, const void* data) {
     SList *result;
 
-    result = list;
+    result = self;
     while(result != NULL && (result->data != data)) {
         result = slist_next(result);
     }
     return result;
 }
 
-SList* slist_find_custom (SList *list, const void* data, CompareFunc(func)) {
+SList *slist_find_custom(SList *self, const void* data, CompareFunc(func)) {
     SList *result;
 
     while(result != NULL && func(result->data, data) != 0) {
@@ -223,11 +224,11 @@ SList* slist_find_custom (SList *list, const void* data, CompareFunc(func)) {
     return result;
 }
 
-int slist_position (SList *list, SList *llink) {
+int slist_position(SList *self, SList *llink) {
     SList *iter;
     int result = 0;
 
-    iter = list;
+    iter = self;
     while((iter != llink) && (iter != NULL)) {
         result++;
     }
@@ -237,11 +238,11 @@ int slist_position (SList *list, SList *llink) {
     return result;
 }
 
-int slist_index (SList *list, const void* data) {
+int slist_index(SList *self, const void* data) {
     SList *iter;
     int result = 0;
 
-    iter = list;
+    iter = self;
     while((iter != NULL) && (iter->data != data)) {
         result++;
     }
@@ -251,13 +252,13 @@ int slist_index (SList *list, const void* data) {
     return result;
 }
 
-SList* slist_last (SList *list) {
+SList *slist_last(SList *self) {
     SList *result;
 
-    result = list;
+    result = self;
     /* Check case of empy list and non-empy list */
-    if(list != NULL) {
-        SList *iter = list;
+    if(self != NULL) {
+        SList *iter = self;
         while(slist_next(iter) != NULL) {
             iter = slist_next(iter);
         }
@@ -267,11 +268,11 @@ SList* slist_last (SList *list) {
     return result;
 }
 
-int slist_length (SList *list) {
+int slist_length(SList *self) {
     SList *iter;
     int result = 0;
 
-    iter = list;
+    iter = self;
     while(iter != NULL) {
         result++;
         iter = slist_next(iter);
@@ -279,33 +280,33 @@ int slist_length (SList *list) {
     return result;
 }
 
-void slist_foreach (SList *list, Func(func), void* user_data) {
+void slist_foreach(SList *self, Func(func), void* user_data) {
     SList *iter;
 
-    iter = list;
+    iter = self;
     while(iter != NULL) {
         func(iter->data);
         iter = slist_next(iter);
     }
 }
 
-SList* slist_sort (SList *list, CompareFunc(compare_func)) {
+SList *slist_sort(SList *self, CompareFunc(compare_func)) {
     /*TODO: Implement a sorting algorithm*/
     return NULL;
 }
 
-SList* slist_sort_with_data (SList *list, CompareDataFunc(compare_func),
+SList *slist_sort_with_data(SList *self, CompareDataFunc(compare_func),
 void* user_data) {
     /*TODO: Implement a sorting algorithm*/
     return NULL;
 }
 
-void* slist_nth_data (SList *list, int n) {
+void *slist_nth_data(SList *self, int n) {
     SList *link;
     void* result;
 
     result = NULL;
-    link = slist_nth(list, n);
+    link = slist_nth(self, n);
     if(link==NULL) {
         /* KABOOM! */
         assert(0);
