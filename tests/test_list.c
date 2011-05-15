@@ -198,10 +198,10 @@ END_TEST
 
 START_TEST(test_slist_reverse)
 {
-    int array[SIZE], iter;
+    int array[SIZE], iter = 0;
     SList *list = NULL;
 
-    for(iter = 0; iter< SIZE; iter++) {
+    for(iter=0;iter<SIZE;iter++) {
         array[iter] = iter;
         list = slist_append(list, &array[iter]);
     }
@@ -211,7 +211,7 @@ START_TEST(test_slist_reverse)
     list = slist_reverse(list);
 
     iter = SIZE-1;
-    while(list!= NULL) {
+    while(list != NULL) {
         fail_unless(*(int *)(list->data) == array[iter]);
         fail_unless(iter >= 0);
         list = slist_next(list);

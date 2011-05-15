@@ -1,6 +1,6 @@
 /*
-SList, emulando las SList de la Glib
-*/
+ * SList, Simple linked list with the same API as GLib lists
+ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -9,7 +9,7 @@ SList, emulando las SList de la Glib
 
 SList *slist_alloc(void) {
     SList *result = NULL;
-    result = calloc(1, sizeof(SList));
+    result = calloc(1, sizeof(*result));
     return result;
 }
 
@@ -31,7 +31,8 @@ void slist_free(SList *self) {
 }
 
 void slist_free_full(SList *self, DestroyDataFunc(free_func)) {
-    SList *iter, *next;
+    SList *iter = self;
+    SList *next = NULL;
 
     while(iter != NULL) {
         next = slist_next(iter);
@@ -41,8 +42,12 @@ void slist_free_full(SList *self, DestroyDataFunc(free_func)) {
     }
 }
 
-SList *slist_append(SList *self, void* data) {
-    SList *result, *toAdd;
+SList *slist_append(SList *self, void *data) {
+    SList *result = NULL;
+    SList *toAdd = NULL;
+
+    /* Precondition */
+    assert(data != NULL);
 
     toAdd = slist_alloc();
     result = self;
@@ -63,11 +68,16 @@ SList *slist_append(SList *self, void* data) {
             iter->next = toAdd;
         }
     }
+
     return result;
 }
 
-SList *slist_prepend(SList *self, void* data) {
-    SList *result, *toAdd;
+SList *slist_prepend(SList *self, void *data) {
+    SList *result = self;
+    SList *toAdd = NULL;
+
+    /* Precondition */
+    assert(data != NULL);
 
     toAdd = slist_alloc();
     result = self;
@@ -79,8 +89,13 @@ SList *slist_prepend(SList *self, void* data) {
     return result;
 }
 
-SList *slist_insert(SList *self, void* data, int position) {
-    SList *result;
+SList *slist_insert(SList *self, void *data, int position) {
+    SList *result = NULL;
+
+    /* Precondition */
+    assert(data != NULL);
+    assert(position >= 0);
+    assert(position <= slist_length(self));
 
     if(position == 0) {
         result = slist_prepend(self, data);
@@ -97,7 +112,7 @@ SList *slist_insert(SList *self, void* data, int position) {
                 next = slist_next(next);
                 currPos++;
             }
-            /* Why I ended the while statement? */
+            /* Check why did the while ended */
             if(currPos == previous && next != NULL) {
                 toAdd->next = slist_next(next);
                 next->next = toAdd;
@@ -109,33 +124,49 @@ SList *slist_insert(SList *self, void* data, int position) {
             }
         }
     }
+
     return result;
 }
 
-SList *slist_insert_sorted(SList *self, void* data, CompareFunc(func)) {
+SList *slist_insert_sorted(SList *self, void *data, CompareFunc(func)) {
+
+    /* Precondition */
+    assert(data != NULL);
+
     /* TODO: Complete*/
     return NULL;
 }
 
-SList *slist_insert_sorted_with_data(SList *self, void* data,
-CompareDataFunc(func), void* user_data) {
+SList *slist_insert_sorted_with_data(SList *self, void *data,
+                                     CompareDataFunc(func), void *user_data) {
+
+    /* Precondition */
+    assert(data != NULL);
+    assert(user_data != NULL);
+
     /* TODO: Complete*/
     return NULL;
 }
 
-SList *slist_insert_before(SList *self, SList *sibling, void* data) {
+SList *slist_insert_before(SList *self, SList *sibling, void *data) {
+    /* Precondition */
+    assert(sibling != NULL);
+    assert(data != NULL);
+
     /* TODO: Complete*/
     return NULL;
 }
 
 SList *slist_concat(SList *self, SList *concat) {
-    SList *result;
+    SList *result = self;
 
-    result = self;
+    /* Precondition */
+    assert(concat != NULL);
+
     if(self == NULL) {
         result = concat;
     } else {
-        SList *last1;
+        SList *last1 = NULL;
         last1 = slist_last(self);
         last1->next = concat;
     }
@@ -147,31 +178,37 @@ SList *slist_concat(SList *self, SList *concat) {
 */
 
 SList *slist_reverse(SList *self) {
-    SList *result, *iter;
+    SList *result = NULL;
+    SList *iter = self;
 
-    result = NULL;
-    iter = self;
     while(iter != NULL) {
         slist_prepend(result, iter->data);
         iter = slist_next(iter);
     }
+
+    /* Postcondition */
+    /* TODO: Check if this is true */
+    /* assert(slist_length(self) == slist_length(result)); */
+
     return result;
 }
 
 SList *slist_copy(SList *self) {
-    SList *result;
+    SList *result = NULL;
 
-    result = NULL;
     if(self != NULL) {
-        /* I'm actually gonna create a new list*/
+        /* Actually create a new list */
         result = slist_alloc();
+
         if(result != NULL) {
-            SList *iter1, *iter2;
+            SList *iter1 = NULL, *iter2 = NULL;
+
             result->data = self->data;
             iter1 = result;
             iter2 = slist_next(self);
             while(iter2 != NULL) {
-                SList *cpy;
+                SList *cpy = NULL;
+
                 cpy = slist_alloc();
                 if(cpy == NULL) {
                     /* Out of memmory */
@@ -179,6 +216,7 @@ SList *slist_copy(SList *self) {
                     /* Kaboom! */
                     assert(0);
                 }
+
                 iter1->next = cpy;
                 iter1 = slist_next(iter1);
                 iter2 = slist_next(iter2);
@@ -205,8 +243,11 @@ SList *slist_nth(SList *self, int n) {
     return result;
 }
 
-SList *slist_find(SList *self, const void* data) {
+SList *slist_find(SList *self, const void *data) {
     SList *result;
+
+    /* Precondition */
+    assert(data != NULL);
 
     result = self;
     while(result != NULL && (result->data != data)) {
@@ -215,8 +256,11 @@ SList *slist_find(SList *self, const void* data) {
     return result;
 }
 
-SList *slist_find_custom(SList *self, const void* data, CompareFunc(func)) {
-    SList *result;
+SList *slist_find_custom(SList *self, const void *data, CompareFunc(func)) {
+    SList *result = NULL;
+
+    /* Precondition */
+    assert(data != NULL);
 
     while(result != NULL && func(result->data, data) != 0) {
         result = slist_next(result);
@@ -232,30 +276,33 @@ int slist_position(SList *self, SList *llink) {
     while((iter != llink) && (iter != NULL)) {
         result++;
     }
+
     if(iter != llink) {
         result = -1;
     }
     return result;
 }
 
-int slist_index(SList *self, const void* data) {
-    SList *iter;
+int slist_index(SList *self, const void *data) {
     int result = 0;
+    SList *iter = self;
 
-    iter = self;
+    /* Precondition */
+    assert(data != NULL);
+
     while((iter != NULL) && (iter->data != data)) {
         result++;
     }
     if(iter == NULL) {
         result = -1;
     }
+
     return result;
 }
 
 SList *slist_last(SList *self) {
-    SList *result;
+    SList *result = self;
 
-    result = self;
     /* Check case of empy list and non-empy list */
     if(self != NULL) {
         SList *iter = self;
@@ -265,25 +312,28 @@ SList *slist_last(SList *self) {
         /* Got on iter the last element*/
         result = iter;
     }
+
     return result;
 }
 
 int slist_length(SList *self) {
-    SList *iter;
+    SList *iter = self;
     int result = 0;
 
-    iter = self;
     while(iter != NULL) {
         result++;
         iter = slist_next(iter);
     }
+
     return result;
 }
 
-void slist_foreach(SList *self, Func(func), void* user_data) {
-    SList *iter;
+void slist_foreach(SList *self, Func(func), void *user_data) {
+    SList *iter = self;
 
-    iter = self;
+    /* Precondition */
+    assert(user_data != NULL);
+
     while(iter != NULL) {
         func(iter->data);
         iter = slist_next(iter);
@@ -296,18 +346,25 @@ SList *slist_sort(SList *self, CompareFunc(compare_func)) {
 }
 
 SList *slist_sort_with_data(SList *self, CompareDataFunc(compare_func),
-void* user_data) {
+                            void *user_data) {
+    /* Precondition */
+    assert(user_data != NULL);
+
     /*TODO: Implement a sorting algorithm*/
     return NULL;
 }
 
 void *slist_nth_data(SList *self, int n) {
-    SList *link;
-    void* result;
+    SList *link = NULL;
+    void *result = NULL;
 
-    result = NULL;
+    /* Precondition */
+    assert(n >= 0);
+    assert(n <= slist_length(self));
+
     link = slist_nth(self, n);
-    if(link==NULL) {
+
+    if(link == NULL) {
         /* KABOOM! */
         assert(0);
     } else {

@@ -53,7 +53,7 @@ NOTE 1- The return value may be the new start of the list, so
 make sure you store the new value.
 NOTE 2- O(slist_append) = O(n)
 */
-SList *slist_append(SList *list, void* data);
+SList *slist_append(SList *list, void *data);
 
 /*
 Adds a new element on to the start of the list.
@@ -61,31 +61,31 @@ NOTE 1- The return value may be the new start of the list, so
 make sure you store the new value.
 NOTE 2- O(slist_prepend) = O(1)
 */
-SList *slist_prepend(SList *list, void* data);
+SList *slist_prepend(SList *list, void *data);
 
 /*
 Inserts a new element into the list at the given position.
 If the index is out of range, an assertion will raise.
 */
-SList *slist_insert(SList *list, void* data, int position);
+SList *slist_insert(SList *list, void *data, int position);
 
 /*
 Inserts a new element into the list, using the given comparison function to
 determine its position.
 */
-SList *slist_insert_sorted(SList *list, void* data, CompareFunc(func));
+SList *slist_insert_sorted(SList *list, void *data, CompareFunc(func));
 
 /*
 Inserts a new element into the list, using the given comparison function to
 determine its position.
 */
-SList *slist_insert_sorted_with_data(SList *list, void* data,
-CompareDataFunc(func), void* user_data);
+SList *slist_insert_sorted_with_data(SList *list, void *data,
+CompareDataFunc(func), void *user_data);
 
 /*
 Inserts a node before sibling containing data.
 */
-SList *slist_insert_before(SList *slist, SList *sibling, void* data);
+SList *slist_insert_before(SList *slist, SList *sibling, void *data);
 
 /*
 Adds the second SList onto the end of the first SList. Note that the
@@ -98,14 +98,14 @@ Removes an element from a SList. If two elements contain the same data, only
 the first is removed. If none of the elements contain the data, the SList is
 unchanged.
 */
-SList *slist_remove(SList *list, const void* data);
+SList *slist_remove(SList *list, const void *data);
 
 /*
 Removes all list nodes with data equal to data. Returns the new head of
 the list. Contrast with slist_remove() which removes only the first node
 matching the given data.
 */
-SList *slist_remove_all(SList *list, const void* data);
+SList *slist_remove_all(SList *list, const void *data);
 
 /*
 Removes an element from a SList, without freeing the element. The removed
@@ -145,7 +145,7 @@ SList *slist_nth(SList *list, int n);
 /*
 Finds the element in a SList which contains the given data.
 */
-SList *slist_find(SList *list, const void* data);
+SList *slist_find(SList *list, const void *data);
 
 /*
 Finds an element in a SList, using a supplied function to find the desired
@@ -154,7 +154,7 @@ return 0 when the desired element is found. The function takes two
 const void* arguments, the SList element's data as the first argument
 and the given user data.
 */
-SList *slist_find_custom(SList *list, const void* data, CompareFunc(func));
+SList *slist_find_custom(SList *list, const void *data, CompareFunc(func));
 
 /*
 Gets the position of the given element in the SList(starting from 0).
@@ -164,7 +164,7 @@ int slist_position(SList *list, SList *llink);
 /*
 Gets the position of the element containing the given data (starting from 0).
 */
-int slist_index(SList *list, const void* data);
+int slist_index(SList *list, const void *data);
 
 /*
 Gets the last element in a SList.
@@ -180,7 +180,7 @@ int slist_length(SList *list);
 /*
 Calls a function for each element of a SList.
 */
-void slist_foreach(SList *list, Func(func), void* user_data);
+void slist_foreach(SList *list, Func(func), void *user_data);
 
 /*
 Sorts a SList using the given comparison function.
