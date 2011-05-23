@@ -12,12 +12,13 @@
 #include <stdbool.h>
 #include "node.h"
 
+/** La capacidad es representada por un entero sin signo */
+typedef unsigned int Weight;
+
 /** El tipo Edge se utiliza como un puntero a una estructura que no es
  *  accesible de forma directa, sino a traves de las funciones de este tipo. */
 typedef struct s_Edge Edge;
 
-/** La capacidad es representada por un entero sin signo */
-typedef unsigned int Weight;
 
 /** Crea una arista desde el nodo x1 hacia el nodo x2 con capacidad w */
 Edge *edge_create(Node x1, Node x2, Weight w);
