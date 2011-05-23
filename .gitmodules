@@ -1,0 +1,3 @@
+[submodule "hashtable"]
+	path = hashtable
+	url = git@github.com:tomyo/Hash-Table.git
