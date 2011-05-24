@@ -80,31 +80,24 @@ void network_add_edge(Network *self, Edge *e) {
     assert(self != NULL);
     assert(e != NULL);
 
-    first_node = (gpointer) edge_get_first(e);
-    edges = hash_table_lookup(self->node_to_edges, (gpointer) first_node, NODE_SIZE);
+    first_node = edge_get_first(e);
+    edges = hash_table_lookup(self->node_to_edges, first_node, NODE_SIZE);
 
     if(edges == NULL) {
         /* El elemento no existia en la hash table */
 
         edges = g_slist_append(edges, (gpointer) e);
-        hash_table_add(self->node_to_edges, (gpointer) first_node, NODE_SIZE,\
-                            (gpointer) edges, 3*NODE_SIZE);
+        hash_table_add(self->node_to_edges, first_node, NODE_SIZE,\
+                            edges, 3*NODE_SIZE);
                             
     } else if(g_slist_find_custom(edges, e, compare_edges) == NULL) {
-        /* El elemento no esta en la lista */
-        /* Agregamos el nuevo edge a la lista */
+        /* El elemento no esta en la lista, lo agregamos */
 
         /* Hacemos un prepend, pues es O(1), append es O(n)*/
-        edges = g_slist_append(edges, (gpointer) e);
-        /* Reinsertamos en la hash */
-        printf("\tlen: %d\n", self->node_to_edges->key_count);
-        /* ---- Primero retiremos el valor anterior */
-        check = hash_table_steal(self->node_to_edges, (gpointer) first_node,
-                                        NODE_SIZE);
-        assert(check == 0);
-        /* ----- Insertamos el elemento modificado */
-        hash_table_add(self->node_to_edges, (gpointer) first_node, NODE_SIZE,\
-                            (gpointer) edges, 3*NODE_SIZE);
+        edges = g_slist_prepend(edges, (gpointer) e);
+        /* reemplazamos de la hash el elemento modificado */
+        hash_table_add(self->node_to_edges, first_node, NODE_SIZE,\
+                             edges, 3*NODE_SIZE);
     } else {
         /* Arista repetida.
          * Le avisamos al usuario, liberamos la arista y continuamos con la
@@ -148,7 +141,7 @@ GSList *network_get_edges(Network *self, Node n) {
 
 void network_destroy(Network *self) {
     assert(self != NULL);
-
+    /*TODO: liberar edges en hash manualmente */
     HT_DESTROY(self->node_to_edges);
     free(self); self = NULL;
 }
