@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <glib-2.0/glib.h>
+#include <assert.h>
 #include "bfs.h"
 #include "parser.h"
 #include "defs.h"
@@ -120,7 +121,7 @@ int main(void) {
         while(iter != NULL) {
                 node = (Node *) g_slist_nth_data(iter, 0);
                 iter = g_slist_next(iter);
-                printf(" %d", *node);
+                printf(" %u", *node);
         }
         puts("");
         printf("Con flujo: %d\n", result_flow);

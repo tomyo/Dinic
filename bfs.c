@@ -4,9 +4,14 @@
 #include <assert.h>
 #include "bfs.h"
 #include "defs.h"
+#include "hashtable/hashtable.h"
 
 #define INF -1 /* Funciona porque los pesos son unsigned */
 #define min(x,y) x < y ? x : y
+
+/* Hash Table redefines */
+#define KEY_SIZE sizeof(int)
+#define VALUE_SIZE sizeof(bfs_step)
 
 void destroy_step(gpointer bfs_step);
 void memory_check(gpointer m);
@@ -38,13 +43,13 @@ bfs_result bfs(Network *net, Node s, Node t) {
     Node curr_node = 0, *pointer_to_t = NULL;
     Weight final_flow = 0;
     bool found_t = false;
-    GHashTable *visited = NULL;  /* Visited nodes */
+    hash_table_t *visited = NULL;  /* Visited nodes */
     GQueue *queue = NULL;        /* BFS queue */
     GSList *result_path = NULL;   /* Shortest path */
     GSList *forward_edges = NULL; /* value de network hashtable */
     bfs_step *state = NULL, *step = NULL;
 
-    visited = g_hash_table_new_full(g_int_hash, g_int_equal, NULL, destroy_step);
+    visited = ht_new_full(MODE_ALLREF, NULL, destroy_step);
     memory_check((gpointer) visited);
 
     queue = g_queue_new();
@@ -58,7 +63,7 @@ bfs_result bfs(Network *net, Node s, Node t) {
     state->father = NULL;
     state->max_flow = INF;
 
-    g_hash_table_insert(visited, (gpointer) &s, (gpointer) state);
+    ht_insert(visited, (gpointer) &s, (gpointer) state);
 
     while(not g_queue_is_empty(queue) and not found_t) {
         Node *first = NULL;
@@ -66,7 +71,7 @@ bfs_result bfs(Network *net, Node s, Node t) {
         bfs_step *priot_step = NULL;
 
         first = (Node *) g_queue_pop_head(queue);
-        priot_step = (bfs_step *) g_hash_table_lookup(visited, (gpointer) first);
+        priot_step = (bfs_step *) ht_lookup(visited, first);
         assert(priot_step != NULL);
 
         flow_to_first = priot_step->max_flow;
@@ -82,7 +87,7 @@ bfs_result bfs(Network *net, Node s, Node t) {
 
             /* Si no hemos visitado este nodo, entonces no hay registro
              * en la hashtable y un lookup devuelve NULL */
-            if(g_hash_table_lookup(visited, neighbour) == NULL) {
+            if(ht_lookup(visited, neighbour) == NULL) {
                 g_queue_push_tail(queue, neighbour);
                 state = calloc(1, sizeof(*state));
                 memory_check((gpointer) state);
@@ -90,7 +95,7 @@ bfs_result bfs(Network *net, Node s, Node t) {
                 state->father = first;
                 curr_weigth = edge_get_weight(curr_edge);
                 state->max_flow = min(flow_to_first, curr_weigth);
-                g_hash_table_insert(visited, (gpointer) neighbour, state);
+                ht_insert(visited, neighbour, state);
 
                 if(*neighbour == t) {
                     pointer_to_t = neighbour;
@@ -118,8 +123,7 @@ bfs_result bfs(Network *net, Node s, Node t) {
         result_path = g_slist_prepend(result_path, pointer_to_t);
         while (curr_node != s) {
             Node *predecessor;
-            step = (bfs_step *) g_hash_table_lookup(visited,
-                                                    (gpointer) &curr_node);
+            step = (bfs_step *) ht_lookup(visited, &curr_node);
             assert(step != NULL);
             predecessor = step->father;
             assert(predecessor != NULL);
@@ -132,8 +136,8 @@ bfs_result bfs(Network *net, Node s, Node t) {
     }
 
     /* liberamos memomria usada */
-    g_hash_table_destroy (visited);
-    g_queue_free (queue);
+    ht_destroy(visited);
+    g_queue_free(queue);
 
     return result  ;
 }

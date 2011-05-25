@@ -4,12 +4,14 @@
 #include "network.h"
 #include "hashtable.h"
 
-#define NODE_SIZE sizeof(Node)
-#define EDGE_SIZE sizeof(Edge)
 
 int compare_edges(gconstpointer a, gconstpointer b);
 void destroy_glist(gpointer list);
 void destroy_edge(gpointer edge);
+
+/* Hash Table redefines */
+#define KEY_SIZE sizeof(int)
+#define VALUE_SIZE sizeof(int)
 
 /**
  * \brief
@@ -58,6 +60,16 @@ void destroy_edge(gpointer edge) {
     edge_destroy((Edge *) edge);
 }
 
+void g_slist_pprint(GSList *l) {
+    int len, i;
+    gpointer value = NULL;
+    len = g_slist_length(l);
+    for (i = 0; i < len; i++) {
+        value = g_slist_nth_data(l, i);
+        edge_pprint((Edge *)value);
+    }
+}
+
 
 /* Crea un network vacio */
 Network *network_create(void) {
@@ -65,7 +77,7 @@ Network *network_create(void) {
 
     result = calloc(1, sizeof(*result));
     if(result != NULL) {
-        result->node_to_edges = hash_table_new(MODE_ALLREF);
+        result->node_to_edges = ht_new_full(MODE_ALLREF, NULL, destroy_glist);
     }
 
     return result;
@@ -74,30 +86,29 @@ Network *network_create(void) {
 void network_add_edge(Network *self, Edge *e) {
     GSList *edges = NULL;
     gpointer first_node = NULL;
-    int check = 0;
 
     /* Precondiciones */
     assert(self != NULL);
     assert(e != NULL);
 
     first_node = edge_get_first(e);
-    edges = hash_table_lookup(self->node_to_edges, first_node, NODE_SIZE);
+    edges = ht_lookup(self->node_to_edges, first_node);
 
     if(edges == NULL) {
         /* El elemento no existia en la hash table */
 
         edges = g_slist_append(edges, (gpointer) e);
-        hash_table_add(self->node_to_edges, first_node, NODE_SIZE,\
-                            edges, 3*NODE_SIZE);
-                            
+        ht_insert(self->node_to_edges, first_node, edges);
+
     } else if(g_slist_find_custom(edges, e, compare_edges) == NULL) {
         /* El elemento no esta en la lista, lo agregamos */
 
         /* Hacemos un prepend, pues es O(1), append es O(n)*/
         edges = g_slist_prepend(edges, (gpointer) e);
-        /* reemplazamos de la hash el elemento modificado */
-        hash_table_add(self->node_to_edges, first_node, NODE_SIZE,\
-                             edges, 3*NODE_SIZE);
+        /* Sacamos la lista vieja del hash, sin liberarla */
+        ht_steal(self->node_to_edges, first_node);
+        /* Agregamos la nueva lista */
+        ht_insert(self->node_to_edges, first_node, edges);
     } else {
         /* Arista repetida.
          * Le avisamos al usuario, liberamos la arista y continuamos con la
@@ -127,13 +138,13 @@ GSList *network_neighbours(Network *self, Node n) {
     return result;
 }
 
-GSList *network_get_edges(Network *self, Node n) {
+GSList *network_get_edges(Network *self, Node node) {
     GSList *result = NULL;
 
     /* Checkeo de precondiciones */
     assert(self != NULL);
 
-    result = hash_table_lookup(self->node_to_edges, (gpointer)&n, NODE_SIZE);
+    result = ht_lookup(self->node_to_edges, &node);
 
     return result;
 }
@@ -141,7 +152,6 @@ GSList *network_get_edges(Network *self, Node n) {
 
 void network_destroy(Network *self) {
     assert(self != NULL);
-    /*TODO: liberar edges en hash manualmente */
-    HT_DESTROY(self->node_to_edges);
+    ht_destroy(self->node_to_edges);
     free(self); self = NULL;
 }
