@@ -11,7 +11,7 @@
 
 #define SIZE 8 /* Size > 5 */
 
-/* Base tests. */
+/* Base tests */
 START_TEST(test_slist_free_1_null)
 {
     slist_free_1(NULL);
@@ -30,17 +30,13 @@ START_TEST(test_slist_insert_out_of_index)
 }
 END_TEST
 
-START_TEST(test_slist_nth_out_of_index)
-{
-    /* It should return an empty list */
-    slist_nth(NULL, 5);
-}
-END_TEST
 
 START_TEST(test_slist_find_null)
 {
+    SList *result = NULL;
     int dummy = 9;
-    slist_find(NULL, &dummy);
+    result = slist_find(NULL, &dummy);
+    fail_unless(result == NULL);
 }
 END_TEST
 
@@ -92,6 +88,14 @@ START_TEST(test_slist_create_destroy_basic)
 END_TEST
 
 /* Testeo de funcionalidad */
+START_TEST(test_slist_nth_out_of_index)
+{
+    SList *result = NULL;
+    result = slist_nth(NULL, 5);
+    fail_unless(slist_length(result) == 0);
+}
+END_TEST
+
 START_TEST(test_slist_append)
 {
     int array[SIZE], iter;
@@ -300,7 +304,6 @@ Suite *slist_suite(void){
     tcase_add_test(tc_base, test_slist_free_1_null);
     tcase_add_test(tc_base, test_slist_free_null);
     tcase_add_test_raise_signal(tc_base, test_slist_insert_out_of_index, SIGABRT);
-    tcase_add_test(tc_base, test_slist_nth_out_of_index);
     tcase_add_test(tc_base, test_slist_find_null);
     tcase_add_test(tc_base, test_slist_last_NULL);
     tcase_add_test(tc_base, test_slist_length_NULL);
@@ -313,6 +316,7 @@ Suite *slist_suite(void){
     suite_add_tcase(s, tc_creation);
 
     /* Funcionalidad */
+    tcase_add_test(tc_functionality, test_slist_nth_out_of_index);
     tcase_add_test(tc_functionality, test_slist_append);
     tcase_add_test(tc_functionality, test_slist_prepend);
     tcase_add_test(tc_functionality, test_slist_insert);
