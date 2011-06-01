@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include "network.h"
-#include "hashtable.h"
+#include "hashtable/hashtable.h"
 
 
 int compare_edges(gconstpointer a, gconstpointer b);
