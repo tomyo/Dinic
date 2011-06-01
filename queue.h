@@ -10,6 +10,13 @@ con las
 
 typedef struct _Queue Queue;
 
+struct _Queue
+{
+ SList *head;
+ SList *tail;
+ unsigned int length;
+};
+
 /*
 Interfaz de queues "similar" a la de la GLIB, PELIGRO: muchas funciones no van
 a estar implementadas.
@@ -126,7 +133,7 @@ Returns the first element of the queue.
 void * queue_peek_head (Queue *queue);
 
 /*
-Returns the last element of the queue.
+Returns the last element of the queue. Lineal order.
 */
 void * queue_peek_tail (Queue *queue);
 
