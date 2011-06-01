@@ -300,6 +300,8 @@ int slist_length(SList *self) {
 
 void slist_foreach(SList *self, Func(func), void *user_data) {
     SList *iter = self;
+    
+    assert(user_data == NULL);
 
     while(iter != NULL) {
         func(iter->data);
