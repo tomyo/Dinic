@@ -66,7 +66,7 @@ Queue * queue_copy (Queue *queue) {
 
     if (new_queue != NULL) {
         new_queue->head = slist_copy(queue->head);
-        new_queue->tail = slist_last(queue->head);
+        new_queue->tail = slist_last(new_queue->head);
         new_queue->length = queue->length;
     }
 
@@ -110,6 +110,9 @@ void queue_push_head (Queue *queue, void * data) {
     assert(queue->length != 0);
 
     queue->head = slist_prepend (queue->head, data);
+    if (queue->length == 0) {
+        queue->tail = queue->head;
+    }
     queue->length ++;
 }
 
@@ -120,6 +123,9 @@ void queue_push_tail (Queue *queue, void * data) {
     assert(queue->length != 0);
 
     queue->tail = slist_append (queue->tail, data);
+    if (queue->length == 0) {
+        queue->head = queue->tail;
+    }
     queue->length ++;
 }
 
