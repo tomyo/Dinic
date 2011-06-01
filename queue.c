@@ -74,7 +74,7 @@ Queue * queue_copy (Queue *queue) {
 }
 
 
-void queue_foreach (Queue *queue, Func(func), void * user_data) {
+void queue_foreach (Queue *queue, Func(func), void *user_data) {
     /* Precondition */
     assert(queue != NULL);
 
@@ -107,7 +107,6 @@ void queue_sort (Queue *queue, CompareDataFunc(compare_func),
 void queue_push_head (Queue *queue, void * data) {
     /* Precondition */
     assert(queue != NULL);
-    assert(queue->length != 0);
 
     queue->head = slist_prepend (queue->head, data);
     if (queue->length == 0) {
@@ -120,7 +119,6 @@ void queue_push_head (Queue *queue, void * data) {
 void queue_push_tail (Queue *queue, void * data) {
     /* Precondition */
     assert(queue != NULL);
-    assert(queue->length != 0);
 
     queue->tail = slist_append (queue->tail, data);
     if (queue->length == 0) {
@@ -133,13 +131,12 @@ void queue_push_tail (Queue *queue, void * data) {
 void queue_push_nth (Queue *queue, void * data, unsigned int n) {
     /* Precondition */
     assert(queue != NULL);
-    assert(queue->length != 0);
     assert(n <= queue->length);
 
     if (n == 0) {
        queue_push_head (queue, data);
     }
-    else if (n == queue->length){
+    else if (n == queue->length - 1){
         queue_push_tail (queue, data);
     }
     else {
