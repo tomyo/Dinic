@@ -32,7 +32,8 @@ functions and so is rarely used on its own.
 SList *slist_alloc(void);
 
 /*
-Frees one SList element. It is usually used after slist_remove_link().
+Frees one (the first) SList element. It is usually used after 
+slist_remove_link().
 */
 void slist_free_1(SList *self);
 
@@ -66,6 +67,7 @@ SList *slist_prepend(SList *self, void *data);
 /*
 Inserts a new element into the list at the given position.
 If the index is out of range, an assertion will raise.
+Lists begin at position zero.
 */
 SList *slist_insert(SList *self, void *data, int position);
 
