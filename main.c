@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdbool.h>
-#include <glib-2.0/glib.h>
 #include <assert.h>
 #include "bfs.h"
 #include "parser.h"
@@ -88,8 +87,8 @@ int main(void) {
     Network *network = NULL;
     bool reach_EOF = false;
     bfs_result result;
-    GSList *result_path = NULL, *iter = NULL;
-    Weight result_flow = 0;
+    SList *result_path = NULL, *iter = NULL;
+    Flow result_flow = 0;
     Node *node = NULL;
 
     /* Creamos network vacio */
@@ -119,15 +118,15 @@ int main(void) {
         /* Mostremos el camino*/
         iter = result_path;
         while(iter != NULL) {
-                node = (Node *) g_slist_nth_data(iter, 0);
-                iter = g_slist_next(iter);
+                node = (Node *) slist_nth_data(iter, 0);
+                iter = slist_next(iter);
                 printf(" %u", *node);
         }
         puts("");
         printf("Con flujo: %d\n", result_flow);
 
         /* Liberemos la lista */
-        g_slist_free(result_path);
+        slist_free(result_path);
     }
 
     /* Liberar la memoria alocada por los programas */

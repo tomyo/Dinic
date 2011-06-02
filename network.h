@@ -8,7 +8,7 @@
  */
 
 #include <stdio.h>
-#include <glib-2.0/glib.h>
+#include "slist.h"
 #include "edge.h"
 
 /** El tipo Network se utiliza como un puntero a una estructura que no es
@@ -24,11 +24,11 @@ void network_add_edge(Network *self, Edge *e);
 /** Devuelve la lista con punteros a los vecinos del nodo n
  *  La lista devuelta por esta funcion debe ser liberada
  *  por el que la llame */
-GSList *network_neighbours(Network *self, Node n);
+SList *network_neighbours(Network *self, Node n);
 
 /** Devuelve una lista con todas las aristas que salen desde n.
  *  Esta lista no debe ser liberada. */
-GSList *network_get_edges(Network *self, Node n);
+SList *network_get_edges(Network *self, Node n);
 
 /** Imprime un network en el archivo f */
 void network_pretty_print(Network *self, FILE *f);

@@ -2,12 +2,13 @@
 #include <stdio.h>
 #include <assert.h>
 #include "network.h"
+#include "slist.h"
 #include "hashtable/hashtable.h"
 
 
-int compare_edges(gconstpointer a, gconstpointer b);
-void destroy_glist(gpointer list);
-void destroy_edge(gpointer edge);
+int compare_edges(const void *a, const void *b);
+void destroy_slist(void *list);
+void destroy_edge(void *edge);
 
 /* Hash Table redefines */
 #define KEY_SIZE sizeof(int)
@@ -25,7 +26,7 @@ struct s_Network {
 
 /*--------------- Funciones Auxiliares */
 /*----- De Comparacion */
-int compare_edges(gconstpointer a, gconstpointer b) {
+int compare_edges(const void *a, const void *b) {
     int result = 0;
 
     if(edge_cmp(a, b)) {
@@ -38,9 +39,9 @@ int compare_edges(gconstpointer a, gconstpointer b) {
 }
 
 /*----- Destructoras */
-void destroy_glist(gpointer list) {
-    GSList *to_free = (GSList *) list, *tmp;
-    gpointer edge = NULL;
+void destroy_slist(void *list) {
+    SList *to_free = (SList *) list, *tmp;
+    void *edge = NULL;
 
     /* Precondicion */
     assert(to_free != NULL);
@@ -48,28 +49,17 @@ void destroy_glist(gpointer list) {
     tmp = to_free;
 
     while (tmp != NULL) {
-        edge = g_slist_nth_data (tmp, 0);
+        edge = slist_nth_data (tmp, 0);
         edge_destroy(edge);
-        tmp = g_slist_next(tmp);
+        tmp = slist_next(tmp);
     }
 
-    g_slist_free(to_free);
+    slist_free(to_free);
 }
 
-void destroy_edge(gpointer edge) {
+void destroy_edge(void *edge) {
     edge_destroy((Edge *) edge);
 }
-
-void g_slist_pprint(GSList *l) {
-    int len, i;
-    gpointer value = NULL;
-    len = g_slist_length(l);
-    for (i = 0; i < len; i++) {
-        value = g_slist_nth_data(l, i);
-        edge_pprint((Edge *)value);
-    }
-}
-
 
 /* Crea un network vacio */
 Network *network_create(void) {
@@ -77,15 +67,15 @@ Network *network_create(void) {
 
     result = calloc(1, sizeof(*result));
     if(result != NULL) {
-        result->node_to_edges = ht_new_full(MODE_ALLREF, NULL, destroy_glist);
+        result->node_to_edges = ht_new_full(MODE_ALLREF, NULL, destroy_slist);
     }
 
     return result;
 }
 
 void network_add_edge(Network *self, Edge *e) {
-    GSList *edges = NULL;
-    gpointer first_node = NULL;
+    SList *edges = NULL;
+    void *first_node = NULL;
 
     /* Precondiciones */
     assert(self != NULL);
@@ -97,14 +87,14 @@ void network_add_edge(Network *self, Edge *e) {
     if(edges == NULL) {
         /* El elemento no existia en la hash table */
 
-        edges = g_slist_append(edges, (gpointer) e);
+        edges = slist_append(edges, (void *) e);
         ht_insert(self->node_to_edges, first_node, edges);
 
-    } else if(g_slist_find_custom(edges, e, compare_edges) == NULL) {
+    } else if(slist_find_custom(edges, e, compare_edges) == NULL) {
         /* El elemento no esta en la lista, lo agregamos */
 
         /* Hacemos un prepend, pues es O(1), append es O(n)*/
-        edges = g_slist_prepend(edges, (gpointer) e);
+        edges = slist_prepend(edges, (void *) e);
         /* Sacamos la lista vieja del hash, sin liberarla */
         ht_steal(self->node_to_edges, first_node);
         /* Agregamos la nueva lista */
@@ -120,8 +110,8 @@ void network_add_edge(Network *self, Edge *e) {
 }
 
 
-GSList *network_neighbours(Network *self, Node n) {
-    GSList *result = NULL, *tmp = NULL;
+SList *network_neighbours(Network *self, Node n) {
+    SList *result = NULL, *tmp = NULL;
     Edge *e = NULL;
 
     /* Checkeo de precondiciones */
@@ -130,16 +120,16 @@ GSList *network_neighbours(Network *self, Node n) {
     tmp = network_get_edges(self, n);
     while (tmp != NULL) {
         /* Tomamos la cabeza de la lista */
-        e = (Edge *) g_slist_nth_data(tmp, 0);
-        result = g_slist_append(result, (gpointer) edge_get_second(e));
-        tmp = g_slist_next(tmp);
+        e = (Edge *) slist_nth_data(tmp, 0);
+        result = slist_append(result, (void *) edge_get_second(e));
+        tmp = slist_next(tmp);
     }
 
     return result;
 }
 
-GSList *network_get_edges(Network *self, Node node) {
-    GSList *result = NULL;
+SList *network_get_edges(Network *self, Node node) {
+    SList *result = NULL;
 
     /* Checkeo de precondiciones */
     assert(self != NULL);

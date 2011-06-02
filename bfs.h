@@ -2,7 +2,6 @@
 #define BFS_H
 
 #include "network.h"
-#include <glib-2.0/glib.h>
 
 /**
  * @file bfs.h
@@ -12,14 +11,14 @@
  * que se puede enviar por este camino
  */
 
-/** 
+/**
  * \brief Una lista con el camino y el flujo que se puede enviar.
  *
  * Este es el resultado del programa.
  */
 typedef struct s_bfs_result {
-    GSList *path;
-    Weight flow;
+    SList *path;
+    Flow flow;
 } bfs_result;
 
 /** Corre DFS sobre el network net y devuelve el camino mas corto de s a t */

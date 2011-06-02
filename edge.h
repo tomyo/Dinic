@@ -5,26 +5,32 @@
  * @file edge.h
  * \brief Modulo donde se define la estructura de una arista.
  *
- * Basicamente va a ser una 3-upla que contiene 2 nodos y la
- * capacidad de la arista.
+ * Basicamente va a ser una 4-upla que contiene 2 nodos, la
+ * capacidad de la arista y el flujo actual.
  */
 
 #include <stdbool.h>
 #include "node.h"
 
 /** La capacidad es representada por un entero sin signo */
-typedef unsigned int Weight;
+typedef unsigned int Capacity;
+
+/** El flujo es representado por un entero sin signo */
+typedef unsigned int Flow;
 
 /** El tipo Edge se utiliza como un puntero a una estructura que no es
  *  accesible de forma directa, sino a traves de las funciones de este tipo. */
 typedef struct s_Edge Edge;
 
+/** Crea una arista desde el nodo x1 hacia el nodo x2 con capacidad w y flujo
+ *  inicial f*/
+Edge *edge_create(Node x1, Node x2, Capacity c, Flow f);
 
-/** Crea una arista desde el nodo x1 hacia el nodo x2 con capacidad w */
-Edge *edge_create(Node x1, Node x2, Weight w);
+/** Devuelve la capacidad de una arista */
+Capacity edge_get_capacity(Edge *self);
 
-/** Devuelve el peso de una arista */
-Weight edge_get_weight(Edge *self);
+/** Devuelve el flujo de una arista */
+Flow edge_get_flow(Edge *self);
 
 /** Devuelve un puntero al primer nodo de una arista */
 Node *edge_get_first(Edge *self);

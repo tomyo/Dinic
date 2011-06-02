@@ -6,18 +6,19 @@
 
 /**
  * \brief
- * Arista: Node (x1) -- Weigth (w) -- Node (x2).
+ * Arista: Node (x1) --  Flow(f)[\Capacity(c)] -- Node (x2).
  *
- * Contiene los Nodos y el peso de una arista.
+ * Contiene los Nodos, la capacidad y el flujo de una arista.
  */
-  
+
 struct s_Edge {
     Node x1;
     Node x2;
-    Weight w;
+    Capacity c;
+    Flow f;
 };
 
-Edge *edge_create(Node x1, Node x2, Weight w) {
+Edge *edge_create(Node x1, Node x2, Capacity c, Flow f) {
     Edge *result = NULL;
 
     assert(x1 != x2); /* No se puede hacer una arista a si mismo */
@@ -27,15 +28,21 @@ Edge *edge_create(Node x1, Node x2, Weight w) {
     if (result != NULL) {
         result->x1 = x1;
         result->x2 = x2;
-        result->w = w;
+        result->c = c;
+        result->f = f;
     }
 
     return result;
 }
 
-Weight edge_get_weight(Edge *self) {
+Capacity edge_get_capacity(Edge *self) {
     assert(self != NULL);
-    return self->w;
+    return self->c;
+}
+
+Flow edge_get_flow(Edge *self) {
+    assert(self != NULL);
+    return self->f;
 }
 
 Node *edge_get_first(Edge *self) {
@@ -58,7 +65,7 @@ bool edge_cmp(const Edge *e1, const Edge *e2) {
 void edge_pprint(const Edge *self){
     assert(self != NULL);
 
-    printf("(%d) --%d-- (%d)\n", self->x1, self->w, self->x2);
+    printf("(%d) --%d[/%d]-- (%d)\n", self->x1, self->f, self->c, self->x2);
 }
 
 void edge_destroy(Edge *self) {

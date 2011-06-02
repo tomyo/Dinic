@@ -3,7 +3,7 @@
 TARGET=runner
 TARGET_MEM=leaktest
 CC=gcc
-LDFLAGS=-lcheck `pkg-config --cflags --libs glib-2.0`
+LDFLAGS=-lcheck
 CFLAGS+= -I.. -ansi -Wall -Wextra -Wdeclaration-after-statement -Wbad-function-cast -Wcast-qual -Wstrict-prototypes -Wmissing-declarations -Wmissing-prototypes -Wno-unused-parameter -Werror -pedantic -g $(LDFLAGS)
 TEST_SOURCES=$(shell echo test*.c) run_tests.c
 MEM_SOURCES=$(shell echo test*.c) leaktest.c

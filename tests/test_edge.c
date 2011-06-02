@@ -33,7 +33,7 @@ END_TEST
 START_TEST(test_edge_invalid_nodes)
 {
     /* No deberia tener una arista de un nodo a si mismo */
-    edge = edge_create(0, 0, 1);
+    edge = edge_create(0, 0, 1, 0);
     edge_destroy(edge);
 }
 END_TEST
@@ -41,18 +41,18 @@ END_TEST
 /* Crear y destruir */
 START_TEST(test_edge_new_destroy)
 {
-    edge = edge_create(0, 1, 1);
+    edge = edge_create(0, 1, 1, 0);
     edge_destroy(edge);
 }
 END_TEST
 
 /* Testeo de funcionalidad */
-START_TEST(test_edge_get_weight)
+START_TEST(test_edge_get_capacity)
 {
     int w = 0;
 
-    edge = edge_create(0, 1, 10);
-    w = edge_get_weight(edge);
+    edge = edge_create(0, 1, 10, 0);
+    w = edge_get_capacity(edge);
 
     fail_unless(w == 10);
 }
@@ -61,7 +61,7 @@ END_TEST
 START_TEST(test_edge_get_first_node)
 {
     Node *node = NULL;
-    edge = edge_create(13, 37, 1337);
+    edge = edge_create(13, 37, 1337, 0);
 
     node = edge_get_first(edge);
 
@@ -73,7 +73,7 @@ END_TEST
 START_TEST(test_edge_get_second_node)
 {
     Node *node = NULL;
-    edge = edge_create(13, 37, 1337);
+    edge = edge_create(13, 37, 1337, 0);
 
     node = edge_get_second(edge);
 
@@ -88,7 +88,7 @@ START_TEST(test_edge_big_edge)
     unsigned int p = 0;
 
     p = UINT_MAX;
-    edge = edge_create(p, 0, 10);
+    edge = edge_create(p, 0, 10, 0);
 
     node = edge_get_first(edge);
 
@@ -117,7 +117,7 @@ Suite *edge_suite(void){
     suite_add_tcase(s, tc_creation);
 
     /* Funcionalidad */
-    tcase_add_test(tc_functionality, test_edge_get_weight);
+    tcase_add_test(tc_functionality, test_edge_get_capacity);
     tcase_add_test(tc_functionality, test_edge_get_first_node);
     tcase_add_test(tc_functionality, test_edge_get_second_node);
     tcase_add_test(tc_functionality, test_edge_big_edge);
@@ -131,13 +131,13 @@ void edge_memory_test(void){
     /* Codigo que deberia correr sin memory leaks */
     Edge *edge = NULL, *edge2 = NULL;
     unsigned int *first = NULL, *second = 0;
-    unsigned int weight = 0;
+    unsigned int capacity = 0;
 
-    edge = edge_create(UINT_MAX, 14, 15);
-    edge2 = edge_create(1, 2, 5);
+    edge = edge_create(UINT_MAX, 14, 15, 0);
+    edge2 = edge_create(1, 2, 5, 0);
 
     first = edge_get_first(edge);
-    weight = edge_get_weight(edge);
+    capacity = edge_get_capacity(edge);
 
     second = edge_get_second(edge2);
 

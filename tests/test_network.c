@@ -6,6 +6,7 @@
 #include <stdlib.h>
 
 #include "network.h"
+#include "slist.h"
 
 Network *net = NULL; /* Para networks temporales */
 
@@ -19,7 +20,7 @@ END_TEST
 START_TEST(test_network_add_edge_null)
 {
     Edge *edge = NULL;
-    edge = edge_create(0, 0, 1);
+    edge = edge_create(0, 0, 1, 0);
     network_add_edge(NULL, edge);
     edge_destroy(edge);
 }
@@ -56,12 +57,12 @@ END_TEST
 START_TEST(test_network_get_edges)
 {
     Edge *e1 = NULL, *e2 = NULL, *e3 = NULL, *etmp = NULL;
-    GSList *el = NULL, *tmp = NULL;
+    SList *el = NULL, *tmp = NULL;
     Node ntmp = 0;
 
-    e1 = edge_create(0, 1, 1);
-    e2 = edge_create(0, 2, 1);
-    e3 = edge_create(2, 3, 1);
+    e1 = edge_create(0, 1, 1, 0);
+    e2 = edge_create(0, 2, 1, 0);
+    e3 = edge_create(2, 3, 1, 0);
 
     net = network_create();
     network_add_edge(net, e1);
@@ -72,11 +73,11 @@ START_TEST(test_network_get_edges)
 
     tmp = el;
     while(tmp != NULL){
-        etmp = (Edge *) g_slist_nth_data(tmp, 0);
+        etmp = (Edge *) slist_nth_data(tmp, 0);
         ntmp = *edge_get_second(etmp);
         fail_unless(ntmp == 1 || ntmp == 2);
 
-        tmp = g_slist_next(tmp);
+        tmp = slist_next(tmp);
     }
 
     network_destroy(net);
@@ -87,11 +88,11 @@ START_TEST(test_network_get_neightbours)
 {
     Edge *e1 = NULL, *e2 = NULL, *e3 = NULL;
     Node *ntmp = NULL;
-    GSList *el = NULL, *tmp = NULL;
+    SList *el = NULL, *tmp = NULL;
 
-    e1 = edge_create(2, 3, 1);
-    e2 = edge_create(1, 4, 1);
-    e3 = edge_create(2, 1, 1);
+    e1 = edge_create(2, 3, 1, 0);
+    e2 = edge_create(1, 4, 1, 0);
+    e3 = edge_create(2, 1, 1, 0);
 
     net = network_create();
     network_add_edge(net, e1);
@@ -102,14 +103,14 @@ START_TEST(test_network_get_neightbours)
 
     tmp = el;
     while(tmp != NULL){
-        ntmp = (Node *) g_slist_nth_data(tmp, 0);
+        ntmp = (Node *) slist_nth_data(tmp, 0);
 
         fail_unless(*ntmp == 3 || *ntmp == 1);
 
-        tmp = g_slist_next(tmp);
+        tmp = slist_next(tmp);
     }
 
-    g_slist_free(el);
+    slist_free(el);
     network_destroy(net);
 }
 END_TEST
@@ -147,12 +148,12 @@ void network_memory_test(void){
 
     Edge *e1 = NULL, *e2 = NULL, *e3 = NULL, *e4 = NULL, *etmp = NULL;
     Node *ntmp = NULL;
-    GSList *el = NULL, *nl = NULL, *tmp = NULL;
+    SList *el = NULL, *nl = NULL, *tmp = NULL;
 
-    e1 = edge_create(0, 1, 1);
-    e2 = edge_create(0, 2, 4);
-    e3 = edge_create(2, 3, 6);
-    e4 = edge_create(2, 0, 0);
+    e1 = edge_create(0, 1, 1, 0);
+    e2 = edge_create(0, 2, 4, 0);
+    e3 = edge_create(2, 3, 6, 0);
+    e4 = edge_create(2, 0, 0, 0);
 
     net = network_create();
     network_add_edge(net, e1);
@@ -164,9 +165,9 @@ void network_memory_test(void){
 
     tmp = el;
     while(tmp != NULL){
-        etmp = (Edge *) g_slist_nth_data(tmp, 0);
+        etmp = (Edge *) slist_nth_data(tmp, 0);
         edge_pprint(etmp);
-        tmp = g_slist_next(tmp);
+        tmp = slist_next(tmp);
     }
 
     nl = network_neighbours(net, 2);
@@ -174,12 +175,12 @@ void network_memory_test(void){
 
     tmp = nl;
     while(tmp != NULL){
-        ntmp = (Node *) g_slist_nth_data(tmp, 0);
-        tmp = g_slist_next(tmp);
+        ntmp = (Node *) slist_nth_data(tmp, 0);
+        tmp = slist_next(tmp);
 
         printf("  %d\n", *ntmp);
     }
 
-    g_slist_free(nl);
+    slist_free(nl);
     network_destroy(net);
 }

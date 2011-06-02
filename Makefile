@@ -1,7 +1,7 @@
 TARGET=bfsNet
 CC=gcc
-CFLAGS+= -Wall -Wextra -Wdeclaration-after-statement -Wbad-function-cast -Wcast-qual -Wstrict-prototypes -Wmissing-declarations -Wmissing-prototypes -Wno-unused-parameter -pedantic -g `pkg-config --cflags glib-2.0`
-LDFLAGS=`pkg-config --cflags --libs glib-2.0`
+CFLAGS+= -Wall -Wextra -Wdeclaration-after-statement -Wbad-function-cast -Wcast-qual -Wstrict-prototypes -Wmissing-declarations -Wmissing-prototypes -Wno-unused-parameter -pedantic -g
+PRODFLAGS=
 SOURCES=$(shell echo *.c)
 OBJECTS= $(SOURCES:.c=.o)
 NETFILE = example.network
@@ -9,7 +9,7 @@ NETFILE = example.network
 all: $(TARGET)
 
 $(TARGET): $(OBJECTS)
-	$(CC) $^ -o $@ $(LDFLAGS)
+	$(CC) $^ -o $@
 
 clean:
 	rm -f $(TARGET) $(OBJECTS) .depend *~
