@@ -19,6 +19,9 @@ Queue* queue_new (void) {
         new_queue->length = 0;
     }
 
+    /* Postcondicion */
+    assert((int)new_queue->length == slist_length(new_queue->head));
+
     return new_queue;
 }
 
@@ -41,12 +44,18 @@ bool queue_is_empty (Queue *queue) {
     /* Precondition */
     assert(queue != NULL);
 
+    /* Postcondicion */
+    assert((int)queue->length == slist_length(queue->head));
+
     return queue->length == 0;
 }
 
 unsigned int queue_get_length (Queue *queue) {
     /* Precondition */
     assert(queue != NULL);
+
+    /* Postcondicion */
+    assert((int)queue->length == slist_length(queue->head));
 
     return queue->length;
 }
@@ -79,6 +88,9 @@ void queue_foreach (Queue *queue, Func(func), void *user_data) {
     assert(queue != NULL);
 
     slist_foreach(queue->head, func, user_data);
+
+    /* Postcondicion */
+    assert((int)queue->length == slist_length(queue->head));
 }
 
 
@@ -86,12 +98,18 @@ SList * queue_find (Queue *queue, const void *data) {
     /* Precondition */
     assert(queue != NULL);
 
+    /* Postcondicion */
+    assert((int)queue->length == slist_length(queue->head));
+
     return slist_find(queue->head, data);
 }
 
 SList * queue_find_custom (Queue *queue, const void *data, CompareFunc(func)) {
     /* Precondition */
     assert(queue != NULL);
+
+    /* Postcondicion */
+    assert((int)queue->length == slist_length(queue->head));
 
     return slist_find_custom(queue->head, data, func);
 }
@@ -113,18 +131,33 @@ void queue_push_head (Queue *queue, void * data) {
         queue->tail = queue->head;
     }
     queue->length ++;
+
+    /* Postcondicion */
+    assert((int)queue->length == slist_length(queue->head));
 }
 
 
 void queue_push_tail (Queue *queue, void * data) {
+    SList *tmp_tail = NULL;
+
     /* Precondition */
     assert(queue != NULL);
 
-    queue->tail = slist_append (queue->tail, data);
+
+    tmp_tail = slist_append (queue->tail, data);
     if (queue->length == 0) {
-        queue->head = queue->tail;
+        queue->head = tmp_tail;
+        queue->tail = tmp_tail;
     }
+    else {
+        queue->tail = slist_next(tmp_tail);
+    }
+
     queue->length ++;
+
+    /* Postcondicion */
+    assert(queue->tail != NULL);
+    assert((int)queue->length == slist_length(queue->head));
 }
 
 
@@ -143,6 +176,9 @@ void queue_push_nth (Queue *queue, void * data, unsigned int n) {
         slist_insert(queue->head, data, n);
         queue->length ++;
     }
+
+    /* Postcondicion */
+    assert((int)queue->length == slist_length(queue->head));
 }
 
 
@@ -162,6 +198,10 @@ void * queue_pop_head (Queue *queue) {
     if (queue->length == 0) {
         queue->tail = NULL;
     }
+
+    /* Postcondicion */
+    assert((int)queue->length == slist_length(queue->head));
+
     return element_data;
 }
 
@@ -191,6 +231,9 @@ void * queue_pop_tail (Queue *queue) {
 
     queue->length --;
 
+    /* Postcondicion */
+    assert((int)queue->length == slist_length(queue->head));
+
     return element_data;
 }
 
@@ -204,6 +247,9 @@ void * queue_peek_head (Queue *queue) {
     assert(queue != NULL);
     assert(queue->length > 0);
 
+    /* Postcondicion */
+    assert((int)queue->length == slist_length(queue->head));
+
     return slist_nth_data(queue->head, 0);
 }
 
@@ -211,6 +257,9 @@ void * queue_peek_tail (Queue *queue) {
     /* Precondition */
     assert(queue != NULL);
     assert(queue->length > 0);
+
+    /* Postcondicion */
+    assert((int)queue->length == slist_length(queue->head));
 
     return slist_nth_data(queue->tail, 0);
 }
@@ -221,12 +270,18 @@ void * queue_peek_nth (Queue *queue, unsigned int n) {
     assert(queue->length > 0);
     assert(n < queue->length);
 
+    /* Postcondicion */
+    assert((int)queue->length == slist_length(queue->head));
+
     return slist_nth_data(queue->head, n);
 }
 
 int queue_index (Queue *queue, const void *data) {
     /* Precondition */
     assert(queue != NULL);
+
+    /* Postcondicion */
+    assert((int)queue->length == slist_length(queue->head));
 
     return slist_index(queue->head, data);
 }

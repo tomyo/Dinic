@@ -155,3 +155,6 @@ void network_destroy(Network *self) {
     ht_destroy(self->node_to_edges);
     free(self); self = NULL;
 }
+
+#undef VALUE_SIZE
+#undef KEY_SIZE
