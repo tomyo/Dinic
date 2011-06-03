@@ -66,7 +66,7 @@ Queue *queue_copy (Queue *queue) {
     return new_queue;
 }
 
-void queue_foreach (Queue *queue, Func(func), void *user_data) {
+void queue_foreach (Queue *queue, UserFunc(func), void *user_data) {
     /* Precondition */
     assert(queue != NULL);
 
