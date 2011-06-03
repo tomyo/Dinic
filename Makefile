@@ -1,7 +1,6 @@
 TARGET=bfsNet
 CC=gcc
 CFLAGS+= -Wall -Wextra -Wdeclaration-after-statement -Wbad-function-cast -Wcast-qual -Wstrict-prototypes -Wmissing-declarations -Wmissing-prototypes -Wno-unused-parameter -pedantic -g
-PRODFLAGS=
 SOURCES=$(shell echo *.c)
 OBJECTS= $(SOURCES:.c=.o)
 NETFILE = example.network
@@ -25,9 +24,7 @@ run: $(TARGET)
 	./$^ < $(NETFILE)
 
 memrun: $(TARGET)
-	# Hay que definir la variable G_SLICE por que el uso interno de alocacion de memoria
-	# de la libreria GLIB hace que valgrind diga que hay memory leaks cuando no los hay
-	G_SLICE=always-malloc valgrind --leak-check=full --show-reachable=yes ./$^ < $(NETFILE)
+	valgrind --leak-check=full --show-reachable=yes ./$^ < $(NETFILE)
 
 docs:
 	doxygen Doxyfile

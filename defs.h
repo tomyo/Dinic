@@ -9,5 +9,12 @@
 #define and &&
 #define or ||
 #define not !
+#define memory_check(m) do\
+{\
+    if(m == NULL) {\
+        fprintf(stderr, "Memoria insuficiente\n");\
+        exit(1);\
+    }\
+} while(0)
 
 #endif /*DEFINITIONS_H*/
