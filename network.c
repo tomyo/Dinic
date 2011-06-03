@@ -10,7 +10,6 @@ int compare_edges(const void *a, const void *b);
 void destroy_slist(void *list);
 void destroy_edge(void *edge);
 
-/* Hash Table redefines */
 #define KEY_SIZE sizeof(int)
 #define VALUE_SIZE sizeof(int)
 
