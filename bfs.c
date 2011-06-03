@@ -15,7 +15,6 @@
 #define VALUE_SIZE sizeof(bfs_step)
 
 void destroy_step(void *bfs_step);
-void memory_check(void *m);
 
 /**
  *\brief
@@ -32,13 +31,6 @@ void destroy_step(void *bfs_step) {
     free(bfs_step);
 }
 
-void memory_check(void *m){
-    if(m == NULL) {
-        fprintf(stderr, "Memoria insuficiente\n");
-        exit(1);
-    }
-}
-
 bfs_result bfs(Network *net, Node s, Node t) {
     bfs_result result;
     Node curr_node = 0, *pointer_to_t = NULL;
@@ -51,15 +43,15 @@ bfs_result bfs(Network *net, Node s, Node t) {
     bfs_step *state = NULL, *step = NULL;
 
     visited = ht_new_full(MODE_ALLREF, NULL, destroy_step);
-    memory_check((void *) visited);
+    memory_check(visited);
 
     queue = queue_new();
-    memory_check((void *) queue);
+    memory_check(queue);
 
     queue_push_tail(queue, &s);
 
     state = calloc(1, sizeof(*state));
-    memory_check((void *) state);
+    memory_check(state);
 
     state->father = NULL;
     state->max_flow = INF;
@@ -98,7 +90,7 @@ bfs_result bfs(Network *net, Node s, Node t) {
                 queue_push_tail(queue, neighbour);
 
                 state = calloc(1, sizeof(*state));
-                memory_check((void *) state);
+                memory_check(state);
 
                 state->father = first;
                 curr_weigth = edge_get_capacity(curr_edge);
