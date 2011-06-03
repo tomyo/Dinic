@@ -1,7 +1,3 @@
-/*
- * Queue with GQueue interface.
- */
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
