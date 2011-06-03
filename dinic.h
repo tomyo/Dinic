@@ -14,12 +14,6 @@ typedef s_dinic_result dinic_result;
  */
 struct s_dinic_result {
     /**
-     * @brief Lista con los valores de los flujos obtenidos.
-     * Formato: {Nodo, Nodo, Flujo, Capacidad}
-     */
-    Slist *max_flow;
-    
-    /**
      * @brief valor del flujo maximal obtenido
      */ 
     unsigned int flow_value;
@@ -45,7 +39,7 @@ struct s_dinic_result {
  * @param Node node destino (en network) (t)
  * @returns DinicResult
  */
-dinic_result *dinic(const Network *, const Node *, const Node *); 
+dinic_result *dinic(Network *, const Node *, const Node *); 
  
 
 #endif 

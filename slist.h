@@ -204,7 +204,7 @@ void *user_data);
 Gets the data of the element at the given position.
 */
 void *slist_nth_data(SList *self, int n);
-
+#define slist_head_data(list) slist_nth_data(list, 0)
 /*
  convenience macro to get the next element in a SList.
 */
