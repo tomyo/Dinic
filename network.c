@@ -10,9 +10,6 @@ int compare_edges(const void *a, const void *b);
 void destroy_slist(void *list);
 void destroy_edge(void *edge);
 
-#define KEY_SIZE sizeof(int)
-#define VALUE_SIZE sizeof(int)
-
 /**
  * \brief
  * Tabla Hash (node_to_edges) con el network
@@ -144,6 +141,3 @@ void network_destroy(Network *self) {
     ht_destroy(self->node_to_edges);
     free(self); self = NULL;
 }
-
-#undef VALUE_SIZE
-#undef KEY_SIZE

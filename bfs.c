@@ -10,10 +10,6 @@
 #define INF -1 /* Funciona porque los pesos son unsigned */
 #define min(x,y) x < y ? x : y
 
-/* Hash Table redefines */
-#define KEY_SIZE sizeof(int)
-#define VALUE_SIZE sizeof(bfs_step)
-
 void destroy_step(void *bfs_step);
 void memory_check(void *m);
 
@@ -147,6 +143,3 @@ bfs_result bfs(Network *net, Node s, Node t) {
 
     return result  ;
 }
-
-#undef VALUE_SIZE
-#undef KEY_SIZE
