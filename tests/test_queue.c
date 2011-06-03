@@ -16,11 +16,6 @@ START_TEST(test_queue_free_null)
 }
 END_TEST
 
-START_TEST(test_queue_clear_null)
-{
-   queue_clear(NULL);
-}
-END_TEST
 
 START_TEST(test_queue_is_empty_null)
 {
@@ -139,7 +134,6 @@ Suite *queue_suite(void){
 
     /* Base cases */
     tcase_add_test_raise_signal(tc_base, test_queue_free_null, SIGABRT);
-    tcase_add_test_raise_signal(tc_base, test_queue_clear_null, SIGABRT);
     tcase_add_test_raise_signal(tc_base, test_queue_get_length_null, SIGABRT);
     tcase_add_test_raise_signal(tc_base, test_queue_push_head_null, SIGABRT);
     tcase_add_test_raise_signal(tc_base, test_queue_is_empty_null, SIGABRT);
