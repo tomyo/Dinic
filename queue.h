@@ -53,7 +53,7 @@ Queue *queue_copy (Queue *queue);
  * func : the function to call for each element's data
  * user_data : user data to pass to func
  */
-void queue_foreach (Queue *queue, Func(func), void *user_data);
+void queue_foreach (Queue *queue, UserFunc(func), void *user_data);
 
 /**
  * Finds the first link in queue which contains data.

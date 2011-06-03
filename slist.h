@@ -13,6 +13,7 @@ typedef struct _SList SList;
 #define CompareFunc(x) int (*x) (const void *, const void *)
 #define CompareDataFunc(x) CompareFunc(x)
 #define DestroyDataFunc(x) void (*x) (void *)
+#define UserFunc(x) void (*x) (void *, void *)
 #define Func(x) void (*x) (void *)
 
 struct _SList
@@ -32,7 +33,7 @@ functions and so is rarely used on its own.
 SList *slist_alloc(void);
 
 /*
-Frees one (the first) SList element. It is usually used after 
+Frees one (the first) SList element. It is usually used after
 slist_remove_link().
 */
 void slist_free_1(SList *self);
@@ -182,7 +183,7 @@ int slist_length(SList *self);
 /*
 Calls a function for each element of a SList.
 */
-void slist_foreach(SList *self, Func(func), void *user_data);
+void slist_foreach(SList *self, UserFunc(func), void *user_data);
 
 /*
 Sorts a SList using the given comparison function.

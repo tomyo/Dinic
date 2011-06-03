@@ -298,13 +298,11 @@ int slist_length(SList *self) {
     return result;
 }
 
-void slist_foreach(SList *self, Func(func), void *user_data) {
+void slist_foreach(SList *self, UserFunc(func), void *user_data) {
     SList *iter = self;
-    
-    assert(user_data == NULL);
 
     while(iter != NULL) {
-        func(iter->data);
+        func(iter->data, user_data);
         iter = slist_next(iter);
     }
 }
