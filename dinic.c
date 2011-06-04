@@ -1,25 +1,23 @@
+#include <assert.h>
+
 #include "dinic.h"
 #include "edge.h"
 #include "node.h"
+#include "queue.h"
 
-extern mode;
+extern bool print_aux_paths;
+
+
 /**
  * @brief Estructura interna de Dinic
- *
  */
-struct s_dinic {
+typedef struct _dinic_t {
     Network *network;
     Node *s;
     Node *t;
     Network *backwards;
-    DinicResult *result;
-}
-
-dinic_result *dinic(Network *network, const Node *s, const Node *t) {
-    /* basicamente el ciclo que hicimos en el pizarron. */
-    
-    return s_dinic->result;
-}
+    dinic_result *result;
+} dinic_t;
 
 /**
  * Funcion de creacion de un nuevo network auxiliar a partir de un 
@@ -27,59 +25,89 @@ dinic_result *dinic(Network *network, const Node *s, const Node *t) {
  * @param s_dinic data donde esta el network y los nodos origen-destino.
  * @returns network (network auxiliar)
  */
-Network *aux_network_new(s_dinic *data) {
-    Network *result = NULL;
-    
-    Queue *bfs_queue = NULL;
-    Edge *node_pivot = NULL, *edge_pivot = NULL;
-    
-    Node *tmp = NULL;
+static Network *aux_network_new(dinic_t *data) {
+    Network *main_network = NULL, *backwards = NULL, *result = NULL;
+    Queue *bfs_queue = NULL, *next_level = NULL;
+    Node *current_node = NULL, *s = NULL, *t = NULL;
     SList *fwd_edges = NULL, *bwd_edges = NULL, *edges = NULL;
-    SList *iter = NULL;
-    SList *nodes_in_next_level = NULL; /* Aristas agregadas al siguiente nivel */
     bool is_t_found = false;
     
     assert(data != NULL);
     
-    /* Pasos Basicos:
-     * Pararte en s
-     * Poner vecinos <- y -> en cola sy network (que no haya agregado antes)
-     * Repetir hasta llegar a t o terminar con corte
-     * Devolver network
-     */
-     
-    result = network_create();
-    bfs_queue = queue_new();
-    node_pivot = data->s;
-    queue_push_head(bfs_queue, node_pivot);
+/* Algoritmo Basicos:
+ * 1) Revisar bfs_queue:
+ *        a) Si esta vacia, terminamos -> Devolver Netwok Auxiliar (result)
+ *        b) Si esta t, listo -> vaciar la cola (para terminar).
+ *
+ * 2) Poner aristas vecinas <- y -> en *result* y en la cola de nodos del
+ *    proximo nivel segun corresponda (*Lea Dinic) por cada nodo de la cola de
+ *    BFS.
+ *
+ * 3) Una vez vacia la cola BFS, Reemplazarla por la cola de nodos del
+ *    siguiente nivel creada en 2) (nueva cola a iterar) -> GOTO 1).
+ */
+ 
+    /* Referencias a datos de *data* que vamos a necesitar constantemente */
+    main_network = data->network;
+    s = data->s;
+    t = data->t;
+    backwards = data->backwards;
     
-    while ((node_pivot != data->t) || (queue_is_empty(bfs_queue))) {
-        fwd_edges = network_get_edges(data->network, node_pivot);
-        bwd_edges = network_get_edges(data->backwards, node_pivot);
-        edges = slist_concat(fwd_edges, bwd_edges);
-        /* edges tiene todas las posibles aristas del nivel i-esimo */
+    /* Inicializando variables */
+    result = network_create(); /* NA (vacio) */
+    bfs_queue = queue_new();   /* BFS queue (vacia) */
+    next_level = queue_new(); /* Siguiente nivel queue (vacia) */
 
-        iter = edges;
-        while (iter != NULL && !is_t_found) {
-            edge_pivot = slist_head_data(iter);
-            if (network_lookup(result, node_pivot) == NULL) {
-                network_add_edge(result, edge_pivot);
-                slist_prepend(nodes_in_next_level, node_pivot);
-            } else {
-                if slist_find(nodes_in_next_level, node_pivot) {
-                    /* Si ya esta, pero en el nivel i+1, igual se agrega */
-                    network_add_edge(result, edge_pivot);
-                    slist_prepend(nodes_in_next_level, node_pivot);
-                }
-            }
+    queue_push_head(bfs_queue, s); /* Empezamos desde *s* */
+    while (bfs_queue != NULL) {
+        SList *current_edges = NULL;
+        Edge *current_edge = NULL;
+        Node *neighbour = NULL;
+        
+        /* 1 */
+        if (queue_find(bfs_queue, t) != NULL) {
+            /* Ya llegamos a t, tenemos nuestro network auxiliar listo,
+             * liberamos la cola para terminar */
+            queue_empty(bfs_queue); /* TODO */
         }
-        slist_free(nodes_in_next_level);
-    
+        
+        /* 2 */
+        while (!queue_is_empty(bfs_queue)) {
+            current_node = queue_pop_head(bfs_queue);
+            /* TODO: los nodos no deberian ser punterops? (network) */
+            fwd_edges = network_get_edges(main_network, *current_node);
+            bwd_edges = network_get_edges(backwards, *current_node);
+            edges = slist_concat(fwd_edges, bwd_edges);
+            /* edges tiene todas las posibles aristas del proximo nivel */
+            current_edges = edges;
+            
+            while (current_edges != NULL) {
+                current_edge = slist_head_data(current_edges);
+                neighbour = edge_get_second(current_edge);
+                
+                /* Ver si corresponde agregar la arista al NA (result) */ 
+                if (!network_has_node(result, *neighbour)) {
+                    network_add_edge(result, current_edge);
+                    queue_push_head(next_level, neighbour);
+                    
+                } else {
+                    /* Solo la agregamos si pertenece al nivel siguiente */
+                    if queue_find(next_level, neighbour) {
+                        network_add_edge(result, current_edge);
+                    }
+                }
+                current_edges = slist_next(current_edges);
+            }
+            /* Revisamos (y agregamos segun correspondia) todas las
+             * arista que contenian los vecinos de current_node */
+        }
+        
+        /* 3 */ 
+        bfs_queue = next_level;
     }
     
-
-
 }
+
 /**
  * Macro que define la funcion siguiente con nombre mas corto
  */
@@ -93,6 +121,13 @@ Network *aux_network_new(s_dinic *data) {
  * @param network network auxiliar donde operar.
  * @returns network auxiliar
  */
-bool aux_network_find_blocking_flow(s_dinic data*, Network *);
+bool aux_network_find_blocking_flow(s_dinic data*, Network *) {
+    return true;
+}
 
+dinic_result *dinic(Network *network, const Node *s, const Node *t) {
+    /* basicamente el ciclo que hicimos en el pizarron. */
+    /*  TODO */
+    return NULL;
+}
 
