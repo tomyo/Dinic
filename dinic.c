@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <stdlib.h>
 
 #include "dinic.h"
 #include "network.h"
@@ -20,7 +21,7 @@ typedef struct _dinic_t {
 } dinic_t;
 
 
-static bool can_add_edge(Network *fwd_net, Network *bwd_net,Edge *edge) {
+static bool can_add_edge(Network *fwd_net, Network *bwd_net, Edge *edge) {
     /* Asumimos que primero se pregunta por los lados backward */
     Node *node = edge_get_first(edge);
     bool result = false;
@@ -47,7 +48,8 @@ static bool can_add_edge(Network *fwd_net, Network *bwd_net,Edge *edge) {
 static Network *aux_network_new(dinic_t *data) {
     Network *main_network = NULL, *backwards = NULL, *result = NULL;
     Queue *bfs_queue = NULL, *next_level = NULL;
-    Node *current_node = NULL, *s = NULL, *t = NULL;
+    Node *current_node = NULL;
+    Node *s = NULL, *t = NULL;
     SList *fwd_edges = NULL, *bwd_edges = NULL, *edges = NULL;
     bool is_t_found = false;
     
@@ -127,6 +129,8 @@ static Network *aux_network_new(dinic_t *data) {
         next_level = queue_new();
     }
     queue_free(bfs_queue);
+    
+    return result;
 }
 
 /**
@@ -143,11 +147,29 @@ static Network *aux_network_new(dinic_t *data) {
  * @returns network auxiliar
  */
 static bool aux_network_find_blocking_flow(dinic_t *data, Network *aux_net) {
-    return true;
+    return false;
 }
 
-dinic_result *dinic(Network *network, const Node *s, const Node *t) {
-
-    return NULL;
+dinic_result *dinic(Network *network, Node *s, Node *t) {
+    dinic_t data;
+    Network *aux_net = NULL;
+    bool found_flow = true;
+    /* Inicializando las estructuras */
+    data.network = network;
+    data.s = s;
+    data.t = t;
+    data.backwards = network_create();
+    data.result = calloc(1, sizeof(dinic_result));
+    
+    data.result->flow_value = 0;
+    data.result->max_flow = NULL;
+    
+    while (found_flow) {
+       aux_net = aux_network_new(&data);
+       found_flow = aux_network_fbf(&data, aux_net);
+       network_destroy(aux_net);
+    }
+    network_destroy(data.backwards);
+    return data.result;
 }
 

@@ -38,7 +38,7 @@ typedef struct s_dinic_result {
  * @param Node node destino (en network) (t)
  * @returns DinicResult
  */
-dinic_result *dinic(Network * n, const Node * s, const Node * t);
+dinic_result *dinic(Network * n, Node * s, Node * t);
 
 
 #endif

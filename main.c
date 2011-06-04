@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
     Network *network = NULL;
     struct parse_result options;
     dinic_result *result = NULL;
-    int s = 0, t = 1;
+    Node s=0, t=1;
 
     if (parse_options(argc, argv, &options) == false) {
         /* Parametros malos */
