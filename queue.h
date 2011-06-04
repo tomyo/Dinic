@@ -59,7 +59,7 @@ void queue_foreach (Queue *queue, UserFunc(func), void *user_data);
  * @brief Finds the first link in queue which contains data.
  * @param queue : a Queue
  * @param data : data to find
- * @param Returns : The first link in queue which contains data.
+ * @param Returns : The first link in queue which contains data or NULL.
  */
 SList *queue_find (Queue *queue, const void *data);
 
