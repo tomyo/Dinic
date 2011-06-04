@@ -6,6 +6,7 @@
 #include "edge.h"
 #include "node.h"
 #include "queue.h"
+#include "stack.h"
 
 extern bool print_aux_paths;
 
@@ -149,20 +150,59 @@ static Network *aux_network_new(dinic_t *data) {
 }
 
 /**
- * Macro que define la funcion siguiente con nombre mas corto
- */
-#define aux_network_fbf aux_network_find_blocking_flow
-
-/**
  * Funcion que busca caminos entre nodo origen y destino hasta
  * saturar todos los caminos (flujo bloqueante)
  * @note Los caminos y los flujos son almacenados en s_dinic->result.
  * @param s_dinic data donde esta el network y los nodos origen-destino.
  * @param network network auxiliar donde operar.
+ * @param verbose si va a imprimir la salida.
  * @returns network auxiliar
  */
-static bool aux_network_find_blocking_flow(dinic_t *data, Network *aux_net) {
-    return false;
+static bool aux_network_find_blocking_flow(dinic_t *data, Network *aux_net, bool verbose) {
+    Stack *dfs_stack = NULL;
+    SList *neighbours = NULL;
+    bool found_flow = false;
+    SList *current_path = NULL;
+
+    /* Vamos a hacer DFS en el grafo buscando caminos en el network auxiliar
+     * y mandando lo que se pueda mandar por el camino. */
+
+    dfs_stack = stack_new();
+    stack_push(dfs_stack, data->s); /* Empezamos en s */
+
+    while (!stack_is_empty(dfs_stack)) {
+        Node *current_node = NULL;
+
+        current_node = (Node *) stack_pop(dfs_stack);
+        neighbours = network_get_edges(aux_net, current_node);
+
+        while (neighbours != NULL) {
+            Edge *edge = NULL;
+            Node *neighbour = NULL;
+
+            if (!slist_is_empty(neighbours)){
+                edge = slist_head_data(neighbours);
+                neighbour = edge_get_second(edge);
+
+                if (edge_get_flow(edge) > 0) {
+                    /* Tengo flujo para mandar, lo agrego al camino actual */
+                    current_path = slist_append(current_path, edge);
+                } else {
+                    /* No puedo avanzar mas por este camino, tendria
+                     * que volver por el camino */
+                }
+
+                if (neighbour == data->t){
+                    /* Llegue a t por este camino, tengo que updatear
+                     * los flujos de current_path con el minimo de ellos */
+                }
+            } else {
+                /* No tiene vecinos: hay que hacer algo? */
+            }
+        }
+    }
+
+    return found_flow;
 }
 
 dinic_result *dinic(Network *network, Node *s, Node *t, bool verbose) {
@@ -182,7 +222,7 @@ dinic_result *dinic(Network *network, Node *s, Node *t, bool verbose) {
 
     while (found_flow) {
        aux_net = aux_network_new(&data);
-       found_flow = aux_network_fbf(&data, aux_net);
+       found_flow = aux_network_find_blocking_flow(&data, aux_net, verbose);
        network_destroy(aux_net);
     }
     network_destroy(data.backwards);
