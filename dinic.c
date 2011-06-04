@@ -187,9 +187,30 @@ static bool aux_network_find_blocking_flow(dinic_t *data, Network *aux_net, bool
                 if (edge_get_flow(edge) > 0) {
                     /* Tengo flujo para mandar, lo agrego al camino actual */
                     current_path = slist_append(current_path, edge);
+                    stack_push(dfs_stack, neighbour);
                 } else {
-                    /* No puedo avanzar mas por este camino, tendria
-                     * que volver por el camino */
+                    /* No puedo avanzar mas por este camino, tengo que volver
+                     * hasta el ultimo punto que se divide el camino (que es
+                     * justo el edge de current_path que tiene como segundo
+                     * elemento el que este en el tope de la pila actualmente */
+
+                    Node *stack_node = NULL;
+                    Node *path_node = NULL;
+                    keep_fixing = true;
+
+                    /* Necesito ver el tope del stack
+                     * pero no sacarlo */
+                    stack_node = stack_pop(dfs_stack);
+                    stack_push(dfs_stack, stack_node)
+
+                    while (keep_fixing) {
+                        path_edge = slist_head_data(current_path);
+                        if (edge_get_second(path_edge) != stack_node){
+                            /* Sacar el elemento de current_path */
+                        } else {
+                            keep_fixing = false;
+                        }
+                    }
                 }
 
                 if (neighbour == data->t){
