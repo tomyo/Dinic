@@ -211,4 +211,5 @@ void *slist_nth_data(SList *self, int n);
  convenience macro to get the next element in a SList.
 */
 #define slist_next(slist) ((slist) ? (((SList *)(slist))->next) : NULL)
+#define slist_is_empty(slist) (((SList *) slist) == NULL)
 #endif

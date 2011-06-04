@@ -48,7 +48,7 @@ Network *parse_network(FILE *fh) {
     result = network_create();
     memory_check(result);
 
-    while(not reach_EOF) {
+    while(!reach_EOF) {
         edge = parse_edge(fh);
         if(edge == NULL) {
             reach_EOF = true;

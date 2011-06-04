@@ -291,6 +291,20 @@ START_TEST(test_slist_length)
 }
 END_TEST
 
+START_TEST(test_slist_is_empty)
+{
+    SList *list = NULL;
+    int value = 42;
+
+    fail_unless(slist_is_empty(list));
+
+    list = slist_append(list, &value);
+
+    fail_unless(!slist_is_empty(list));
+
+    slist_free(list);
+}
+END_TEST
 
 
 /* Armado de la test suite */
@@ -325,6 +339,7 @@ Suite *slist_suite(void){
     tcase_add_test(tc_functionality, test_slist_nth);
     /*tcase_add_test(tc_functionality, test_slist_index);*/
     tcase_add_test(tc_functionality, test_slist_length);
+    tcase_add_test(tc_functionality, test_slist_is_empty);
     suite_add_tcase(s, tc_functionality);
 
     return s;

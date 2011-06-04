@@ -57,9 +57,9 @@ Node *edge_get_second(Edge *self) {
 
 
 bool edge_cmp(const Edge *e1, const Edge *e2) {
-    assert(e1 != NULL and e2 != NULL);
+    assert(e1 != NULL && e2 != NULL);
 
-    return (*e1->x1 == *e2->x1 and *e1->x2 == *e2->x2);
+    return (*e1->x1 == *e2->x1 && *e1->x2 == *e2->x2);
 }
 
 void edge_pprint(const Edge *self){

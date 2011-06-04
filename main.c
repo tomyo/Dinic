@@ -2,21 +2,11 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <assert.h>
-#include "bfs.h" /* TODO: sacar cuando ya no lo usemos para probar */
 #include "dinic.h"
 #include "parser.h"
 #include "defs.h"
 
-/**
- * \mainpage dinic
- *
- * \section Introduction
- *
- * \section Implementacion
- *
- * \section other_aspects Otros Aspectos
- *
- */
+/* TODO: Ver donde se puede meter la documentación de modularizacion y todo eso */
 
 /**
  * @file main.c
@@ -31,20 +21,20 @@ int main(int argc, char *argv[]) {
     Network *network = NULL;
     struct parse_result options;
     dinic_result *result = NULL;
-    Node s=0, t=1;
+    Node s = 0, t = 1;
 
+    /* Las opciones se acceden con options.verbose, options.flujo
+     * u options.corte y son de tipo booleano */
     if (parse_options(argc, argv, &options) == false) {
         /* Parametros malos */
         exit(1);
     }
-    /* Las opciones se acceden con options.verbose, options.flujo
-     * u options.corte y son de tipo booleano */
 
-    /* Parsear el network de la entrada estandar*/
+    /* Parsear el network de la entrada estandar */
     network = parse_network(stdin);
 
     /* Ya tenemos el network, a correrle BFS ahora */
-    result = dinic(network, &s, &t);
+    result = dinic(network, &s, &t, options.verbose);
 
     print_output(result, options);
 

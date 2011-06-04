@@ -6,9 +6,6 @@
  * \brief Definición de algunas constantes
  */
 
-#define and &&
-#define or ||
-#define not !
 #define memory_check(m) do\
 {\
     if(m == NULL) {\
