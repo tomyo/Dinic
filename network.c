@@ -54,10 +54,10 @@ static bool edge_is_dummy(Edge *edge) {
     return (edge_get_second(edge) != NULL);
 }
 
-static void network_add_dummy_edge(Network *self, Node *node) { 
+static void network_add_dummy_edge(Network *self, Node *node) {
     Edge *dummy = edge_create(node, NULL, 0, 0);
     network_add_edge(self, dummy);
-} 
+}
 
 /*--------------------------- Funciones del ADT ----------------------------*/
 
@@ -91,7 +91,7 @@ void network_add_edge(Network *self, Edge *e) {
     } else if(slist_find_custom(edges, e, compare_edges) == NULL) {
         /* Arista no esta en edges (lista de aristas vecinas al primer nodo),
          * i.e: la arista no existe en la hash table (la agregamos) */
-         
+
         /* Si esta solo la arista dummy, la reemplazamos */
         if (slist_length(edges) == 1) {
         /* NOTA: INVARIANTE -> Si hay mas de una arista => Nou dummy */
@@ -107,7 +107,7 @@ void network_add_edge(Network *self, Edge *e) {
             ht_steal(self->node_to_edges, first_node);
             ht_insert(self->node_to_edges, first_node, edges);
         }
-        
+
     } else {
         /* Arista repetida. Le avisamos al usuario,
          * Liberamos la arista y continuamos con la ejecucion */
@@ -132,7 +132,7 @@ SList *network_neighbours(Network *self, const Node *n) {
     while (tmp != NULL) {
         /* Tomamos la cabeza de la lista */
         e = (Edge *) slist_head_data(tmp);
-        
+
         result = slist_append(result, (void *) edge_get_second(e));
         tmp = slist_next(tmp);
     }
@@ -146,7 +146,7 @@ SList *network_get_edges(Network *self, const Node *node) {
     /* Checkeo de precondiciones */
     assert(self != NULL);
     result = ht_lookup(self->node_to_edges, node);
-    
+
     /* En caso de ser la lista con la arista dummy, se saca de result */
     if (slist_length(result) == 1) {
         /* NOTA: INVARIANTE -> Si hay mas de una arista, dummy ya fue quitado.*/
@@ -166,4 +166,43 @@ void network_destroy(Network *self) {
     assert(self != NULL);
     ht_destroy(self->node_to_edges);
     free(self); self = NULL;
+}
+
+Edge * network_del_edge(Network *self, Edge *e) {
+    SList *edges = NULL;
+    Node *node = NULL;
+    Edge *result = NULL;
+
+    /* Checkeo de precondiciones */
+    assert(self != NULL);
+    assert(e != NULL);
+
+    node = edge_get_first(e);
+
+    edges = ht_lookup(self->node_to_edges, node);
+
+    if (edges == NULL) {
+        /* El nodo no esta */
+        return NULL;
+    }
+
+    result = slist_find(edges, e);
+
+    if (result == NULL) {
+        /* La arista no esta */
+        return NULL;
+    }
+
+    edges = slist_remove(edges, e);
+
+    if (edges == NULL) {
+        /* Ya no tiene aristas */
+        ht_remove(self->node_to_edges, node);
+    }
+    else {
+        /* Insertamos de vuelta porque el inicio puede haber cambiado */
+        ht_insert(self->node_to_edges, node, edges);
+    }
+
+    return result;
 }

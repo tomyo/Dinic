@@ -31,6 +31,14 @@ typedef struct _dinic_t {
 } dinic_t;
 
 /**
+ * TODO: docs
+ */
+typedef struct {
+    SList *path;
+    Flow flow_value;
+} DinicFlow;
+
+/**
  * @brief Deterina si se puede agregar edge al network auxiliar.
  * @param fwd_net network con los lados forward.
  * @param bwd_net network con los lados backward.
@@ -158,72 +166,67 @@ static Network *aux_network_new(dinic_t *data) {
  * @param verbose si va a imprimir la salida.
  * @returns network auxiliar
  */
-static bool aux_network_find_blocking_flow(dinic_t *data, Network *aux_net, bool verbose) {
-    Stack *dfs_stack = NULL;
+static DinicFlow *aux_network_find_flow(dinic_t *data, Network *aux_net, bool verbose) {
+    Stack *current_flow = NULL;
     SList *neighbours = NULL;
-    bool found_flow = false;
-    SList *current_path = NULL;
+    bool is_t_found = false;
+    DinicFlow *result = NULL;
+    Slist *path = NULL;
 
-    /* Vamos a hacer DFS en el grafo buscando caminos en el network auxiliar
-     * y mandando lo que se pueda mandar por el camino. */
+    result = (DinicFlow *) calloc(1, sizeof(*result));
+    memory_check(result);
 
-    dfs_stack = stack_new();
+    current_flow = stack_new();
     stack_push(dfs_stack, data->s); /* Empezamos en s */
 
-    while (!stack_is_empty(dfs_stack)) {
+    while (!is_t_found && !stack_is_empty(current_flow)) {
         Node *current_node = NULL;
 
-        current_node = (Node *) stack_pop(dfs_stack);
+        current_node = (Node *) stack_head(current_flow);
         neighbours = network_get_edges(aux_net, current_node);
 
-        while (neighbours != NULL) {
+        if (!slist_is_empty(neighbours)) {
             Edge *edge = NULL;
             Node *neighbour = NULL;
 
-            if (!slist_is_empty(neighbours)){
-                edge = slist_head_data(neighbours);
-                neighbour = edge_get_second(edge);
+            edge = slist_head_data(neighbours);
+            neighbour = edge_get_second(edge);
 
-                if (edge_get_flow(edge) > 0) {
-                    /* Tengo flujo para mandar, lo agrego al camino actual */
-                    current_path = slist_append(current_path, edge);
-                    stack_push(dfs_stack, neighbour);
-                } else {
-                    /* No puedo avanzar mas por este camino, tengo que volver
-                     * hasta el ultimo punto que se divide el camino (que es
-                     * justo el edge de current_path que tiene como segundo
-                     * elemento el que este en el tope de la pila actualmente */
-
-                    Node *stack_node = NULL;
-                    Node *path_node = NULL;
-                    keep_fixing = true;
-
-                    /* Necesito ver el tope del stack
-                     * pero no sacarlo */
-                    stack_node = stack_pop(dfs_stack);
-                    stack_push(dfs_stack, stack_node)
-
-                    while (keep_fixing) {
-                        path_edge = slist_head_data(current_path);
-                        if (edge_get_second(path_edge) != stack_node){
-                            /* Sacar el elemento de current_path */
-                        } else {
-                            keep_fixing = false;
-                        }
-                    }
-                }
-
-                if (neighbour == data->t){
-                    /* Llegue a t por este camino, tengo que updatear
-                     * los flujos de current_path con el minimo de ellos */
-                }
+            if (edge_get_flow(edge) > 0) {
+                /* Tengo flujo para mandar, lo agrego al camino actual */
+                stack_push(current_flow, neighbour);
             } else {
-                /* No tiene vecinos: hay que hacer algo? */
+                Node *last_node = NULL;
+                Edge *edge_to_delete = NULL;
+
+                stack_pop(current_flow);
+                last_node = stack_head(current_flow);
+
+                edge_to_delete = slist_head_data(network_get_edges(aux_net, last_node));
+                network_del_edge(edge_to_delete);
+            }
+        } else {
+            /* No tiene vecinos */
+
+            if (current_node == data->t){
+                is_t_found = true;
             }
         }
     }
 
-    return found_flow;
+    /* path es una lista de la forma [a, b, c, d] */
+    path = slist_reverse(stack_to_list(current_flow));
+    result->path = path;
+
+    while(path != NULL){
+        /* Calcular el valor del flujo de current_flow) */
+    }
+
+    return result;
+}
+
+bool aux_network_find_blocking_flow(&data, aux_net, verbose){
+    /* Llamar muchas veces a aux_network_find_flow */
 }
 
 dinic_result *dinic(Network *network, Node *s, Node *t, bool verbose) {
