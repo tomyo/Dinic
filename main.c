@@ -3,7 +3,7 @@
 #include <stdbool.h>
 #include <assert.h>
 #include "bfs.h" /* TODO: sacar cuando ya no lo usemos para probar */
-#include "dinic_trucho.h" /* TODO: Trucho por ahora */
+#include "dinic.h"
 #include "parser.h"
 #include "defs.h"
 
@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
     network = parse_network(stdin);
 
     /* Ya tenemos el network, a correrle BFS ahora */
-    result = dinic(network, &s, &t, options.verbose);
+    result = dinic(network, &s, &t);
 
     print_output(result, options);
 

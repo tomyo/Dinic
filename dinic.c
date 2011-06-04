@@ -1,12 +1,12 @@
 #include <assert.h>
 
 #include "dinic.h"
+#include "network.h"
 #include "edge.h"
 #include "node.h"
 #include "queue.h"
 
 extern bool print_aux_paths;
-
 
 /**
  * @brief Estructura interna de Dinic
@@ -18,6 +18,25 @@ typedef struct _dinic_t {
     Network *backwards;
     dinic_result *result;
 } dinic_t;
+
+
+static bool can_add_edge(Network *fwd_net, Network *bwd_net,Edge *edge) {
+    /* Asumimos que primero se pregunta por los lados backward */
+    Node *node = edge_get_first(edge);
+    bool result = false;
+    if (network_get_edges(fwd_net, node)) {
+        /* Podemos mandar flujo? */
+        result = ((edge_get_capacity(edge) - edge_get_flow(edge)) > 0);
+        
+    } 
+    if (!result) {
+        /* Podemos devolver flujo? */
+        if (network_get_edges(bwd_net, node)) {
+            result = true;
+        }
+   }     
+   return result;
+}
 
 /**
  * Funcion de creacion de un nuevo network auxiliar a partir de un 
@@ -33,12 +52,12 @@ static Network *aux_network_new(dinic_t *data) {
     bool is_t_found = false;
     
     assert(data != NULL);
-    
+
 /* Algoritmo Basicos:
  * 1) Revisar bfs_queue:
  *        a) Si esta vacia, terminamos -> Devolver Netwok Auxiliar (result)
- *        b) Si esta t, listo -> vaciar la cola (para terminar).
- *
+ *        b) Si esta t, terminamos -> Devolver Netwok Auxiliar (result)
+ *   
  * 2) Poner aristas vecinas <- y -> en *result* y en la cola de nodos del
  *    proximo nivel segun corresponda (*Lea Dinic) por cada nodo de la cola de
  *    BFS.
@@ -59,24 +78,16 @@ static Network *aux_network_new(dinic_t *data) {
     next_level = queue_new(); /* Siguiente nivel queue (vacia) */
 
     queue_push_head(bfs_queue, s); /* Empezamos desde *s* */
-    while (bfs_queue != NULL) {
+    while (!queue_is_empty(bfs_queue) && !is_t_found) {
         SList *current_edges = NULL;
         Edge *current_edge = NULL;
         Node *neighbour = NULL;
         
-        /* 1 */
-        if (queue_find(bfs_queue, t) != NULL) {
-            /* Ya llegamos a t, tenemos nuestro network auxiliar listo,
-             * liberamos la cola para terminar */
-            queue_empty(bfs_queue); /* TODO */
-        }
-        
         /* 2 */
         while (!queue_is_empty(bfs_queue)) {
             current_node = queue_pop_head(bfs_queue);
-            /* TODO: los nodos no deberian ser punterops? (network) */
-            fwd_edges = network_get_edges(main_network, *current_node);
-            bwd_edges = network_get_edges(backwards, *current_node);
+            fwd_edges = network_get_edges(main_network, current_node);
+            bwd_edges = network_get_edges(backwards, current_node);
             edges = slist_concat(fwd_edges, bwd_edges);
             /* edges tiene todas las posibles aristas del proximo nivel */
             current_edges = edges;
@@ -86,26 +97,36 @@ static Network *aux_network_new(dinic_t *data) {
                 neighbour = edge_get_second(current_edge);
                 
                 /* Ver si corresponde agregar la arista al NA (result) */ 
-                if (!network_has_node(result, *neighbour)) {
-                    network_add_edge(result, current_edge);
-                    queue_push_head(next_level, neighbour);
+                if (!network_has_node(result, neighbour)) {
+                    if (can_add_edge(main_network, backwards, current_edge)) {
+                        network_add_edge(result, current_edge);
+                        queue_push_head(next_level, neighbour);
+                    }
+                    if (neighbour == t) {
+                        is_t_found = true;
+                    }
                     
                 } else {
                     /* Solo la agregamos si pertenece al nivel siguiente */
-                    if queue_find(next_level, neighbour) {
+                    if (queue_find(next_level, neighbour) &&
+                        can_add_edge(main_network, backwards, current_edge)) {
                         network_add_edge(result, current_edge);
                     }
                 }
                 current_edges = slist_next(current_edges);
+                
             }
             /* Revisamos (y agregamos segun correspondia) todas las
              * arista que contenian los vecinos de current_node */
+            slist_free(edges);
         }
         
-        /* 3 */ 
+        /* 3 */
+        queue_free(bfs_queue); /* supuestamente vacia */
         bfs_queue = next_level;
+        next_level = queue_new();
     }
-    
+    queue_free(bfs_queue);
 }
 
 /**
@@ -121,13 +142,12 @@ static Network *aux_network_new(dinic_t *data) {
  * @param network network auxiliar donde operar.
  * @returns network auxiliar
  */
-bool aux_network_find_blocking_flow(s_dinic data*, Network *) {
+static bool aux_network_find_blocking_flow(dinic_t *data, Network *aux_net) {
     return true;
 }
 
 dinic_result *dinic(Network *network, const Node *s, const Node *t) {
-    /* basicamente el ciclo que hicimos en el pizarron. */
-    /*  TODO */
+
     return NULL;
 }
 

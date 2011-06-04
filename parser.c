@@ -17,11 +17,12 @@
                      "  -h --help       Muestra esta ayuda\n"
 
 Edge *parse_edge(FILE *fh) {
-    Node x1 = 0, x2 = 0;
+    Node *x1 = NULL, *x2 = NULL;
     Capacity c = 0;
     Edge *result = NULL;
-
-    if(fscanf(fh, FORMAT, &x1, &x2, &c) != 3) {
+    x1 = calloc(1, sizeof(Node));
+    x2 = calloc(1, sizeof(Node));
+    if(fscanf(fh, FORMAT, x1, x2, &c) != 3) {
         /* La entrada no era valida */
         result = NULL;
     } else {

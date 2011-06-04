@@ -13,16 +13,16 @@
  */
 typedef struct s_dinic_result {
     /**
+     * @brief Lista con los valores de los flujos obtenidos.
+     * Formato: {Nodo, Nodo, Flujo, Capacidad}
+     */
+    Slist *max_flow;
+    
+    /**
      * @brief valor del flujo maximal obtenido
      */
     unsigned int flow_value;
-
-    /**
-     * @brief Lista con los valores de los caminos obtenidos en cada N.A.
-     * Formato: {(Node, ->), (Node, ->), ... , (Node, <-), ... , Flujo}
-     */
-    SList *aux_flows;
-
+    
     /**
      * @brief Lista
      * Formato: {Node, Node, ...}

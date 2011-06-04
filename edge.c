@@ -65,7 +65,7 @@ bool edge_cmp(const Edge *e1, const Edge *e2) {
 void edge_pprint(const Edge *self){
     assert(self != NULL);
 
-    printf("%u %u %u (%u)\n", *self->x1, self->x2, self->f, *self->c);
+    printf("%u %u %u (%u)\n", *self->x1, *self->x2, self->f, self->c);
 }
 
 void edge_destroy(Edge *self) {

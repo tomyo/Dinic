@@ -74,12 +74,11 @@ Network *network_create(void) {
 
 void network_add_edge(Network *self, Edge *e) {
     SList *edges = NULL;
-    void *first_node = NULL;
+    Node *first_node = NULL;
 
     /* Precondiciones */
     assert(self != NULL);
     assert(e != NULL);
-
     first_node = edge_get_first(e);
     edges = ht_lookup(self->node_to_edges, first_node);
 
@@ -112,14 +111,12 @@ void network_add_edge(Network *self, Edge *e) {
     } else {
         /* Arista repetida. Le avisamos al usuario,
          * Liberamos la arista y continuamos con la ejecucion */
-        fprintf(stderr, "Arista Repetida: %u %u %u \n", 
-                *edge_get_first(e), *edge_get_second(e), edge_get_capacity(e));
         edge_destroy(e);
         return;
     }
     /* Ahora vemos si el segundo nodo ya pertenece al network, si no,
-     * lo agregamos con una arista dummy */
-    if (!network_has_node(self, edge_get_second(e))) {
+     * lo agregamos con una arista dummy (si no es ya una dummy!)*/
+    if ((!edge_is_dummy(e)) && !network_has_node(self, edge_get_second(e))) {
         network_add_dummy_edge(self, edge_get_second(e));
     }
 }
@@ -148,11 +145,10 @@ SList *network_get_edges(Network *self, const Node *node) {
 
     /* Checkeo de precondiciones */
     assert(self != NULL);
-
     result = ht_lookup(self->node_to_edges, node);
     
     /* En caso de ser la lista con la arista dummy, se saca de result */
-    if (list_length(result) == 1) {
+    if (slist_length(result) == 1) {
         /* NOTA: INVARIANTE -> Si hay mas de una arista, dummy ya fue quitado.*/
         if (edge_is_dummy(slist_head_data(result))) {
             result = NULL;
