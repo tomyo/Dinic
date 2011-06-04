@@ -2,12 +2,10 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <assert.h>
-#include "bfs.h"
+#include "bfs.h" /* TODO: sacar cuando ya no lo usemos para probar */
+#include "dinic_trucho.h" /* TODO: Trucho por ahora */
 #include "parser.h"
 #include "defs.h"
-
-#define s 0
-#define t 1
 
 /**
  * \mainpage dinic
@@ -27,27 +25,63 @@
  * el resultado
  */
 
+static void print_output(dinic_result *result, struct parse_result options);
+
 int main(int argc, char *argv[]) {
     Network *network = NULL;
     struct parse_result options;
+    dinic_result *result = NULL;
+    int s = 0, t = 1;
 
-    if (parse_params(argc, argv, &options) == false) {
+    if (parse_options(argc, argv, &options) == false) {
         /* Parametros malos */
         exit(1);
     }
-
-    if (options.verbose) puts("verbose");
-    if (options.flujo) puts("flujo");
-    if (options.corte) puts("corte");
+    /* Las opciones se acceden con options.verbose, options.flujo
+     * u options.corte y son de tipo booleano */
 
     /* Parsear el network de la entrada estandar*/
     network = parse_network(stdin);
 
     /* Ya tenemos el network, a correrle BFS ahora */
-    /* result = dinic(network, s, t); */
+    result = dinic(network, &s, &t, options.verbose);
+
+    print_output(result, options);
 
     /* Liberar la memoria alocada por los programas */
     network_destroy(network);
 
     return 0;
- }
+}
+
+/** Imprime la salida */
+static void print_output(dinic_result *result, struct parse_result options) {
+    SList *max_flow = NULL;
+    SList *min_cut = NULL;
+
+    if (options.flujo) {
+        max_flow = result->max_flow;
+        printf("Flujo Maximal\n");
+
+        while(max_flow != NULL){
+            edge_pprint((Edge *) slist_head_data(max_flow));
+        }
+
+        printf("\n");
+        printf("Valor del Flujo: %u\n", result->flow_value);
+    }
+
+    if (options.corte) {
+        min_cut = result->min_cut;
+
+        printf("Corte: {");
+
+        /* Iteramos sobre el corte separando el ultimo elemento */
+        while(slist_next(min_cut) != NULL) {
+            printf("%u, ", *((unsigned int *) slist_head_data(min_cut)));
+            min_cut = slist_next(min_cut);
+        }
+
+        printf("%u}\n", *((unsigned int *) slist_head_data(min_cut)));
+    }
+}

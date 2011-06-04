@@ -1,4 +1,4 @@
-TARGET=bfsNet
+TARGET=dinic
 CC=gcc
 CFLAGS+= -Wall -Wextra -Wdeclaration-after-statement -Wbad-function-cast -Wcast-qual -Wstrict-prototypes -Wmissing-declarations -Wmissing-prototypes -Wno-unused-parameter -pedantic -g
 SOURCES=$(shell echo *.c)
