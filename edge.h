@@ -24,7 +24,7 @@ typedef struct s_Edge Edge;
 
 /** Crea una arista desde el nodo x1 hacia el nodo x2 con capacidad w y flujo
  *  inicial f*/
-Edge *edge_create(Node x1, Node x2, Capacity c, Flow f);
+Edge *edge_create(Node *x1, Node *x2, Capacity c, Flow f);
 
 /** Devuelve la capacidad de una arista */
 Capacity edge_get_capacity(Edge *self);

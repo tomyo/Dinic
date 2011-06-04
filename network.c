@@ -6,9 +6,8 @@
 #include "hashtable/hashtable.h"
 
 
-int compare_edges(const void *a, const void *b);
-void destroy_slist(void *list);
-void destroy_edge(void *edge);
+static int compare_edges(const void *a, const void *b);
+static void destroy_slist(void *list);
 
 /**
  * \brief
@@ -20,12 +19,11 @@ struct s_Network {
     hash_table_t *node_to_edges;
 };
 
-/*--------------- Funciones Auxiliares */
-/*----- De Comparacion */
-int compare_edges(const void *a, const void *b) {
+/*------------------------ Funciones Auxiliares ---------------------------- */
+static int compare_edges(const void *a, const void *b) {
     int result = 0;
 
-    if(edge_cmp(a, b)) {
+    if(edge_cmp((Edge *) a, (Edge *) b)) {
         result = 0;
     } else {
         result = 1;
@@ -34,8 +32,7 @@ int compare_edges(const void *a, const void *b) {
     return result;
 }
 
-/*----- Destructoras */
-void destroy_slist(void *list) {
+static void destroy_slist(void *list) {
     SList *to_free = (SList *) list, *tmp;
     void *edge = NULL;
 
@@ -45,7 +42,7 @@ void destroy_slist(void *list) {
     tmp = to_free;
 
     while (tmp != NULL) {
-        edge = slist_nth_data (tmp, 0);
+        edge = slist_head_data(tmp);
         edge_destroy(edge);
         tmp = slist_next(tmp);
     }
@@ -53,11 +50,17 @@ void destroy_slist(void *list) {
     slist_free(to_free);
 }
 
-void destroy_edge(void *edge) {
-    edge_destroy((Edge *) edge);
+static bool edge_is_dummy(Edge *edge) {
+    return (edge_get_second(edge) != NULL);
 }
 
-/* Crea un network vacio */
+static void network_add_dummy_edge(Network *self, Node *node) { 
+    Edge *dummy = edge_create(node, NULL, 0, 0);
+    network_add_edge(self, dummy);
+} 
+
+/*--------------------------- Funciones del ADT ----------------------------*/
+
 Network *network_create(void) {
     Network *result = NULL;
 
@@ -81,32 +84,47 @@ void network_add_edge(Network *self, Edge *e) {
     edges = ht_lookup(self->node_to_edges, first_node);
 
     if(edges == NULL) {
-        /* El elemento no existia en la hash table */
-
+        /* No existe arista que comienze por el primer nodo de 'e' en network
+         * => la arista no existe en la hash table (la agregamos) */
         edges = slist_append(edges, (void *) e);
         ht_insert(self->node_to_edges, first_node, edges);
 
     } else if(slist_find_custom(edges, e, compare_edges) == NULL) {
-        /* El elemento no esta en la lista, lo agregamos */
-
-        /* Hacemos un prepend, pues es O(1), append es O(n)*/
-        edges = slist_prepend(edges, (void *) e);
-        /* Sacamos la lista vieja del hash, sin liberarla */
-        ht_steal(self->node_to_edges, first_node);
-        /* Agregamos la nueva lista */
-        ht_insert(self->node_to_edges, first_node, edges);
+        /* Arista no esta en edges (lista de aristas vecinas al primer nodo),
+         * i.e: la arista no existe en la hash table (la agregamos) */
+         
+        /* Si esta solo la arista dummy, la reemplazamos */
+        if (slist_length(edges) == 1) {
+        /* NOTA: INVARIANTE -> Si hay mas de una arista => Nou dummy */
+            if (edge_is_dummy(slist_head_data(edges))) {
+                edge_destroy(slist_head_data(edges));
+                edges->data = e; /* TODO: slist_replace_data */
+            }
+        } else {
+            /* Hacemos un prepend, pues es O(1) (append es O(n)) */
+            edges = slist_prepend(edges, (void *) e);
+            /* Ahora la lista empieza por la nueva arista => hay que
+             * reinsertar la lista en la hash (actualizar referencia) */
+            ht_steal(self->node_to_edges, first_node);
+            ht_insert(self->node_to_edges, first_node, edges);
+        }
+        
     } else {
-        /* Arista repetida.
-         * Le avisamos al usuario, liberamos la arista y continuamos con la
-         * ejecucion
-         */
-        fprintf(stderr, "Arista Repetida\n");
+        /* Arista repetida. Le avisamos al usuario,
+         * Liberamos la arista y continuamos con la ejecucion */
+        fprintf(stderr, "Arista Repetida: %u %u %u \n", 
+                *edge_get_first(e), *edge_get_second(e), edge_get_capacity(e));
         edge_destroy(e);
+        return;
+    }
+    /* Ahora vemos si el segundo nodo ya pertenece al network, si no,
+     * lo agregamos con una arista dummy */
+    if (!network_has_node(self, edge_get_second(e))) {
+        network_add_dummy_edge(self, edge_get_second(e));
     }
 }
 
-
-SList *network_neighbours(Network *self, Node n) {
+SList *network_neighbours(Network *self, const Node *n) {
     SList *result = NULL, *tmp = NULL;
     Edge *e = NULL;
 
@@ -116,7 +134,8 @@ SList *network_neighbours(Network *self, Node n) {
     tmp = network_get_edges(self, n);
     while (tmp != NULL) {
         /* Tomamos la cabeza de la lista */
-        e = (Edge *) slist_nth_data(tmp, 0);
+        e = (Edge *) slist_head_data(tmp);
+        
         result = slist_append(result, (void *) edge_get_second(e));
         tmp = slist_next(tmp);
     }
@@ -124,17 +143,28 @@ SList *network_neighbours(Network *self, Node n) {
     return result;
 }
 
-SList *network_get_edges(Network *self, Node node) {
+SList *network_get_edges(Network *self, const Node *node) {
     SList *result = NULL;
 
     /* Checkeo de precondiciones */
     assert(self != NULL);
 
-    result = ht_lookup(self->node_to_edges, &node);
+    result = ht_lookup(self->node_to_edges, node);
+    
+    /* En caso de ser la lista con la arista dummy, se saca de result */
+    if (list_length(result) == 1) {
+        /* NOTA: INVARIANTE -> Si hay mas de una arista, dummy ya fue quitado.*/
+        if (edge_is_dummy(slist_head_data(result))) {
+            result = NULL;
+        }
+    }
 
     return result;
 }
 
+bool network_has_node(Network *self, const Node *n) {
+    return (network_get_edges(self, n) != NULL);
+}
 
 void network_destroy(Network *self) {
     assert(self != NULL);

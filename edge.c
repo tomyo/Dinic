@@ -12,13 +12,13 @@
  */
 
 struct s_Edge {
-    Node x1;
-    Node x2;
+    Node *x1;
+    Node *x2;
     Capacity c;
     Flow f;
 };
 
-Edge *edge_create(Node x1, Node x2, Capacity c, Flow f) {
+Edge *edge_create(Node *x1, Node *x2, Capacity c, Flow f) {
     Edge *result = NULL;
 
     assert(x1 != x2); /* No se puede hacer una arista a si mismo */
@@ -47,25 +47,25 @@ Flow edge_get_flow(Edge *self) {
 
 Node *edge_get_first(Edge *self) {
     assert(self != NULL);
-    return &self->x1;
+    return self->x1;
 }
 
 Node *edge_get_second(Edge *self) {
     assert(self != NULL);
-    return &self->x2;
+    return self->x2;
 }
 
 
 bool edge_cmp(const Edge *e1, const Edge *e2) {
     assert(e1 != NULL and e2 != NULL);
 
-    return (e1->x1 == e2->x1 and e1->x2 == e2->x2);
+    return (*e1->x1 == *e2->x1 and *e1->x2 == *e2->x2);
 }
 
 void edge_pprint(const Edge *self){
     assert(self != NULL);
 
-    printf("(%d) --%d[/%d]-- (%d)\n", self->x1, self->f, self->c, self->x2);
+    printf("(%d) --%d[/%d]-- (%d)\n", *self->x1, self->f, self->c, *self->x2);
 }
 
 void edge_destroy(Edge *self) {

@@ -147,6 +147,7 @@ SList *slist_nth(SList *self, int n);
 
 /*
 Finds the element in a SList which contains the given data.
+Returns NULL otherwise.
 */
 SList *slist_find(SList *self, const void *data);
 
