@@ -51,7 +51,7 @@ static void destroy_slist(void *list) {
 }
 
 static bool edge_is_dummy(Edge *edge) {
-    return (edge_get_second(edge) != NULL);
+    return ((edge_get_second(edge) == NULL) && (edge_get_capacity(edge) == 0));
 }
 
 static void network_add_dummy_edge(Network *self, Node *node) {
