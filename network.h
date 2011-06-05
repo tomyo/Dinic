@@ -41,7 +41,7 @@ void network_pretty_print(Network *self, FILE *f);
 /** Destruye un network */
 void network_destroy(Network *self);
 
-Edge *network_del_edge(Network *self, Edge *e) {
+Edge *network_del_edge(Network *self, Edge *e);
 
 #endif
 
