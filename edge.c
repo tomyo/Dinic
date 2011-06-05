@@ -20,11 +20,15 @@ struct s_Edge {
 
 Edge *edge_create(Node *x1, Node *x2, Capacity c, Flow f) {
     Edge *result = NULL;
-
-    assert(*x1 != *x2); /* No se puede hacer una arista a si mismo */
-
+    
+    assert(x1 != x2);/* No se puede hacer una arista a si mismo */
+    if (x2 != NULL) {
+        /* parche feo para que ande con los edges dummies en network.c */
+         assert(*x1 != *x2);
+    }
+    assert(x1 != x2); 
+    
     result = calloc(1, sizeof(*result));
-
     if (result != NULL) {
         result->x1 = x1;
         result->x2 = x2;

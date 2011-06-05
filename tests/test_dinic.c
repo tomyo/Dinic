@@ -23,8 +23,8 @@ START_TEST(test_dinic_aux_net)
 {
     Network *net = NULL, *backwards = NULL, *aux_net = NULL;
     dinic_t *dt = NULL;
-    unsigned int s = 0, t = 1;
-    unsigned int x2 = 2, x3 = 3, x4 = 4, x5 = 5, x6 = 6;
+    Node s = 0, t = 1;
+    Node x2 = 2, x3 = 3, x4 = 4, x5 = 5, x6 = 6;
     Edge *e1 = NULL, *e2 = NULL, *e3 = NULL, *e4 = NULL;
     Edge *e5 = NULL, *e6 = NULL, *e7 = NULL, *e8 = NULL;
     SList *n1 = NULL;

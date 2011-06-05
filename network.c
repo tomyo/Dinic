@@ -55,6 +55,8 @@ static bool edge_is_dummy(Edge *edge) {
 }
 
 static void network_add_dummy_edge(Network *self, Node *node) {
+    assert(self != NULL);
+    assert(node != NULL);
     Edge *dummy = edge_create(node, NULL, 0, 0);
     network_add_edge(self, dummy);
 }
@@ -81,7 +83,6 @@ void network_add_edge(Network *self, Edge *e) {
     assert(e != NULL);
     first_node = edge_get_first(e);
     edges = ht_lookup(self->node_to_edges, first_node);
-
     if(edges == NULL) {
         /* No existe arista que comienze por el primer nodo de 'e' en network
          * => la arista no existe en la hash table (la agregamos) */
@@ -145,6 +146,8 @@ SList *network_get_edges(Network *self, const Node *node) {
 
     /* Checkeo de precondiciones */
     assert(self != NULL);
+    assert(node != NULL);
+    
     result = ht_lookup(self->node_to_edges, node);
 
     /* En caso de ser la lista con la arista dummy, se saca de result */
@@ -158,8 +161,10 @@ SList *network_get_edges(Network *self, const Node *node) {
     return result;
 }
 
-bool network_has_node(Network *self, const Node *n) {
-    return (network_get_edges(self, n) != NULL);
+bool network_has_node(Network *self, const Node *node) {
+    assert(self != NULL);
+    assert(node != NULL);
+    return (network_get_edges(self, node) != NULL);
 }
 
 void network_destroy(Network *self) {
