@@ -3,10 +3,10 @@
 #include <assert.h>
 #include "network.h"
 #include "slist.h"
+#include "defs.h"
 #include "hashtable/hashtable.h"
 
 
-static int compare_edges(const void *a, const void *b);
 static void destroy_slist(void *list);
 
 /**
@@ -20,17 +20,6 @@ struct s_Network {
 };
 
 /*------------------------ Funciones Auxiliares ---------------------------- */
-static int compare_edges(const void *a, const void *b) {
-    int result = 0;
-
-    if(edge_cmp((Edge *) a, (Edge *) b)) {
-        result = 0;
-    } else {
-        result = 1;
-    }
-
-    return result;
-}
 
 static void destroy_slist(void *list) {
     SList *to_free = (SList *) list, *tmp;
@@ -39,26 +28,19 @@ static void destroy_slist(void *list) {
     /* Precondicion */
     assert(to_free != NULL);
 
-    tmp = to_free;
+    /* Liberando el reference counter */
+    free(slist_head_data(list));
+    tmp = slist_next(to_free);
 
+    /* Liberando los edges */
     while (tmp != NULL) {
         edge = slist_head_data(tmp);
         edge_destroy(edge);
         tmp = slist_next(tmp);
     }
 
+    /* Liberando estructura de listas */
     slist_free(to_free);
-}
-
-static bool edge_is_dummy(Edge *edge) {
-    return ((edge_get_second(edge) == NULL) && (edge_get_capacity(edge) == 0));
-}
-
-static void network_add_dummy_edge(Network *self, Node *node) {
-    assert(self != NULL);
-    assert(node != NULL);
-    Edge *dummy = edge_create(node, NULL, 0, 0);
-    network_add_edge(self, dummy);
 }
 
 /*--------------------------- Funciones del ADT ----------------------------*/
@@ -74,55 +56,57 @@ Network *network_create(void) {
     return result;
 }
 
-void network_add_edge(Network *self, Edge *e) {
-    SList *edges = NULL;
-    Node *first_node = NULL;
+void network_add_edge(Network *network, Edge *edge) {
+    Node *x1 = NULL, *x2 = NULL;
+    SList *neighbours_x1 = NULL, *neighbours_x2 = NULL;
 
-    /* Precondiciones */
-    assert(self != NULL);
-    assert(e != NULL);
-    first_node = edge_get_first(e);
-    edges = ht_lookup(self->node_to_edges, first_node);
-    if(edges == NULL) {
-        /* No existe arista que comienze por el primer nodo de 'e' en network
-         * => la arista no existe en la hash table (la agregamos) */
-        edges = slist_append(edges, (void *) e);
-        ht_insert(self->node_to_edges, first_node, edges);
+    x1 = edge_get_first(edge);
+    x2 = edge_get_second(edge);
 
-    } else if(slist_find_custom(edges, e, compare_edges) == NULL) {
-        /* Arista no esta en edges (lista de aristas vecinas al primer nodo),
-         * i.e: la arista no existe en la hash table (la agregamos) */
+    neighbours_x1 = ht_lookup(network->node_to_edges, x1);
+    neighbours_x2 = ht_lookup(network->node_to_edges, x2);
 
-        /* Si esta solo la arista dummy, la reemplazamos */
-        if (slist_length(edges) == 1) {
-        /* NOTA: INVARIANTE -> Si hay mas de una arista => Nou dummy */
-            if (edge_is_dummy(slist_head_data(edges))) {
-                edge_destroy(slist_head_data(edges));
-                edges->data = e; /* TODO: slist_replace_data */
-            }
-        } else {
-            /* Hacemos un prepend, pues es O(1) (append es O(n)) */
-            edges = slist_prepend(edges, (void *) e);
-            /* Ahora la lista empieza por la nueva arista => hay que
-             * reinsertar la lista en la hash (actualizar referencia) */
-            ht_steal(self->node_to_edges, first_node);
-            ht_insert(self->node_to_edges, first_node, edges);
-        }
-
-    } else {
-        /* Arista repetida. Le avisamos al usuario,
-         * Liberamos la arista y continuamos con la ejecucion */
-        edge_destroy(e);
-        return;
+    /* Yo se, que en la primera posicion de la lista deberia ir el Ref Coun */
+    if (neighbours_x1 == NULL) {
+        /* No estaba en la Hash */
+        unsigned int *reference_counter_x1 = NULL;
+        reference_counter_x1 = (unsigned int *) calloc(1, sizeof(*reference_counter_x1));
+        memory_check(reference_counter_x1);
+        *reference_counter_x1 = 0;
+        neighbours_x1 = slist_prepend(neighbours_x1, reference_counter_x1);
+        ht_insert(network->node_to_edges, x1, neighbours_x1);
     }
-    /* Ahora vemos si el segundo nodo ya pertenece al network, si no,
-     * lo agregamos con una arista dummy (si no es ya una dummy!)*/
-    if ((!edge_is_dummy(e)) && !network_has_node(self, edge_get_second(e))) {
-        network_add_dummy_edge(self, edge_get_second(e));
+    if (neighbours_x2 == NULL) {
+        /* No estaba en la hash */
+        unsigned int *reference_counter_x2 = NULL;
+        reference_counter_x2 = (unsigned int *) calloc(1, sizeof(*reference_counter_x2));
+        memory_check(reference_counter_x2);
+        *reference_counter_x2 = 0;
+        neighbours_x2 = slist_prepend(neighbours_x2, reference_counter_x2);
+        ht_insert(network->node_to_edges, x2, neighbours_x2);
     }
+    /* Actualizar Refernce Counters */
+    {
+        unsigned int *rc_x1 = NULL;
+        unsigned int *rc_x2 = NULL;
+
+        rc_x1 = slist_head_data(neighbours_x1);
+        rc_x2 = slist_head_data(neighbours_x2);
+
+        *rc_x1 = *rc_x1 + 1;
+        *rc_x2 = *rc_x2 + 1;
+    }
+
+    /* Si repetimos aristas, algo anda mal.. mmmmmmmm*/
+    assert((slist_find(neighbours_x1, (void *) edge) != NULL) &&
+            "No soportamos aristas repetidas");
+
+    /* En la pos 0 de las listas esta el reference counter */
+    /* En la pos 1 empieza la lista de vecinos */
+    slist_insert(neighbours_x1, (void *) edge, 1);
 }
 
-SList *network_neighbours(Network *self, const Node *n) {
+SList *network_neighbours(Network *self, const Node n) {
     SList *result = NULL, *tmp = NULL;
     Edge *e = NULL;
 
@@ -141,30 +125,26 @@ SList *network_neighbours(Network *self, const Node *n) {
     return result;
 }
 
-SList *network_get_edges(Network *self, const Node *node) {
+SList *network_get_edges(Network *self, const Node node) {
     SList *result = NULL;
 
     /* Checkeo de precondiciones */
     assert(self != NULL);
     assert(node != NULL);
-    
-    result = ht_lookup(self->node_to_edges, node);
 
-    /* En caso de ser la lista con la arista dummy, se saca de result */
-    if (slist_length(result) == 1) {
-        /* NOTA: INVARIANTE -> Si hay mas de una arista, dummy ya fue quitado.*/
-        if (edge_is_dummy(slist_head_data(result))) {
-            result = NULL;
-        }
+    result = ht_lookup(self->node_to_edges, (void *) &node);
+
+    if (result != NULL) {
+        result = slist_next(result);
     }
 
     return result;
 }
 
-bool network_has_node(Network *self, const Node *node) {
+bool network_has_node(Network *self, const Node node) {
     assert(self != NULL);
     assert(node != NULL);
-    return (network_get_edges(self, node) != NULL);
+    return (ht_lookup(self->node_to_edges, (void *) &node) != NULL);
 }
 
 void network_destroy(Network *self) {
@@ -173,41 +153,45 @@ void network_destroy(Network *self) {
     free(self); self = NULL;
 }
 
-Edge * network_del_edge(Network *self, Edge *e) {
-    SList *edges = NULL;
-    Node *node = NULL;
-    Edge *result = NULL;
+Edge *network_del_edge(Network *network, Edge *edge) {
+    unsigned int *rc_x1 = NULL;
+    unsigned int *rc_x2 = NULL;
+    Node *x1 = NULL, *x2 = NULL;
+    SList *neighbours_x1 = NULL, *neighbours_x2 = NULL;
 
-    /* Checkeo de precondiciones */
-    assert(self != NULL);
-    assert(e != NULL);
+    x1 = edge_get_first(edge);
+    x2 = edge_get_second(edge);
 
-    node = edge_get_first(e);
+    neighbours_x1 = ht_lookup(network->node_to_edges, x1);
+    neighbours_x2 = ht_lookup(network->node_to_edges, x2);
 
-    edges = ht_lookup(self->node_to_edges, node);
+    /* Yo se, que en la primera posicion de la lista deberia ir el Ref Coun */
+    assert(neighbours_x1 != NULL);
+    assert(neighbours_x2 != NULL);
 
-    if (edges == NULL) {
-        /* El nodo no esta */
-        return NULL;
+    /* Los reference counters existen */
+    rc_x1 = slist_head_data(neighbours_x1);
+    rc_x2 = slist_head_data(neighbours_x2);
+
+    assert(*rc_x1 > 0);
+    assert(*rc_x2 > 0);
+
+    *rc_x1 = *rc_x1 - 1;
+    *rc_x2 = *rc_x2 - 1;
+
+    assert(slist_find(neighbours_x1, edge));
+    slist_remove(neighbours_x1, edge);
+    if (*rc_x1 == 0) {
+        /* Este nodo ya no existe mas en la Hash */
+        ht_remove(network->node_to_edges, x1);
     }
 
-    result = slist_find(edges, e);
-
-    if (result == NULL) {
-        /* La arista no esta */
-        return NULL;
+    assert(slist_find(neighbours_x1, edge));
+    slist_remove(neighbours_x2, edge);
+    if (*rc_x2 == 0) {
+        /* Este nodo ya no existe mas en la Hash */
+        ht_remove(network->node_to_edges, x2);
     }
 
-    edges = slist_remove(edges, e);
-
-    if (edges == NULL) {
-        /* Ya no tiene aristas */
-        ht_remove(self->node_to_edges, node);
-    }
-    else {
-        /* Insertamos de vuelta porque el inicio puede haber cambiado */
-        ht_insert(self->node_to_edges, node, edges);
-    }
-
-    return result;
+    return edge;
 }
