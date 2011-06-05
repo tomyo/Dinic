@@ -18,5 +18,9 @@
 #define min(x,y) (x < y ? x : y)
 #define max(x,y) (x < y ? y : x)
 
+/* Nodos destino y origen estandard */
+#define s 0
+#define t 1
+
 
 #endif /*DEFINITIONS_H*/
