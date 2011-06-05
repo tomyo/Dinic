@@ -1,7 +1,7 @@
 #ifndef STACK_H
 #define STACK_H
 
-typedef Stack Queue;
+typedef Queue Stack;
 
 #define stack_new() queue_new()
 #define stack_free(stack) queue_free(stack)

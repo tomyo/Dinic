@@ -125,5 +125,5 @@ int queue_index (Queue *queue, const void *data);
 /**
  * @returns a list that represents a queue.
  */
-const SList *queue_list (Queue *queue);
+SList *queue_list (Queue *queue);
 #endif
