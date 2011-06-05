@@ -32,8 +32,10 @@ END_TEST
 
 START_TEST(test_edge_invalid_nodes)
 {
+    unsigned int x1 = 0, x2 = 0;
+
     /* No deberia tener una arista de un nodo a si mismo */
-    edge = edge_create(0, 0, 1, 0);
+    edge = edge_create(&x1, &x2, 1, 0);
     edge_destroy(edge);
 }
 END_TEST
@@ -41,7 +43,9 @@ END_TEST
 /* Crear y destruir */
 START_TEST(test_edge_new_destroy)
 {
-    edge = edge_create(0, 1, 1, 0);
+    unsigned int x1 = 0, x2 = 1;
+
+    edge = edge_create(&x1, &x2, 1, 0);
     edge_destroy(edge);
 }
 END_TEST
@@ -50,8 +54,9 @@ END_TEST
 START_TEST(test_edge_get_capacity)
 {
     int w = 0;
+    unsigned int x1 = 0, x2 = 1;
 
-    edge = edge_create(0, 1, 10, 0);
+    edge = edge_create(&x1, &x2, 10, 0);
     w = edge_get_capacity(edge);
 
     fail_unless(w == 10);
@@ -61,7 +66,9 @@ END_TEST
 START_TEST(test_edge_get_first_node)
 {
     Node *node = NULL;
-    edge = edge_create(13, 37, 1337, 0);
+    unsigned int x1 = 13, x2 = 37;
+
+    edge = edge_create(&x1, &x2, 1337, 0);
 
     node = edge_get_first(edge);
 
@@ -73,7 +80,9 @@ END_TEST
 START_TEST(test_edge_get_second_node)
 {
     Node *node = NULL;
-    edge = edge_create(13, 37, 1337, 0);
+    unsigned int x1 = 13, x2 = 37;
+
+    edge = edge_create(&x1, &x2, 1337, 0);
 
     node = edge_get_second(edge);
 
@@ -85,14 +94,14 @@ END_TEST
 START_TEST(test_edge_big_edge)
 {
     Node *node = NULL;
-    unsigned int p = 0;
+    unsigned int x1 = 0, x2 = 0;
 
-    p = UINT_MAX;
-    edge = edge_create(p, 0, 10, 0);
+    x1 = UINT_MAX;
+    edge = edge_create(&x1, &x2, 10, 0);
 
     node = edge_get_first(edge);
 
-    fail_unless(*node == p);
+    fail_unless(*node == x1);
     edge_destroy(edge);
 }
 END_TEST
@@ -132,9 +141,16 @@ void edge_memory_test(void){
     Edge *edge = NULL, *edge2 = NULL;
     unsigned int *first = NULL, *second = 0;
     unsigned int capacity = 0;
+    unsigned int x1 = 0, x2 = 0;
+    unsigned int x3 = 0, x4 = 0;
 
-    edge = edge_create(UINT_MAX, 14, 15, 0);
-    edge2 = edge_create(1, 2, 5, 0);
+    x1 = UINT_MAX;
+    x2 = 14;
+    x3 = 1;
+    x4 = 2;
+
+    edge = edge_create(&x1, &x2, 15, 0);
+    edge2 = edge_create(&x3, &x4, 5, 0);
 
     first = edge_get_first(edge);
     capacity = edge_get_capacity(edge);

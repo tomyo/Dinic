@@ -20,7 +20,9 @@ END_TEST
 START_TEST(test_network_add_edge_null)
 {
     Edge *edge = NULL;
-    edge = edge_create(0, 0, 1, 0);
+    unsigned int x1 = 0, x2 = 0;
+
+    edge = edge_create(&x1, &x2, 1, 0);
     network_add_edge(NULL, edge);
     edge_destroy(edge);
 }
@@ -35,13 +37,15 @@ END_TEST
 
 START_TEST(test_network_get_edge_null)
 {
-    network_get_edges(NULL, 42);
+    unsigned int x1 = 42;
+    network_get_edges(NULL, &x1);
 }
 END_TEST
 
 START_TEST(test_network_neighbours_null)
 {
-    network_neighbours(NULL, 42);
+    unsigned int x1 = 42;
+    network_neighbours(NULL, &x1);
 }
 END_TEST
 
@@ -59,17 +63,20 @@ START_TEST(test_network_get_edges)
     Edge *e1 = NULL, *e2 = NULL, *e3 = NULL, *etmp = NULL;
     SList *el = NULL, *tmp = NULL;
     Node ntmp = 0;
+    unsigned int x1 = 0, x2 = 1;
+    unsigned int x3 = 0, x4 = 2;
+    unsigned int x5 = 2, x6 = 3;
 
-    e1 = edge_create(0, 1, 1, 0);
-    e2 = edge_create(0, 2, 1, 0);
-    e3 = edge_create(2, 3, 1, 0);
+    e1 = edge_create(&x1, &x2, 1, 0);
+    e2 = edge_create(&x3, &x4, 1, 0);
+    e3 = edge_create(&x5, &x6, 1, 0);
 
     net = network_create();
     network_add_edge(net, e1);
     network_add_edge(net, e2);
     network_add_edge(net, e3);
 
-    el = network_get_edges(net, 0);
+    el = network_get_edges(net, &x1);
 
     tmp = el;
     while(tmp != NULL){
@@ -89,17 +96,20 @@ START_TEST(test_network_get_neightbours)
     Edge *e1 = NULL, *e2 = NULL, *e3 = NULL;
     Node *ntmp = NULL;
     SList *el = NULL, *tmp = NULL;
+    unsigned int x1 = 2, x2 = 3;
+    unsigned int x3 = 1, x4 = 4;
+    unsigned int x5 = 2, x6 = 1;
 
-    e1 = edge_create(2, 3, 1, 0);
-    e2 = edge_create(1, 4, 1, 0);
-    e3 = edge_create(2, 1, 1, 0);
+    e1 = edge_create(&x1, &x2, 1, 0);
+    e2 = edge_create(&x3, &x4, 1, 0);
+    e3 = edge_create(&x5, &x6, 1, 0);
 
     net = network_create();
     network_add_edge(net, e1);
     network_add_edge(net, e2);
     network_add_edge(net, e3);
 
-    el = network_neighbours(net, 2);
+    el = network_neighbours(net, &x1);
 
     tmp = el;
     while(tmp != NULL){
@@ -149,11 +159,15 @@ void network_memory_test(void){
     Edge *e1 = NULL, *e2 = NULL, *e3 = NULL, *e4 = NULL, *etmp = NULL;
     Node *ntmp = NULL;
     SList *el = NULL, *nl = NULL, *tmp = NULL;
+    unsigned int x1 = 0, x2 = 1;
+    unsigned int x3 = 0, x4 = 2;
+    unsigned int x5 = 2, x6 = 3;
+    unsigned int x7 = 2, x8 = 0;
 
-    e1 = edge_create(0, 1, 1, 0);
-    e2 = edge_create(0, 2, 4, 0);
-    e3 = edge_create(2, 3, 6, 0);
-    e4 = edge_create(2, 0, 0, 0);
+    e1 = edge_create(&x1, &x2, 1, 0);
+    e2 = edge_create(&x3, &x4, 4, 0);
+    e3 = edge_create(&x5, &x6, 6, 0);
+    e4 = edge_create(&x7, &x8, 0, 0);
 
     net = network_create();
     network_add_edge(net, e1);
@@ -170,7 +184,7 @@ void network_memory_test(void){
         tmp = slist_next(tmp);
     }
 
-    nl = network_neighbours(net, 2);
+    nl = network_neighbours(net, &x5);
     printf("Vecinos del nodo: 2\n");
 
     tmp = nl;
