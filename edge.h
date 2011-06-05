@@ -3,7 +3,7 @@
 
 /**
  * @file edge.h
- * \brief Modulo donde se define la estructura de una arista.
+ * @brief Modulo donde se define la estructura de una arista.
  *
  * Basicamente va a ser una 4-upla que contiene 2 nodos, la
  * capacidad de la arista y el flujo actual.
@@ -42,7 +42,7 @@ Node *edge_get_second(Edge *self);
  * Funcion para comparar dos aristas, o sea para saber si
  * dos aristas son iguales.
  *
- * Decimos que dos aristas de la forma xy, zw son iguales
+ * @note Decimos que dos aristas de la forma xy, zw son iguales
  * si x == z e y == w. i.e son iguales si los nodos
  * son iguales, sin importar el peso.
  */
