@@ -162,7 +162,7 @@ static Network *aux_network_new(dinic_t *data) {
  * mencionada.
  */
 static void flow_pretty_print(dinic_t *data, DinicFlow *to_print) {
-    if to_print->path
+    /*if to_print->path*/
 }
 
 /**
@@ -179,7 +179,7 @@ static DinicFlow *aux_network_find_flow(dinic_t *data, Network *aux_net, bool ve
     SList *neighbours = NULL;
     bool is_t_found = false;
     DinicFlow *result = NULL;
-    Slist *path = NULL;
+    SList *path = NULL;
 
     result = (DinicFlow *) calloc(1, sizeof(*result));
     memory_check(result);
