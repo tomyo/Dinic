@@ -5,8 +5,8 @@
 #include "defs.h"
 
 /**
- * \brief
- * Arista: Node (x1) --  Flow(f)[\Capacity(c)] -- Node (x2).
+ * @brief
+ * @note Arista: Node (x1) --  Flow(f)[/Capacity(c)] -- Node (x2).
  *
  * Contiene los Nodos, la capacidad y el flujo de una arista.
  */
@@ -20,9 +20,9 @@ struct s_Edge {
 
 Edge *edge_create(Node x1, Node x2, Capacity c, Flow f) {
     Edge *result = NULL;
-    
+
     assert(x1 != x2);/* No se puede hacer una arista a si mismo */
-    
+
     result = calloc(1, sizeof(*result));
     if (result != NULL) {
         result->x1 = x1;
