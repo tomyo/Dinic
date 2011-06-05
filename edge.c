@@ -12,21 +12,16 @@
  */
 
 struct s_Edge {
-    Node *x1;
-    Node *x2;
+    Node x1;
+    Node x2;
     Capacity c;
     Flow f;
 };
 
-Edge *edge_create(Node *x1, Node *x2, Capacity c, Flow f) {
+Edge *edge_create(Node x1, Node x2, Capacity c, Flow f) {
     Edge *result = NULL;
     
     assert(x1 != x2);/* No se puede hacer una arista a si mismo */
-    if (x2 != NULL) {
-        /* parche feo para que ande con los edges dummies en network.c */
-         assert(*x1 != *x2);
-    }
-    assert(x1 != x2); 
     
     result = calloc(1, sizeof(*result));
     if (result != NULL) {
@@ -51,25 +46,25 @@ Flow edge_get_flow(Edge *self) {
 
 Node *edge_get_first(Edge *self) {
     assert(self != NULL);
-    return self->x1;
+    return &self->x1;
 }
 
 Node *edge_get_second(Edge *self) {
     assert(self != NULL);
-    return self->x2;
+    return &self->x2;
 }
 
 
 bool edge_cmp(const Edge *e1, const Edge *e2) {
     assert(e1 != NULL && e2 != NULL);
 
-    return (*e1->x1 == *e2->x1 && *e1->x2 == *e2->x2);
+    return (e1->x1 == e2->x1 && e1->x2 == e2->x2);
 }
 
 void edge_pprint(const Edge *self) {
     assert(self != NULL);
 
-    printf("%u %u %u (%u)\n", *self->x1, *self->x2, self->f, self->c);
+    printf("%u %u %u (%u)\n", self->x1, self->x2, self->f, self->c);
 }
 
 void edge_destroy(Edge *self) {

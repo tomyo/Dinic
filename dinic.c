@@ -37,7 +37,7 @@ bool aux_network_find_blocking_flow(dinic_t *, Network *, bool);
  */
 static bool can_add_edge(Network *fwd_net, Network *bwd_net, Edge *edge) {
     /* Asumimos que primero se pregunta por los lados backward */
-    Node *node = edge_get_first(edge);
+    Node node = *edge_get_first(edge);
     bool result = false;
 
     if (!slist_is_empty(network_get_edges(fwd_net, node))) {
@@ -64,7 +64,7 @@ Network *aux_network_new(dinic_t *data) {
     Network *main_network = NULL, *backwards = NULL, *result = NULL;
     Queue *bfs_queue = NULL, *next_level = NULL;
     Node *current_node = NULL;
-    Node *s = NULL, *t = NULL;
+    Node s = 0, t = 0;
     SList *fwd_edges = NULL, *bwd_edges = NULL, *edges = NULL;
     bool is_t_found = false;
 
@@ -94,7 +94,7 @@ Network *aux_network_new(dinic_t *data) {
     bfs_queue = queue_new();   /* BFS queue (vacia) */
     next_level = queue_new(); /* Siguiente nivel queue (vacia) */
 
-    queue_push_head(bfs_queue, s); /* Empezamos desde *s* */
+    queue_push_head(bfs_queue, &s); /* Empezamos desde *s* */
     while (!queue_is_empty(bfs_queue) && !is_t_found) {
         SList *current_edges = NULL;
         Edge *current_edge = NULL;
@@ -103,8 +103,8 @@ Network *aux_network_new(dinic_t *data) {
         /* 2 */
         while (!queue_is_empty(bfs_queue)) {
             current_node = queue_pop_head(bfs_queue);
-            fwd_edges = network_get_edges(main_network, current_node);
-            bwd_edges = network_get_edges(backwards, current_node);
+            fwd_edges = network_get_edges(main_network, *current_node);
+            bwd_edges = network_get_edges(backwards, *current_node);
             edges = slist_concat(fwd_edges, bwd_edges);
             /* edges tiene todas las posibles aristas del proximo nivel */
             current_edges = edges;
@@ -114,12 +114,12 @@ Network *aux_network_new(dinic_t *data) {
                 neighbour = edge_get_second(current_edge);
 
                 /* Ver si corresponde agregar la arista al NA (result) */
-                if (!network_has_node(result, neighbour)) {
+                if (!network_has_node(result, *neighbour)) {
                     if (can_add_edge(main_network, backwards, current_edge)) {
                         network_add_edge(result, current_edge);
                         queue_push_head(next_level, neighbour);
                     }
-                    if (neighbour == t) {
+                    if (*neighbour == t) {
                         is_t_found = true;
                     }
                 } else {
@@ -177,9 +177,8 @@ static DinicFlow *aux_network_find_flow(dinic_t *data, Network *aux_net, bool ve
     /** En flow_edges vamos mateniendo las aristas por las que pasamos */
     flow_edges = stack_new();
 
-    /* TODO: If feo pero es la unica forma de poder trabajar
-     * con aristas de pecho */
-    if ((neighbours = network_get_edges(aux_net, data->s)) != NULL) {
+    neighbours = network_get_edges(aux_net, data->s);
+    if (neighbours != NULL) {
         stack_push(flow_edges, slist_head_data(neighbours)); /* Agregamos (S,vecino) */
 
         while (!is_t_found && !stack_is_empty(flow_edges)) {
@@ -188,7 +187,7 @@ static DinicFlow *aux_network_find_flow(dinic_t *data, Network *aux_net, bool ve
 
             current_edge = (Edge *) stack_head(flow_edges);
             current_node = edge_get_second(current_edge);
-            neighbours = network_get_edges(aux_net, current_node);
+            neighbours = network_get_edges(aux_net, *current_node);
 
             if (!slist_is_empty(neighbours)) {
                 Edge *edge = NULL;
@@ -204,7 +203,7 @@ static DinicFlow *aux_network_find_flow(dinic_t *data, Network *aux_net, bool ve
                 }
             } else {
                 /* No tiene vecinos */
-                if (current_node == data->t){
+                if (*current_node == data->t){
                     is_t_found = true;
                 } else {
                     /* Ese camino no me lleva a ningun lado, borremoslo del network
@@ -245,9 +244,9 @@ bool aux_network_find_blocking_flow(dinic_t *data, Network *aux_net,
     static unsigned int aux_net_number = 1;
     bool result = false;
 
-    if (verbose)
+    if (verbose) {
         printf(stdout, "N.A. %d:\n", aux_net_number);
-
+    }
     partial = aux_network_find_flow(data, aux_net, verbose);
     if (slist_is_empty(partial->path)) {
         result = true;
@@ -276,7 +275,7 @@ bool aux_network_find_blocking_flow(dinic_t *data, Network *aux_net,
     return result;
 }
 
-dinic_result *dinic(Network *network, Node *s, Node *t, bool verbose) {
+dinic_result *dinic(Network *network, Node s, Node t, bool verbose) {
     dinic_t data;
     Network *aux_net = NULL;
     bool found_flow = true;

@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
     network = parse_network(stdin);
 
     /* Ya tenemos el network, a correrle BFS ahora */
-    result = dinic(network, &s, &t, options.verbose);
+    result = dinic(network, s, t, options.verbose);
 
     print_output(result, options);
 

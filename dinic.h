@@ -39,7 +39,7 @@ typedef struct s_dinic_result {
  * @param Booleano para hacer el resultado mas verbose
  * @returns DinicResult
  */
-dinic_result *dinic(Network * n, Node * s, Node * t, bool);
+dinic_result *dinic(Network * n, Node s, Node t, bool);
 
 /* *********** TEMPORALMENTE MOVIDO ACA ESTO VA EN EL .h ************ */
 
@@ -51,10 +51,10 @@ typedef struct {
     Network *network;
 
     /** Nodo origen */
-    Node *s;
+    Node s;
 
     /** Nodo destino */
-    Node *t;
+    Node t;
 
     /** Un network que va a contener los lados backwards */
     Network *backwards;
