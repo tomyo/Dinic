@@ -344,3 +344,7 @@ Suite *slist_suite(void){
 
     return s;
 }
+
+void list_memory_test(void){
+
+}

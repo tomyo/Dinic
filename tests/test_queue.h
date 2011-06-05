@@ -5,4 +5,6 @@
 
 Suite *queue_suite(void);
 
+void queue_memory_test(void);
+
 #endif

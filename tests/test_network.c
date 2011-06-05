@@ -63,20 +63,19 @@ START_TEST(test_network_get_edges)
     Edge *e1 = NULL, *e2 = NULL, *e3 = NULL, *etmp = NULL;
     SList *el = NULL, *tmp = NULL;
     Node ntmp = 0;
-    unsigned int x1 = 0, x2 = 1;
-    unsigned int x3 = 0, x4 = 2;
-    unsigned int x5 = 2, x6 = 3;
+    unsigned int x0 = 0, x1 = 1, x2 = 2, x3 = 3;
 
-    e1 = edge_create(&x1, &x2, 1, 0);
-    e2 = edge_create(&x3, &x4, 1, 0);
-    e3 = edge_create(&x5, &x6, 1, 0);
+    e1 = edge_create(&x0, &x1, 1, 0);
+    e2 = edge_create(&x0, &x2, 1, 0);
+    e3 = edge_create(&x2, &x3, 1, 0);
 
     net = network_create();
     network_add_edge(net, e1);
     network_add_edge(net, e2);
     network_add_edge(net, e3);
 
-    el = network_get_edges(net, &x1);
+    el = network_get_edges(net, &x0);
+    fail_unless(el != NULL);
 
     tmp = el;
     while(tmp != NULL){
@@ -96,13 +95,11 @@ START_TEST(test_network_get_neightbours)
     Edge *e1 = NULL, *e2 = NULL, *e3 = NULL;
     Node *ntmp = NULL;
     SList *el = NULL, *tmp = NULL;
-    unsigned int x1 = 2, x2 = 3;
-    unsigned int x3 = 1, x4 = 4;
-    unsigned int x5 = 2, x6 = 1;
+    unsigned int x1 = 1, x2 = 2, x3 = 3, x4 = 4;
 
-    e1 = edge_create(&x1, &x2, 1, 0);
-    e2 = edge_create(&x3, &x4, 1, 0);
-    e3 = edge_create(&x5, &x6, 1, 0);
+    e1 = edge_create(&x1, &x3, 1, 0);
+    e2 = edge_create(&x1, &x4, 1, 0);
+    e3 = edge_create(&x2, &x1, 1, 0);
 
     net = network_create();
     network_add_edge(net, e1);
@@ -110,6 +107,7 @@ START_TEST(test_network_get_neightbours)
     network_add_edge(net, e3);
 
     el = network_neighbours(net, &x1);
+    fail_unless(!slist_is_empty(el));
 
     tmp = el;
     while(tmp != NULL){
