@@ -156,7 +156,7 @@ SList *slist_concat(SList *self, SList *concat) {
 -----------------------
 */
 
-SList *slist_reverse(SList *self) {
+SList *slist_reverse(const SList *self) {
     SList *result = NULL;
     SList *iter = self;
 

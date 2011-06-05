@@ -128,7 +128,7 @@ Reverses a SList.
 Returns a new list.
 NOTE 1- O(slist_reverse) = O(n)
 */
-SList *slist_reverse(SList *self);
+SList *slist_reverse(const SList *self);
 
 /*
 Copies a SList.

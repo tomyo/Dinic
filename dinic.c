@@ -12,6 +12,20 @@
 
 /* ******************* Estructuras internas ****************** */
 
+#define INF -1 /* Funciona porque los pesos son unsigned */
+#define min(x,y) (x < y ? x : y)
+#define max(x,y) (x < y ? y : x)
+
+/**
+ * @brief Funcion interna para el chequeo de alloc's.
+ */
+static void memory_check(void *m){
+    if(m == NULL) {
+        fprintf(stderr, "Memoria insuficiente\n");
+        exit(1);
+    }
+}
+
 /**
  * @brief Estructura que contiene un flujo (camino y valor).
  */
