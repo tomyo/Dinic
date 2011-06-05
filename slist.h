@@ -203,13 +203,24 @@ SList *slist_sort_with_data(SList *self, CompareDataFunc(compare_func),
 void *user_data);
 
 /*
+Removes an element from a SList. If two elements contain the same data, only
+the first is removed. If none of the elements contain the data, the SList is
+unchanged.
+Returns the head of the list.
+*/
+SList *slist_remove(SList *self, const void *data);
+
+/*
 Gets the data of the element at the given position.
 */
 void *slist_nth_data(SList *self, int n);
-#define slist_head_data(list) slist_nth_data(list, 0)
+
+
 /*
- convenience macro to get the next element in a SList.
+ Convenience macros.
 */
+#define slist_head_data(list) slist_nth_data(list, 0)
 #define slist_next(slist) ((slist) ? (((SList *)(slist))->next) : NULL)
 #define slist_is_empty(slist) (((SList *) slist) == NULL)
-#endif
+
+#endif /* SLIST_H */

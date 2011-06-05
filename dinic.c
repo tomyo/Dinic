@@ -8,8 +8,9 @@
 #include "node.h"
 #include "queue.h"
 #include "stack.h"
+#include "defs.h"
 
-extern bool print_aux_paths;
+/* ******************* Estructuras internas ****************** */
 
 #define INF -1 /* Funciona porque los pesos son unsigned */
 #define min(x,y) (x < y ? x : y)
@@ -28,7 +29,7 @@ static void memory_check(void *m){
 /**
  * @brief Estructura interna de Dinic
  */
-typedef struct _dinic_t {
+typedef struct {
     /** El network original que va a ir cambiando durante el algoritmo */
     Network *network;
 
@@ -46,12 +47,21 @@ typedef struct _dinic_t {
 } dinic_t;
 
 /**
- * TODO: docs
+ * @brief Estructura que contiene un flujo (camino y valor).
  */
 typedef struct {
-    SList *path; /* [(a,b) (b,c) (c,d)]*/
+    /** Lista de edges que forman el flujo. Tiene la forma [(a, b), (b, c)..] */
+    SList *path;
+
+    /** Valor del flujo */
     Flow flow_value;
 } DinicFlow;
+
+/* ******************* Funciones internas ******************** */
+
+bool aux_network_find_blocking_flow(dinic_t *, Network *, bool);
+
+/* ************************ Funciones ************************ */
 
 /**
  * @brief Deterina si se puede agregar edge al network auxiliar.
@@ -176,7 +186,7 @@ static Network *aux_network_new(dinic_t *data) {
  * mencionada.
  */
 static void flow_pretty_print(dinic_t *data, DinicFlow *to_print) {
-    /*if to_print->path*/
+    /* if to_print->path */
 }
 
 /**
@@ -251,6 +261,7 @@ static DinicFlow *aux_network_find_flow(dinic_t *data, Network *aux_net, bool ve
             Edge *edge = slist_head_data(path);
             current_flow = max(current_flow, edge_get_flow(edge));
         }
+
         result->path = path;
         result->flow_value = current_flow;
     }
