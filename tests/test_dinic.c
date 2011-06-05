@@ -11,6 +11,11 @@
 #include "edge.h"
 #include "defs.h"
 
+
+/* Nodos destino y origen estandard */
+#define s 0
+#define t 1
+
 /* Precondition tests */
 START_TEST(test_dinic_aux_net_null)
 {
@@ -34,13 +39,12 @@ START_TEST(test_dinic_aux_net)
                                           |
            2 — 3                          |              2 —
           /   / \                         |             /    \
-         s   /    — t                     |            s      3 — t
-          \ /       |                     |             \    /
-           4 — 5  — 6                     |              4 —————— 5
+         s   /    — t                     |            s    — 3 — t
+          \ /       |                     |             \  /
+           4 — 5  — 6                     |              4 —— 5 — 6 
                                           |
        (todas las capacidades son 1)      |
     */
-
 
     /* Creo un network vacio */
     net = network_create();
@@ -91,15 +95,7 @@ START_TEST(test_dinic_aux_net)
     /* Verifico los vecinos de 2. Tiene que ser solamente 3 */
     n1 = network_neighbours(aux_net, 2);
     fail_unless(slist_length(n1) == 1);
-    head = slist_head_data(n1);
-    fail_unless(head == 3);
-    slist_free(n1);
-
-    /* Verifico los vecinos de 3. Tiene que ser solamente t */
-    n1 = network_neighbours(aux_net, 3);
-    fail_unless(slist_length(n1) == 1);
-    head = slist_head_data(n1);
-    fail_unless(head == t);
+    fail_unless(slist_head_data(n1) == 3);
     slist_free(n1);
 
     /* Verifico los vecinos de 4. Tienen que ser 3 y 5 */
@@ -111,15 +107,24 @@ START_TEST(test_dinic_aux_net)
         n1 = slist_next(n1);
     }
     slist_free(n1);
+    
+    /* Verifico los vecinos de 3. Tiene que ser solamente t */
+    n1 = network_neighbours(aux_net, 3);
+    fail_unless(slist_length(n1) == 1);
+    fail_unless(slist_head_data(n1); == t);
+    slist_free(n1);
 
+    /* Verifico los vecinos de 5, tiene que ser 6 */
+    n1 = network_neighbours(aux_net, t);
+    fail_unless(slist_head_data(n1) == 6);
+    
     /* Verifico los vecinos de t, tiene que ser una lista vacia */
     n1 = network_neighbours(aux_net, t);
     fail_unless(slist_is_empty(n1));
 
-    /* Verifico los vecinos de 5, tiene que ser una lista vacia */
-    n1 = network_neighbours(aux_net, t);
+    /* Verifico los vecinos de 6, tiene que ser una lista vacia */
+    n1 = network_neighbours(aux_net, 6);
     fail_unless(slist_is_empty(n1));
-
 }
 END_TEST
 
@@ -148,3 +153,6 @@ Suite *dinic_suite(void){
 void dinic_memory_test(void){
 
 }
+
+#undef s
+#undef t
