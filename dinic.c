@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <stdlib.h>
+#include <limits.h>
 
 #include "dinic.h"
 #include "network.h"
@@ -34,7 +35,7 @@ typedef struct _dinic_t {
  * TODO: docs
  */
 typedef struct {
-    SList *path;
+    SList *path; /* [(a,b) (b,c) (c,d)]*/
     Flow flow_value;
 } DinicFlow;
 
@@ -157,6 +158,13 @@ static Network *aux_network_new(dinic_t *data) {
     return result;
 }
 
+/* Funcion Auxiliar de DinicFlow, para no "ensuciar" a la funcion antes
+ * mencionada.
+ */
+static void flow_pretty_print(dinic_t *data, DinicFlow *to_print) {
+    if to_print->path
+}
+
 /**
  * Funcion que busca caminos entre nodo origen y destino hasta
  * saturar todos los caminos (flujo bloqueante)
@@ -167,7 +175,7 @@ static Network *aux_network_new(dinic_t *data) {
  * @returns network auxiliar
  */
 static DinicFlow *aux_network_find_flow(dinic_t *data, Network *aux_net, bool verbose) {
-    Stack *current_flow = NULL;
+    Stack *flow_edges = NULL;
     SList *neighbours = NULL;
     bool is_t_found = false;
     DinicFlow *result = NULL;
@@ -176,57 +184,104 @@ static DinicFlow *aux_network_find_flow(dinic_t *data, Network *aux_net, bool ve
     result = (DinicFlow *) calloc(1, sizeof(*result));
     memory_check(result);
 
-    current_flow = stack_new();
-    stack_push(dfs_stack, data->s); /* Empezamos en s */
+    /** En flow_edges vamos mateniendo las aristas por las que pasamos */
+    flow_edges = stack_new();
 
-    while (!is_t_found && !stack_is_empty(current_flow)) {
-        Node *current_node = NULL;
+    /* TODO: If feo pero es la unica forma de poder trabajar
+     * con aristas de pecho */
+    if ((neighbours = network_get_edges(aux_net, data->s)) != NULL) {
+        stack_push(flow_edges, slist_head_data(neighbours)); /* Agregamos (S,vecino) */
 
-        current_node = (Node *) stack_head(current_flow);
-        neighbours = network_get_edges(aux_net, current_node);
+        while (!is_t_found && !stack_is_empty(flow_edges)) {
+            Edge *current_edge = NULL;
+            Node *current_node = NULL;
 
-        if (!slist_is_empty(neighbours)) {
-            Edge *edge = NULL;
-            Node *neighbour = NULL;
+            current_edge = (Edge *) stack_head(flow_edges);
+            current_node = edge_get_second(current_edge);
+            neighbours = network_get_edges(aux_net, current_node);
 
-            edge = slist_head_data(neighbours);
-            neighbour = edge_get_second(edge);
+            if (!slist_is_empty(neighbours)) {
+                Edge *edge = NULL;
 
-            if (edge_get_flow(edge) > 0) {
-                /* Tengo flujo para mandar, lo agrego al camino actual */
-                stack_push(current_flow, neighbour);
+                edge = slist_head_data(neighbours);
+
+                if (edge_get_flow(edge) > 0) {
+                    /* Tengo flujo para mandar, lo agrego al camino actual */
+                    stack_push(flow_edges, edge);
+                } else {
+                    /* No puedo mandar nada por ese edge, lo borro del network*/
+                    network_del_edge(edge);
+                }
             } else {
-                Node *last_node = NULL;
-                Edge *edge_to_delete = NULL;
-
-                stack_pop(current_flow);
-                last_node = stack_head(current_flow);
-
-                edge_to_delete = slist_head_data(network_get_edges(aux_net, last_node));
-                network_del_edge(edge_to_delete);
-            }
-        } else {
-            /* No tiene vecinos */
-
-            if (current_node == data->t){
-                is_t_found = true;
+                /* No tiene vecinos */
+                if (current_node == data->t){
+                    is_t_found = true;
+                } else {
+                /* Ese camino no me lleva a ningun lado, borremoslo del network
+                 * y quitemoslo de nuestros posibles caminos */
+                    network_del_edge(current_edge);
+                    stack_pop(flow_edges);
+                }
             }
         }
     }
 
-    /* path es una lista de la forma [a, b, c, d] */
+    /* path es una lista de la forma [(s, a), (a, b), ..., (r, t)]  o []*/
     path = slist_reverse(stack_to_list(current_flow));
-    result->path = path;
+    stack_free(stack);
 
-    while(path != NULL){
-        /* Calcular el valor del flujo de current_flow) */
+    {
+        Flow current_flow = UINT_MAX;
+        while(path != NULL){
+            /* Calcular el valor del flujo de current_flow) */
+            Edge *edge = slist_head_data(path);
+            current_flow = max(current_flow, edge_get_flow(edge));
+        }
     }
+    result->path = path;
+    result->flow_value = current_flow;
+
+    if (verbose)
+        flow_pretty_print(dinic_t data, result);
 
     return result;
 }
 
-bool aux_network_find_blocking_flow(&data, aux_net, verbose){
-    /* Llamar muchas veces a aux_network_find_flow */
+bool aux_network_find_blocking_flow(dinic_t *data, Network *aux_net,
+                                    bool verbose){
+    DinicFlow *partial = NULL;
+    static unsigned int aux_net_number = 1;
+    bool result = false;
+
+    if (verbose)
+        printf(stdout, "N.A. %d:\n", aux_net_number);
+
+    partial = aux_network_find_flow(data, aux_net, verbose);
+    if (list_is_empty(partial->path)) {
+        result = true;
+    }
+
+    /* Hasta que no halla camino de data->s a data->t*/
+    while(list_is_empty(partial->path)){
+        SList *iter = partial->path;
+
+        while (list_is_empty(iter)){
+            /* Para cada arista de aux_net actualiza el valor de la arista
+             * basado en el valor de partial. */
+            Edge *current = NULL;
+            Flow new_flow = 0;
+
+            current = slist_head_data(iter);
+            new_flow = edge_get_flow(current) - partial->flow_value;
+            edge_update_flow(current, new_flow);
+        }
+        /* Corremos una vez mas el DFS en busca de un flujo adicional */
+        slist_free(partial->path);
+        free(partial);
+        partial = aux_network_find_flow(data, aux_net,verbose);
+    }
+
+    return result;
 }
 
 dinic_result *dinic(Network *network, Node *s, Node *t, bool verbose) {

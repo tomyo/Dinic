@@ -14,4 +14,6 @@
     }\
 } while(0)
 
+#define max(x,y) x>y?x:y
+
 #endif /*DEFINITIONS_H*/

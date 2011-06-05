@@ -122,4 +122,8 @@ void *queue_peek_nth (Queue *queue, unsigned int n);
  */
 int queue_index (Queue *queue, const void *data);
 
+/**
+ * @returns a list that represents a queue.
+ */
+const SList *queue_list (Queue *queue);
 #endif

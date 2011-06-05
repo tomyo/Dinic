@@ -54,4 +54,8 @@ void edge_pprint(const Edge *self);
 /** Libera una arista */
 void edge_destroy(Edge *self);
 
+/** Modifica el valor del flujo de la arista por el valor de new_flow */
+void edge_update_flow(Edge *self, unsigned int new_flow);
+
 #endif /* EDGE_H */
+

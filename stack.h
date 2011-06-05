@@ -9,5 +9,6 @@ typedef Stack Queue;
 #define stack_push(stack, elem) queue_push_head(stack, elem)
 #define stack_pop(stack) queue_pop_head(stack)
 #define stack_head(stack) queue_peek_head(stack)
+#define stack_to_list(stack) queue_list(stack)
 
 #endif /* STACK_H */

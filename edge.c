@@ -62,7 +62,7 @@ bool edge_cmp(const Edge *e1, const Edge *e2) {
     return (*e1->x1 == *e2->x1 && *e1->x2 == *e2->x2);
 }
 
-void edge_pprint(const Edge *self){
+void edge_pprint(const Edge *self) {
     assert(self != NULL);
 
     printf("%u %u %u (%u)\n", *self->x1, *self->x2, self->f, self->c);
@@ -71,4 +71,9 @@ void edge_pprint(const Edge *self){
 void edge_destroy(Edge *self) {
     assert(self != NULL);
     free(self);
+}
+
+void edge_update_flow(Edge *self, unsigned int new_flow) {
+    assert(self != NULL);
+    self->f = new_flow;
 }
