@@ -251,6 +251,11 @@ int queue_index (Queue *queue, const void *data) {
 }
 
 const SList *queue_list (Queue *queue) {
-    assert(queue != null);
+    /* Precondition */
+    assert(queue != NULL);
+
+    /* Postcondicion */
+    assert((int) queue->length == slist_length(queue->head));
+
     return queue->head;
 }

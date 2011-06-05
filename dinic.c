@@ -11,6 +11,20 @@
 
 extern bool print_aux_paths;
 
+#define INF -1 /* Funciona porque los pesos son unsigned */
+#define min(x,y) (x < y ? x : y)
+#define max(x,y) (x < y ? y : x)
+
+/**
+ * @brief Funcion interna para el chequeo de alloc's.
+ */
+static void memory_check(void *m){
+    if(m == NULL) {
+        fprintf(stderr, "Memoria insuficiente\n");
+        exit(1);
+    }
+}
+
 /**
  * @brief Estructura interna de Dinic
  */
@@ -210,7 +224,7 @@ static DinicFlow *aux_network_find_flow(dinic_t *data, Network *aux_net, bool ve
                     stack_push(flow_edges, edge);
                 } else {
                     /* No puedo mandar nada por ese edge, lo borro del network*/
-                    network_del_edge(edge);
+                    network_del_edge(aux_net, edge);
                 }
             } else {
                 /* No tiene vecinos */
@@ -219,7 +233,7 @@ static DinicFlow *aux_network_find_flow(dinic_t *data, Network *aux_net, bool ve
                 } else {
                 /* Ese camino no me lleva a ningun lado, borremoslo del network
                  * y quitemoslo de nuestros posibles caminos */
-                    network_del_edge(current_edge);
+                    network_del_edge(aux_net, current_edge);
                     stack_pop(flow_edges);
                 }
             }
@@ -227,8 +241,8 @@ static DinicFlow *aux_network_find_flow(dinic_t *data, Network *aux_net, bool ve
     }
 
     /* path es una lista de la forma [(s, a), (a, b), ..., (r, t)]  o []*/
-    path = slist_reverse(stack_to_list(current_flow));
-    stack_free(stack);
+    path = slist_reverse(stack_to_list(flow_edges));
+    stack_free(flow_edges);
 
     {
         Flow current_flow = UINT_MAX;
@@ -237,12 +251,13 @@ static DinicFlow *aux_network_find_flow(dinic_t *data, Network *aux_net, bool ve
             Edge *edge = slist_head_data(path);
             current_flow = max(current_flow, edge_get_flow(edge));
         }
+        result->path = path;
+        result->flow_value = current_flow;
     }
-    result->path = path;
-    result->flow_value = current_flow;
 
-    if (verbose)
-        flow_pretty_print(dinic_t data, result);
+    if (verbose) {
+        flow_pretty_print(data, result);
+    }
 
     return result;
 }
@@ -257,15 +272,15 @@ bool aux_network_find_blocking_flow(dinic_t *data, Network *aux_net,
         printf(stdout, "N.A. %d:\n", aux_net_number);
 
     partial = aux_network_find_flow(data, aux_net, verbose);
-    if (list_is_empty(partial->path)) {
+    if (slist_is_empty(partial->path)) {
         result = true;
     }
 
     /* Hasta que no halla camino de data->s a data->t*/
-    while(list_is_empty(partial->path)){
+    while(slist_is_empty(partial->path)){
         SList *iter = partial->path;
 
-        while (list_is_empty(iter)){
+        while (slist_is_empty(iter)){
             /* Para cada arista de aux_net actualiza el valor de la arista
              * basado en el valor de partial. */
             Edge *current = NULL;
