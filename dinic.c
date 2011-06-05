@@ -12,40 +12,6 @@
 
 /* ******************* Estructuras internas ****************** */
 
-#define INF -1 /* Funciona porque los pesos son unsigned */
-#define min(x,y) (x < y ? x : y)
-#define max(x,y) (x < y ? y : x)
-
-/**
- * @brief Funcion interna para el chequeo de alloc's.
- */
-static void memory_check(void *m){
-    if(m == NULL) {
-        fprintf(stderr, "Memoria insuficiente\n");
-        exit(1);
-    }
-}
-
-/**
- * @brief Estructura interna de Dinic
- */
-typedef struct {
-    /** El network original que va a ir cambiando durante el algoritmo */
-    Network *network;
-
-    /** Nodo origen */
-    Node *s;
-
-    /** Nodo destino */
-    Node *t;
-
-    /** Un network que va a contener los lados backwards */
-    Network *backwards;
-
-    /** La estructura que devuelve el resultado */
-    dinic_result *result;
-} dinic_t;
-
 /**
  * @brief Estructura que contiene un flujo (camino y valor).
  */
@@ -84,8 +50,8 @@ static bool can_add_edge(Network *fwd_net, Network *bwd_net, Edge *edge) {
         if (!slist_is_empty(network_get_edges(bwd_net, node))) {
             result = true;
         }
-   }
-   return result;
+    }
+    return result;
 }
 
 /**
@@ -94,7 +60,7 @@ static bool can_add_edge(Network *fwd_net, Network *bwd_net, Edge *edge) {
  * @param s_dinic data donde esta el network y los nodos origen y destino.
  * @returns network (network auxiliar)
  */
-static Network *aux_network_new(dinic_t *data) {
+Network *aux_network_new(dinic_t *data) {
     Network *main_network = NULL, *backwards = NULL, *result = NULL;
     Queue *bfs_queue = NULL, *next_level = NULL;
     Node *current_node = NULL;
@@ -241,8 +207,8 @@ static DinicFlow *aux_network_find_flow(dinic_t *data, Network *aux_net, bool ve
                 if (current_node == data->t){
                     is_t_found = true;
                 } else {
-                /* Ese camino no me lleva a ningun lado, borremoslo del network
-                 * y quitemoslo de nuestros posibles caminos */
+                    /* Ese camino no me lleva a ningun lado, borremoslo del network
+                     * y quitemoslo de nuestros posibles caminos */
                     network_del_edge(aux_net, current_edge);
                     stack_pop(flow_edges);
                 }
@@ -326,9 +292,9 @@ dinic_result *dinic(Network *network, Node *s, Node *t, bool verbose) {
     data.result->max_flow = NULL;
 
     while (found_flow) {
-       aux_net = aux_network_new(&data);
-       found_flow = aux_network_find_blocking_flow(&data, aux_net, verbose);
-       network_destroy(aux_net);
+        aux_net = aux_network_new(&data);
+        found_flow = aux_network_find_blocking_flow(&data, aux_net, verbose);
+        network_destroy(aux_net);
     }
     network_destroy(data.backwards);
     return data.result;

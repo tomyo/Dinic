@@ -152,3 +152,7 @@ Suite *queue_suite(void){
 
     return s;
 }
+
+void queue_memory_test(void){
+
+}

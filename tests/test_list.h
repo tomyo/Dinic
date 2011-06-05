@@ -5,4 +5,6 @@
 
 Suite *slist_suite(void);
 
+void list_memory_test(void);
+
 #endif

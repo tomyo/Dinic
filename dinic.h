@@ -41,5 +41,31 @@ typedef struct s_dinic_result {
  */
 dinic_result *dinic(Network * n, Node * s, Node * t, bool);
 
+/* *********** TEMPORALMENTE MOVIDO ACA ESTO VA EN EL .h ************ */
+
+/**
+ * @brief Estructura interna de Dinic
+ */
+typedef struct {
+    /** El network original que va a ir cambiando durante el algoritmo */
+    Network *network;
+
+    /** Nodo origen */
+    Node *s;
+
+    /** Nodo destino */
+    Node *t;
+
+    /** Un network que va a contener los lados backwards */
+    Network *backwards;
+
+    /** La estructura que devuelve el resultado */
+    dinic_result *result;
+} dinic_t;
+
+Network *aux_network_new(dinic_t *);
+
+/* *********** TEMPORALMENTE MOVIDO ACA ESTO VA EN EL .h ************ */
+
 
 #endif
