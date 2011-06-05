@@ -250,7 +250,7 @@ int queue_index (Queue *queue, const void *data) {
     return slist_index(queue->head, data);
 }
 
-const SList *queue_list (Queue *queue) {
+SList *queue_list (Queue *queue) {
     /* Precondition */
     assert(queue != NULL);
 
