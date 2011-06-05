@@ -336,3 +336,32 @@ void *slist_nth_data(SList *self, int n) {
     }
     return result;
 }
+
+SList *slist_remove(SList *self, const void *data) {
+    SList *current = NULL, *previous = NULL, *head = NULL;
+
+    current = self;
+    previous = current;
+
+    while(current != NULL && (current->data != data)) {
+        previous = current;
+        current = slist_next(current);
+    }
+    if (current == NULL) {
+        /* Data is not in the list */
+        head = self;
+    }
+    else {
+        if (previous == current) {
+            /* Data is on the head of the list */
+            head = current->next;
+        }
+        else {
+            previous->next = current->next;
+            head = self;
+        }
+        slist_free_1(current);
+    }
+
+    return head;
+}
