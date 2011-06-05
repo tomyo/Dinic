@@ -24,6 +24,7 @@ START_TEST(test_dinic_aux_net_null)
 }
 END_TEST
 
+
 /* Functionality test */
 START_TEST(test_dinic_aux_net)
 {
@@ -41,7 +42,7 @@ START_TEST(test_dinic_aux_net)
           /   / \                         |             /    \
          s   /    — t                     |            s    — 3 — t
           \ /       |                     |             \  /
-           4 — 5  — 6                     |              4 —— 5 — 6 
+           4 — 5  — 6                     |              4 —— 5 — 6
                                           |
        (todas las capacidades son 1)      |
     */
@@ -107,7 +108,7 @@ START_TEST(test_dinic_aux_net)
         n1 = slist_next(n1);
     }
     slist_free(n1);
-    
+
     /* Verifico los vecinos de 3. Tiene que ser solamente t */
     n1 = network_neighbours(aux_net, 3);
     fail_unless(slist_length(n1) == 1);
@@ -117,7 +118,7 @@ START_TEST(test_dinic_aux_net)
     /* Verifico los vecinos de 5, tiene que ser 6 */
     n1 = network_neighbours(aux_net, t);
     fail_unless(slist_head_data(n1) == 6);
-    
+
     /* Verifico los vecinos de t, tiene que ser una lista vacia */
     n1 = network_neighbours(aux_net, t);
     fail_unless(slist_is_empty(n1));
