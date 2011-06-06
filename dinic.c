@@ -37,8 +37,14 @@ typedef struct {
 /* ******************* Funciones internas ******************** */
 
 bool aux_network_find_blocking_flow(dinic_t *, Network *, bool);
+static int compare_nodes(const void *x1, const void *x2);
 
 /* ************************ Funciones ************************ */
+
+/* TODO: Descripcion */
+static int compare_nodes(const void *x1, const void *x2) {
+    return ((*(const Node *)x1) == (*(const Node *)x2))?0:1;
+}
 
 /**
  * @brief Determina si se puede mandar flujo o devolverlo por edge.
@@ -144,7 +150,7 @@ Network *aux_network_new(dinic_t *data) {
                     }
                 } else {
                     /* Solo la agregamos si pertenece al nivel siguiente */
-                    if (queue_find(next_level, neighbour) &&
+                    if (queue_find_custom(next_level, neighbour, compare_nodes) &&
                         can_send_flow(current_edge, mode)) {
                         network_add_edge_m(result, current_edge, mode);
                     }

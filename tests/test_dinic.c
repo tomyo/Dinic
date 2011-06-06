@@ -98,7 +98,6 @@ START_TEST(test_dinic_aux_net)
     fail_unless(slist_length(n1) == 2);
     while (n1 != NULL) {
         head = *((Node *) slist_head_data(n1));
-        printf("%u\n", head);
         fail_unless(head == 3 || head == 5);
         n1 = slist_next(n1);
     }
