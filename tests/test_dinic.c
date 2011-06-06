@@ -530,7 +530,8 @@ START_TEST(test_dinic_net_small)
     Edge *e1 = NULL, *e2 = NULL, *e3 = NULL, *e4 = NULL;
     Edge *e5 = NULL, *e6 = NULL, *e7 = NULL;
     Node s = 0, t = 1;
-    bool verbose_mode = true; /* EDITME */
+    
+    bool verbose_mode = false; /* EDITME */
 
     /*
        Network a representar
@@ -588,9 +589,18 @@ START_TEST(test_dinic_net_small)
 
 
     fail_unless(result != NULL);
+    {
+    SList *edges = NULL;
+    
+    edges = result->max_flow;
+    while(edges != NULL) {
+        edge_pprint(slist_head_data(edges));
+        
+        edges = slist_next(edges);
+    }
+    }
     fail_unless(result->flow_value == 3);
     fail_unless(slist_length(result->max_flow) == 7);
-
 }
 END_TEST
 

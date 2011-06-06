@@ -217,7 +217,6 @@ SList *network_forward_edges(Network *self){
             }
             iter_edges = slist_next(iter_edges);
         }
-        slist_free(edges);
         iter_nodes = slist_next(iter_nodes);
     }
     slist_free(nodes);
