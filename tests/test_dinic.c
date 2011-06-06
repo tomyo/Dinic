@@ -237,7 +237,6 @@ START_TEST(test_dinic_aux_net_backward)
     dinic_t *dt = NULL;
     Edge *e1 = NULL, *e2 = NULL, *e3 = NULL;
     Edge *e4 = NULL, *e5 = NULL, *e6 = NULL;
-    Edge *b1 = NULL, *b2 = NULL, *b3 = NULL;
     SList *n1 = NULL;
     Edge *head = NULL;
     Node s = 0, t = 1;
@@ -253,10 +252,10 @@ START_TEST(test_dinic_aux_net_backward)
 
        Capacidades:
         x1_|__x2_|__flow_|__cap
-        s  |  1  |   3   |   3
+        s  |  4  |   3   |   3
         s  |  2  |   0   |   5
-        1  |  3  |   3   |   5
-        1  |  t  |   0   |   5
+        4  |  3  |   3   |   5
+        4  |  t  |   0   |   5
         2  |  3  |   0   |   5
         3  |  t  |   3   |   3
     */
@@ -325,6 +324,95 @@ START_TEST(test_dinic_aux_net_backward)
 }
 END_TEST
 
+START_TEST(test_dinic_aux_net_no_t)
+{
+    Network *net = NULL, *aux_net = NULL;
+    dinic_t *dt = NULL;
+    Edge *e1 = NULL, *e2 = NULL, *e3 = NULL, *e4 = NULL;
+    SList *n1 = NULL, *min_cut = NULL;
+    Node head = 0;
+    Node s = 0, t = 1;
+
+    /*
+       Network a representar              |       Network auxiliar
+                                          |
+           2                              |        2  
+          / \                             |       / \
+         s   4                            |      s   4            
+          \ /                             |       \ /
+           3                              |        3
+
+       Capacidades:
+        x1_|__x2_|__flow_|__cap
+        s  |  2  |   0   |   1
+        s  |  3  |   0   |   2
+        2  |  4  |   0   |   3
+        3  |  4  |   0   |   4
+    */
+
+    /* Creo un network vacio */
+    net = network_create();
+
+    /* Creo los lados forward */
+    e1 = edge_create(s, 2, 1, 0);
+    e2 = edge_create(s, 3, 2, 0);
+    e3 = edge_create(2, 4, 3, 0);
+    e4 = edge_create(3, 4, 4, 0);
+
+    /* Lleno el network con los lados forward */
+    network_add_edge(net, e1);
+    network_add_edge(net, e2);
+    network_add_edge(net, e3);
+    network_add_edge(net, e4);
+
+    /* Completo la estructura con los datos */
+    dt = (dinic_t *) calloc(1, sizeof(*dt));
+    dt->network = net;
+    dt->s = s;
+    dt->t = t; /* Not used. Not tested */
+    dt->result = NULL; /* Not used. Not tested */
+
+    /* Creo el network auxiliar */
+    aux_net = aux_network_new(dt);
+
+    /* Verifico los vecinos de s, tiene que ser 2 y 3 */
+    n1 = network_neighbours(aux_net, s);
+    fail_unless(slist_length(n1) == 2);
+    while (n1 != NULL) {
+        head = *((Node *) slist_head_data(n1));
+        fail_unless(head == 2 || head == 3);
+        n1 = slist_next(n1);
+    }
+
+    /* Verifico los vecinos de 2, tiene que ser solamente 4 */
+    n1 = network_neighbours(aux_net, 2);
+    fail_unless(slist_length(n1) == 1);
+    head = *(Node *) slist_head_data(n1);
+    fail_unless(head == 4);
+
+    /* Verifico los vecinos de 3, tiene que ser solamente 4 */
+    n1 = network_neighbours(aux_net, 3);
+    fail_unless(slist_length(n1) == 1);
+    head = *(Node *) slist_head_data(n1);
+    fail_unless(head == 4);
+
+    /* Verifico los vecinos de 4, tiene que ser una lista vacia */
+    n1 = network_neighbours(aux_net, 4);
+    fail_unless(slist_is_empty(n1));
+    
+    /* Verifico el que sea el corte minimo */
+    min_cut = network_get_nodes(net);
+    fail_unless(min_cut != NULL);
+    fail_unless(slist_length(min_cut) == 4);
+    while (min_cut != NULL)
+    {
+        fail_unless(*((Node *)slist_head_data(min_cut)) <= 4);
+        fail_unless(*((Node *)slist_head_data(min_cut)) != t);
+        min_cut = slist_next(min_cut);
+    }
+}
+END_TEST
+
 /* Armado de la test suite */
 Suite *dinic_suite(void){
     Suite *s = suite_create("dinic");
@@ -343,6 +431,7 @@ Suite *dinic_suite(void){
     tcase_add_test(tc_functionality, test_dinic_aux_net);
     tcase_add_test(tc_functionality, test_dinic_aux_net_2);
     tcase_add_test(tc_functionality, test_dinic_aux_net_backward);
+    tcase_add_test(tc_functionality, test_dinic_aux_net_no_t);
     suite_add_tcase(s, tc_functionality);
 
     return s;
