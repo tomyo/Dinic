@@ -1,18 +1,21 @@
 TARGET=dinic
 CC=gcc
-CFLAGS+= -Wall -Wextra -Wdeclaration-after-statement -Wbad-function-cast -Wcast-qual -Wstrict-prototypes -Wmissing-declarations -Wmissing-prototypes -Wno-unused-parameter -pedantic -g # -Werror
+CFLAGS+= -Wall -Wextra -Wdeclaration-after-statement -Wbad-function-cast -Wcast-qual -Wstrict-prototypes -Wmissing-declarations -Wmissing-prototypes -Wno-unused-parameter -pedantic -g -Werror
 SOURCES=$(shell echo *.c)
 OBJECTS= $(SOURCES:.c=.o)
+HASHOBJECTS=$(shell echo hashtable/*.o)
 NETFILE = example.network
 
 all: $(TARGET)
 
 $(TARGET): $(OBJECTS)
-	$(CC) $^ -o $@
+	make -C hashtable
+	$(CC) $^ $(HASHOBJECTS) -o $@
 
 clean:
 	rm -f $(TARGET) $(OBJECTS) .depend *~
 	make -C tests clean
+	make -C hashtable clean
 
 test: $(OBJECTS)
 	make -C tests test

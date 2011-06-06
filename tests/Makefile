@@ -4,20 +4,20 @@ TARGET=runner
 TARGET_MEM=leaktest
 CC=gcc
 LDFLAGS=-lcheck
-CFLAGS+= -I.. -ansi -Wall -Wextra -Wdeclaration-after-statement -Wbad-function-cast -Wcast-qual -Wstrict-prototypes -Wmissing-declarations -Wmissing-prototypes -Wno-unused-parameter -Werror -pedantic -g $(LDFLAGS)
+CFLAGS+= -I.. -ansi -Wall -Wextra -Wdeclaration-after-statement -Wbad-function-cast -Wcast-qual -Wstrict-prototypes -Wmissing-declarations -Wmissing-prototypes -Wno-unused-parameter -Werror -pedantic -g
 TEST_SOURCES=$(shell echo test*.c) run_tests.c
 MEM_SOURCES=$(shell echo test*.c) leaktest.c
 TEST_OBJECTS= $(TEST_SOURCES:.c=.o)
 MEM_OBJECTS= $(MEM_SOURCES:.c=.o)
 # Aquí no usamos un wildcard para no traer el main
-TESTED_OBJECTS=../edge.o ../network.o ../slist.o ../queue.o ../hashtable.o ../dinic.o
+TESTED_OBJECTS=../edge.o ../network.o ../slist.o ../queue.o ../hashtable.o 
+               ../dinic.o
 
 test: $(TARGET)
 	./$^
 
 memtest: $(TARGET_MEM)
-	# Ver http://live.gnome.org/Valgrind para explicacion de G_SLICE
-	G_SLICE=always-malloc valgrind --leak-check=full --show-reachable=yes ./$^
+	valgrind --leak-check=full --show-reachable=yes ./$^
 
 $(TARGET): $(TEST_OBJECTS) $(TESTED_OBJECTS)
 	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
