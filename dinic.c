@@ -360,6 +360,9 @@ DinicFlow *aux_network_find_flow(dinic_t *data, Network *aux_net, bool verbose) 
         next_node = &data->s;
 
         result->path = path;
+        if (path == NULL) {
+            current_flow = 0;
+        }
         while (path != NULL) {
             Edge *edge = slist_head_data(path);
 
@@ -438,7 +441,7 @@ dinic_result *dinic(Network *network, Node s, Node t, bool verbose) {
         
         /* 1 */
         aux_net = aux_network_new(&data);
-        assert(aux_net != NULL);
+        memory_check(aux_net);
         
         /* 2 */
         if (network_has_node(aux_net, t)) {
