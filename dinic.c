@@ -11,28 +11,8 @@
 #include "defs.h"
 
 
-#define network_add_edge_m(network, edge, mode) do\
-{\
-    assert(mode == 'f' || mode == 'b');\
-    if (mode == 'f')\
-        network_add_edge(network, edge);\
-    else\
-        network_add_edge_backward(network, edge);\
-} while(0)
-
-
 /* ******************* Estructuras internas ****************** */
 
-/**
- * @brief Estructura que contiene un flujo (camino y valor).
- */
-typedef struct {
-    /** Lista de edges que forman el flujo. Tiene la forma [(a, b), (b, c)..] */
-    SList *path;
-
-    /** Valor del flujo */
-    Flow flow_value;
-} DinicFlow;
 
 /* ******************* Funciones internas ******************** */
 
@@ -116,17 +96,6 @@ Network *aux_network_new(dinic_t *data) {
         SList *current_edges = NULL;
         Edge *current_edge = NULL;
         Node *neighbour = NULL;
-        static int counter = 0;
-        SList *mi_list = queue_list(bfs_queue);
-
-        counter++;
-        printf("Nivel %d\n", counter);
-        printf("[ ");
-        while(mi_list != NULL) {
-            printf("%d ", *(Node *)slist_head_data(mi_list));
-            mi_list = slist_next(mi_list);
-        }
-        printf("]\n");
 
         /* 2 */
         while (!queue_is_empty(bfs_queue)) {
@@ -154,7 +123,7 @@ Network *aux_network_new(dinic_t *data) {
                     /* Si no esta en el network, solo me tengo que fijar que
                      * puedo mandar o devolver flujo */
                     if (can_send_flow(current_edge, mode)) {
-                        network_add_edge_m(result, current_edge, mode);
+                        _network_add_edge(result, current_edge, mode);
                         queue_push_head(next_level, neighbour);
                         if (*neighbour == t) {
                             is_t_found = true;
@@ -164,7 +133,7 @@ Network *aux_network_new(dinic_t *data) {
                     /* Solo la agregamos si pertenece al nivel siguiente */
                     if (queue_find_custom(next_level, neighbour, compare_nodes) &&
                         can_send_flow(current_edge, mode)) {
-                        network_add_edge_m(result, current_edge, mode);
+                        _network_add_edge(result, current_edge, mode);
                     }
                 }
                 current_edges = slist_next(current_edges);
@@ -203,7 +172,7 @@ static void flow_pretty_print(dinic_t *data, DinicFlow *to_print) {
  * @param verbose si va a imprimir la salida.
  * @returns DinicFlow con el camino encontrado y su flujo
  */
-static DinicFlow *aux_network_find_flow(dinic_t *data, Network *aux_net, bool verbose) {
+DinicFlow *aux_network_find_flow(dinic_t *data, Network *aux_net, bool verbose) {
     Node *expected_node = NULL;
     Stack *flow_edges = NULL;
     SList *neighbours = NULL, *path = NULL;
