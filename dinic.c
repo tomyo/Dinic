@@ -248,6 +248,7 @@ DinicFlow *aux_network_find_flow(dinic_t *data, Network *aux_net, bool verbose) 
             }
             else {
                 _network_del_edge(aux_net, edge, 'f');
+                continue;
             }
             
             next_node = &data->s;
