@@ -56,9 +56,6 @@ typedef struct {
     /** Nodo destino */
     Node t;
 
-    /** Un network que va a contener los lados backwards */
-    Network *backwards;
-
     /** La estructura que devuelve el resultado */
     dinic_result *result;
 } dinic_t;

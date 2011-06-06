@@ -8,6 +8,8 @@
 #include "slist.h"
 #include "defs.h" /* Para memory_check */
 
+/* TODO: Ver que no haya variables mal inicializadas (yo no fui!) =) */
+
 SList *slist_alloc(void) {
     SList *result = NULL;
     result = calloc(1, sizeof(*result));
@@ -242,7 +244,7 @@ SList *slist_find(SList *self, const void *data) {
 }
 
 SList *slist_find_custom(SList *self, const void *data, CompareFunc(func)) {
-    SList *result = NULL;
+    SList *result = self;
 
     while(result != NULL && func(result->data, data) != 0) {
         result = slist_next(result);

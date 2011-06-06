@@ -31,6 +31,15 @@ Network *network_create(void);
 void network_add_edge(Network *self, Edge *e);
 
 /**
+ * @brief Agrega una arista al network en sentido backward.
+ *
+ * No se debe agregar una arista ya agregada.
+ * @param self network donde ejecutar la operacion.
+ * @param e la arista a agregar.
+ */
+void network_add_edge_backward(Network *self, Edge *e);
+
+/**
  * @brief Devuelve la lista con punteros a los vecinos del nodo n.
  * @note La lista devuelta por esta funcion debe ser liberada
  * por el que la llame.
@@ -86,4 +95,16 @@ void network_destroy(Network *self);
  */
 Edge *network_del_edge(Network *self, Edge *e);
 
-#endif
+
+/**
+ * @brief Elimina una arista del network agregada backward.
+ *
+ * La arista debe pertenecer al network en sentido backward.
+ * @note Se devuelve la arista para quien llame la funcion la libere o no.
+ * @param self network donde ejecutar la operacion.
+ * @param e edge para borrar.
+ * @returns Arista borrada del network.
+ */
+Edge *network_del_edge_backward(Network *self, Edge *e);
+
+#endif /* NETWORK_H */
