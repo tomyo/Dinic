@@ -35,10 +35,9 @@ static int compare_edges(const void *a, const void *b) {
 }
 
 static void destroy_slist(void *list) {
-    SList *to_free = (SList *) list, *tmp;
+    SList *to_free = (SList *) list, *tmp = NULL;
     void *edge = NULL;
 
-    /* TODO: No liberar lados backwards */
     /* Precondicion */
     assert(to_free != NULL);
 
@@ -49,7 +48,11 @@ static void destroy_slist(void *list) {
     /* Liberando los edges */
     while (tmp != NULL) {
         edge = slist_head_data(tmp);
-        edge_destroy(edge);
+        /* Podria haber liberado el edge si
+         * estaba insertado en otra posicion */
+        if (edge != NULL) {
+            edge_destroy(edge);
+        }
         tmp = slist_next(tmp);
     }
 
