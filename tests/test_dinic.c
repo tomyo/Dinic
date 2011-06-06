@@ -417,8 +417,8 @@ START_TEST(test_dinic_aux_net_find_flow)
 {
     Network *net = NULL, *aux_net = NULL;
     dinic_t *dt = NULL;
-    Edge *e1 = NULL, *e2 = NULL, *e3 = NULL, *e4 = NULL;
-    Edge *e5 = NULL, *e6 = NULL, *e7 = NULL, *e8 = NULL;
+    Edge *e1 = NULL, *e2 = NULL, *e3 = NULL;
+    Edge *e4 = NULL, *e5 = NULL, *e6 = NULL;
     Node s = 0, t = 1;
     DinicFlow *flow = NULL;
     SList *path = NULL;
@@ -427,17 +427,15 @@ START_TEST(test_dinic_aux_net_find_flow)
     int expected = 0;
 
     /*
-       Network a representar              |       Network auxiliar
-                                          |
-           2 — 3                          |              2 —
-          /   / \ 0                       |             /    \
-         s   /    — t                     |            s    — 3
-          \ /       |                     |             \  /
-           4 — 5  — 6                     |              4 —— 5 — 6 — t
-                                          |
-       Mismo network que en el test       |
-       anterior pero con la arista        |
-       3-t con capacidad 0 y el resto 1   |
+       Network a representar
+
+           2
+          /  \
+         s    3
+          \  /
+           4 —— 5 — 6 — t
+
+        Todas las capacidades son 1
     */
 
     /* Creo un network vacio */
@@ -448,20 +446,8 @@ START_TEST(test_dinic_aux_net_find_flow)
     e2 = edge_create(s, 4, 1, 0);
     e3 = edge_create(2, 3, 1, 0);
     e4 = edge_create(4, 3, 1, 0);
-    e5 = edge_create(4, 5, 1, 0);
-    e6 = edge_create(3, t, 0, 0);
-    e7 = edge_create(5, 6, 1, 0);
-    e8 = edge_create(6, t, 1, 0);
-
-    /* Lleno el network */
-    network_add_edge(net, e1);
-    network_add_edge(net, e2);
-    network_add_edge(net, e3);
-    network_add_edge(net, e4);
-    network_add_edge(net, e5);
-    network_add_edge(net, e6);
-    network_add_edge(net, e7);
-    network_add_edge(net, e8);
+    e5 = edge_create(5, 6, 1, 0);
+    e6 = edge_create(6, t, 1, 0);
 
     /* Completo la estructura con los datos */
     dt = (dinic_t *) calloc(1, sizeof(*dt));
@@ -473,27 +459,21 @@ START_TEST(test_dinic_aux_net_find_flow)
     /* Creo el network auxiliar */
     aux_net = aux_network_new(dt);
 
-
-    printf("%d\n", network_has_node(aux_net, dt->t));
     flow = aux_network_find_flow(dt, aux_net, false);
     path = flow->path;
     fail_unless(!slist_is_empty(path));
 
-    {
+    while (path != NULL) {
+        current_edge = slist_head_data(path);
+        edge_pprint(current_edge);
 
-        while (path != NULL) {
-            current_edge = slist_head_data(path);
-            edge_pprint(current_edge);
+        fail_unless(*edge_get_first(current_edge) == sequence[expected]);
 
-            fail_unless(*edge_get_first(current_edge) == sequence[expected]);
-
-            expected += 1;
-            path = slist_next(path);
-        }
-
-        fail_unless(expected == 4, "La secuencia termino antes?");
+        expected += 1;
+        path = slist_next(path);
     }
 
+    fail_unless(expected == 4, "La secuencia termino antes?");
 }
 END_TEST
 
