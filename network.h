@@ -115,4 +115,9 @@ Edge *network_del_edge(Network *self, Edge *e);
  */
 Edge *network_del_edge_backward(Network *self, Edge *e);
 
+
+void _network_add_edge(Network *network, Edge *edge, char mode);
+
+Edge *_network_del_edge(Network *network, Edge *edge, char mode);
+
 #endif /* NETWORK_H */
