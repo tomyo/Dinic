@@ -229,9 +229,9 @@ static DinicFlow *aux_network_find_flow(dinic_t *data, Network *aux_net, bool ve
         if (stack_is_empty(flow_edges)) {
             SList *edges = NULL;
 
-            edges = network_get_edges(aux_net, data->s)
-            stack_push(slist_head_data(edges));
-            expected_node = data->s;
+            edges = network_get_edges(aux_net, data->s);
+            stack_push(flow_edges, slist_head_data(edges));
+            expected_node = &data->s;
         }
 
         current_edge = (Edge *) stack_head(flow_edges);
