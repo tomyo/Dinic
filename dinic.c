@@ -161,7 +161,20 @@ Network *aux_network_new(dinic_t *data) {
  * mencionada.
  */
 static void flow_pretty_print(dinic_t *data, DinicFlow *to_print) {
-    /* if to_print->path */
+    Node *next_node = &data->s;
+    SList *path = to_print->path;
+
+    while (path != NULL) {
+        /* Calcular el valor del flujo de current_flow) */
+        Edge *edge = slist_head_data(path);
+        if(*edge_get_first(edge) == next_node) {
+            /* Forward */
+            current_flow = min(current_flow, edge_get_capacity(edge) - edge_get_flow(edge));
+        } else {
+            /* Backward */
+            current_flow = min(current_flow, edge_get_flow(edge));
+        }
+    }
 }
 
 /**
