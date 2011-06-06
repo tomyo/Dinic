@@ -588,7 +588,7 @@ START_TEST(test_dinic_net_small)
 
     
     fail_unless(result != NULL);
-    fail_unless(result->flow_value == 2);
+    fail_unless(result->flow_value == 3);
     fail_unless(slist_length(result->max_flow) == 7);
 
 }
