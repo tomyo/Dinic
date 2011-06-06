@@ -69,8 +69,9 @@ Network *network_create(void) {
     return result;
 }
 
+/* TODO: Comentar */
 /* mode == 'f' forward, 'b' backward */
-static void _network_add_edge(Network *network, Edge *edge, char mode) {
+void _network_add_edge(Network *network, Edge *edge, char mode) {
     Node *x1 = NULL, *x2 = NULL;
     SList *neighbours_x1 = NULL, *neighbours_x2 = NULL;
 
@@ -188,8 +189,9 @@ void network_destroy(Network *self) {
     free(self); self = NULL;
 }
 
+/* TODO: Comentar */
 /* mode == 'f' forward, 'b' backward */
-static Edge *_network_del_edge(Network *network, Edge *edge, char mode) {
+Edge *_network_del_edge(Network *network, Edge *edge, char mode) {
     unsigned int *rc_x1 = NULL;
     unsigned int *rc_x2 = NULL;
     Node *x1 = NULL, *x2 = NULL;

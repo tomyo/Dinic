@@ -116,6 +116,17 @@ Network *aux_network_new(dinic_t *data) {
         SList *current_edges = NULL;
         Edge *current_edge = NULL;
         Node *neighbour = NULL;
+        static int counter = 0;
+        SList *mi_list = queue_list(bfs_queue);
+
+        counter++;
+        printf("Nivel %d\n", counter);
+        printf("[ ");
+        while(mi_list != NULL) {
+            printf("%d ", *(Node *)slist_head_data(mi_list));
+            mi_list = slist_next(mi_list);
+        }
+        printf("]\n");
 
         /* 2 */
         while (!queue_is_empty(bfs_queue)) {
@@ -123,6 +134,7 @@ Network *aux_network_new(dinic_t *data) {
             edges = network_get_edges(main_network, *current_node);
             /* edges tiene todas las posibles aristas del proximo nivel */
             current_edges = edges;
+
 
             while (current_edges != NULL) {
                 char mode = 'f';
@@ -144,9 +156,9 @@ Network *aux_network_new(dinic_t *data) {
                     if (can_send_flow(current_edge, mode)) {
                         network_add_edge_m(result, current_edge, mode);
                         queue_push_head(next_level, neighbour);
-                    }
-                    if (*neighbour == t) {
-                        is_t_found = true;
+                        if (*neighbour == t) {
+                            is_t_found = true;
+                        }
                     }
                 } else {
                     /* Solo la agregamos si pertenece al nivel siguiente */
@@ -184,60 +196,85 @@ static void flow_pretty_print(dinic_t *data, DinicFlow *to_print) {
 }
 
 /**
- * Funcion que busca caminos entre nodo origen y destino hasta
- * saturar todos los caminos (flujo bloqueante)
+ * Funcion que busca caminos entre nodo origen y destino.
  * @note Los caminos y los flujos son almacenados en s_dinic->result.
- * @param s_dinic data donde esta el network y los nodos origen-destino.
+ * @param data donde esta el network y los nodos origen-destino.
  * @param network network auxiliar donde operar.
  * @param verbose si va a imprimir la salida.
- * @returns network auxiliar
+ * @returns DinicFlow con el camino encontrado y su flujo
  */
 static DinicFlow *aux_network_find_flow(dinic_t *data, Network *aux_net, bool verbose) {
+    Node *expected_node = NULL;
     Stack *flow_edges = NULL;
-    SList *neighbours = NULL;
+    SList *neighbours = NULL, *path = NULL;
     bool is_t_found = false;
     DinicFlow *result = NULL;
-    SList *path = NULL;
+
+    /* Precondicion */
+    assert(network_has_node(aux_net, data->t));
 
     result = (DinicFlow *) calloc(1, sizeof(*result));
     memory_check(result);
 
-    /** En flow_edges vamos mateniendo las aristas por las que pasamos */
+    /* En flow_edges vamos mateniendo las aristas por las que pasamos */
     flow_edges = stack_new();
 
-    neighbours = network_get_edges(aux_net, data->s);
-    if (neighbours != NULL) {
-        stack_push(flow_edges, slist_head_data(neighbours)); /* Agregamos (S,vecino) */
+    /* TODO: comentario */
+    while (!is_t_found && (!stack_is_empty(flow_edges) ||
+                   slist_is_empty(network_get_edges(aux_net, data->s)))) {
+        Edge *current_edge = NULL;
+        char mode = 'f';
 
-        while (!is_t_found && !stack_is_empty(flow_edges)) {
-            Edge *current_edge = NULL;
-            Node *current_node = NULL;
+        /* TODO: comentario */
+        if (stack_is_empty(flow_edges)) {
+            SList *edges = NULL;
 
-            current_edge = (Edge *) stack_head(flow_edges);
-            current_node = edge_get_second(current_edge);
-            neighbours = network_get_edges(aux_net, *current_node);
+            edges = network_get_edges(aux_net, data->s)
+            stack_push(slist_head_data(edges));
+            expected_node = data->s;
+        }
 
-            if (!slist_is_empty(neighbours)) {
-                Edge *edge = NULL;
+        current_edge = (Edge *) stack_head(flow_edges);
+        /* TODO: Comentar esto, con dibujito */
+        if (*edge_get_first(current_edge) == *expected_node) {
+            mode = 'f';
+            expected_node = edge_get_second(current_edge);
+        } else {
+            mode = 'b';
+            expected_node = edge_get_first(current_edge);
+        }
+        /* TODO: Cambiar nombre neighbours */
+        neighbours = network_get_edges(aux_net, *expected_node);
 
-                edge = slist_head_data(neighbours);
+        if (!slist_is_empty(neighbours)) {
+            Edge *edge = NULL;
 
-                if (edge_get_flow(edge) > 0) {
-                    /* Tengo flujo para mandar, lo agrego al camino actual */
-                    stack_push(flow_edges, edge);
-                } else {
-                    /* No puedo mandar nada por ese edge, lo borro del network*/
-                    network_del_edge(aux_net, edge);
-                }
+            edge = slist_head_data(neighbours);
+
+            /* TODO: Ver si se llego a t. Comentar porque t no tiene vecinos. */
+            /* TODO: Ahora no es verdad */
+            if (can_send_flow(current_edge, mode)) {
+                /* Tengo flujo para mandar, lo agrego al camino actual */
+                stack_push(flow_edges, edge);
             } else {
-                /* No tiene vecinos */
-                if (*current_node == data->t){
-                    is_t_found = true;
+                /* No puedo mandar nada por ese edge, lo borro del network, pero
+                 * es menester actualizar mode */
+                mode = (*edge_get_first(current_edge) == *expected_node)?'f':'b';
+                _network_del_edge(aux_net, edge, mode);
+            }
+        } else {
+            /* No tiene vecinos */
+            if (*expected_node == data->t) {
+                is_t_found = true;
+            } else {
+                /* Ese camino no me lleva a ningun lado, borremoslo del network
+                 * y quitemoslo de nuestros posibles caminos */
+                _network_del_edge(aux_net, current_edge, mode);
+                stack_pop(flow_edges);
+                if (mode == 'f') {
+                    expected_node = edge_get_first(current_edge);
                 } else {
-                    /* Ese camino no me lleva a ningun lado, borremoslo del network
-                     * y quitemoslo de nuestros posibles caminos */
-                    network_del_edge(aux_net, current_edge);
-                    stack_pop(flow_edges);
+                    expected_node = edge_get_second(current_edge);
                 }
             }
         }
@@ -249,10 +286,17 @@ static DinicFlow *aux_network_find_flow(dinic_t *data, Network *aux_net, bool ve
 
     {
         Flow current_flow = UINT_MAX;
-        while(path != NULL){
+        Node next_node = data->s;
+        while (path != NULL) {
             /* Calcular el valor del flujo de current_flow) */
             Edge *edge = slist_head_data(path);
-            current_flow = max(current_flow, edge_get_flow(edge));
+            if(*edge_get_first(edge) == next_node) {
+                /* Forward */
+                current_flow = min(current_flow, edge_get_capacity(edge) - edge_get_flow(edge));
+            } else {
+                /* Backward */
+                current_flow = min(current_flow, edge_get_flow(edge));
+            }
         }
 
         result->path = path;
@@ -260,6 +304,7 @@ static DinicFlow *aux_network_find_flow(dinic_t *data, Network *aux_net, bool ve
     }
 
     if (verbose) {
+        /* TODO: Escribir la funcion */
         flow_pretty_print(data, result);
     }
 
