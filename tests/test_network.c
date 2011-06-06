@@ -85,6 +85,35 @@ START_TEST(test_network_get_edges)
 }
 END_TEST
 
+START_TEST(test_network_get_nodes)
+{
+    Edge *e1 = NULL, *e2 = NULL, *e3 = NULL;
+    SList *nodes = NULL;
+    Node ntmp = 0;
+
+    e1 = edge_create(1, 2, 1, 0);
+    e2 = edge_create(3, 4, 1, 0);
+    e3 = edge_create(5, 6, 1, 0);
+
+    net = network_create();
+    network_add_edge(net, e1);
+    network_add_edge(net, e2);
+    network_add_edge(net, e3);
+
+    nodes = network_get_nodes(net);
+    fail_unless(nodes != NULL);
+    fail_unless(slist_length(nodes) == 6);
+    
+    while(nodes != NULL){
+        ntmp = *((Node *) slist_head_data(nodes));
+        fail_unless((1 <= ntmp) && (ntmp <= 6));
+        nodes = slist_next(nodes);
+    }
+
+    network_destroy(net);
+}
+END_TEST
+
 START_TEST(test_network_get_neightbours)
 {
     Edge *e1 = NULL, *e2 = NULL, *e3 = NULL;
@@ -117,6 +146,7 @@ START_TEST(test_network_get_neightbours)
 }
 END_TEST
 
+
 /* Armado de la test suite */
 Suite *network_suite(void){
     Suite *s = suite_create("network");
@@ -138,6 +168,7 @@ Suite *network_suite(void){
 
     /* Funcionalidad */
     tcase_add_test(tc_functionality, test_network_get_edges);
+        tcase_add_test(tc_functionality, test_network_get_nodes);
     tcase_add_test(tc_functionality, test_network_get_neightbours);
     suite_add_tcase(s, tc_functionality);
 

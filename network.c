@@ -162,17 +162,25 @@ SList *network_get_edges(Network *self, const Node node) {
     return result;
 }
 
+/** Devuelve nueva lista con todos los nodos del network
+ *  El llamador debe liberarla con slist_free().
+ */
 SList *network_get_nodes(Network *self) {
     SList *result = NULL;
+    Node *current = NULL; 
+    
     /* Precondiciones */
-/*    assert(self != NULL);
+    assert(self != NULL);
 
     ht_iter_keys_reset(self->node_to_edges);
+    
     while (!ht_iter_keys_is_done(self->node_to_edges)) {
-        slist_prepend(result, (Node *) ht_iter_keys_next(self->node_to_edges));
-    }*/
+        current = (Node *) ht_iter_keys_next(self->node_to_edges);
+        result = slist_prepend(result, current);
+    }
+    
     /* Postcondicion */
-    /*assert(result != NULL);*/
+    assert(result != NULL);
 
     return result;
 }

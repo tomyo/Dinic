@@ -10,7 +10,7 @@ MEM_SOURCES=$(shell echo test*.c) leaktest.c
 TEST_OBJECTS= $(TEST_SOURCES:.c=.o)
 MEM_OBJECTS= $(MEM_SOURCES:.c=.o)
 # Aquí no usamos un wildcard para no traer el main
-TESTED_OBJECTS=../edge.o ../network.o ../slist.o ../queue.o ../hashtable.o ../dinic.o
+TESTED_OBJECTS=../edge.o ../network.o ../slist.o ../queue.o ../hashtable/hashtable.o ../dinic.o
 
 test: $(TARGET)
 	./$^
