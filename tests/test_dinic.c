@@ -336,9 +336,9 @@ START_TEST(test_dinic_aux_net_no_t)
     /*
        Network a representar              |       Network auxiliar
                                           |
-           2                              |        2  
+           2                              |        2
           / \                             |       / \
-         s   4                            |      s   4            
+         s   4                            |      s   4
           \ /                             |       \ /
            3                              |        3
 
@@ -399,7 +399,7 @@ START_TEST(test_dinic_aux_net_no_t)
     /* Verifico los vecinos de 4, tiene que ser una lista vacia */
     n1 = network_neighbours(aux_net, 4);
     fail_unless(slist_is_empty(n1));
-    
+
     /* Verifico el que sea el corte minimo */
     min_cut = network_get_nodes(net);
     fail_unless(min_cut != NULL);
@@ -410,6 +410,90 @@ START_TEST(test_dinic_aux_net_no_t)
         fail_unless(*((Node *)slist_head_data(min_cut)) != t);
         min_cut = slist_next(min_cut);
     }
+}
+END_TEST
+
+START_TEST(test_dinic_aux_net_find_flow)
+{
+    Network *net = NULL;
+    dinic_t *dt = NULL;
+    Edge *e1 = NULL, *e2 = NULL, *e3 = NULL;
+    Edge *e4 = NULL, *e5 = NULL, *e6 = NULL, *e7 = NULL, *e8 = NULL;
+    Edge *e9 = NULL, *e10 = NULL, *e11 = NULL, *e12 = NULL, *e13 = NULL;
+    Node s = 0, t = 1;
+    DinicFlow *flow = NULL;
+    SList *path = NULL;
+    Edge *current_edge = NULL;
+    unsigned int sequence[] = {0, 4, 5, 10, 1};
+    int expected = 0;
+
+
+    /*
+       Network a representar
+
+           2
+          /  \
+         s    3 —— 10 —— t    11
+          \  /   /          /
+           4 —— 5 — 6 — 7 — 8 — 9
+
+        Todas las capacidades son 1
+    */
+
+    /* Creo un network vacio */
+    net = network_create();
+
+    /* Creo los lados */
+    e1 = edge_create(s, 2, 1, 0);
+    e3 = edge_create(2, 3, 1, 0);
+    e10 = edge_create(7, 8, 1, 0);
+    e5 = edge_create(5, 6, 1, 0);
+    e8 = edge_create(10, t, 1, 0);
+    e2 = edge_create(s, 4, 1, 0);
+    e9 = edge_create(6, 7, 1, 0);
+    e6 = edge_create(5, 10, 1, 0);
+    e4 = edge_create(4, 3, 1, 0);
+    e11 = edge_create(8, 9, 1, 0);
+    e7 = edge_create(4, 5, 1, 0);
+    e12 = edge_create(8, 11, 1, 0);
+    e13 = edge_create(3, 10, 0, 0);
+
+    network_add_edge(net, e6);
+    network_add_edge(net, e5);
+    network_add_edge(net, e2);
+    network_add_edge(net, e4);
+    network_add_edge(net, e10);
+    network_add_edge(net, e7);
+    network_add_edge(net, e12);
+    network_add_edge(net, e11);
+    network_add_edge(net, e1);
+    network_add_edge(net, e8);
+    network_add_edge(net, e3);
+    network_add_edge(net, e9);
+    network_add_edge(net, e13);
+
+
+    /* Completo la estructura con los datos */
+    dt = (dinic_t *) calloc(1, sizeof(*dt));
+    dt->network = NULL; /* Not used. Not tested */
+    dt->s = s;
+    dt->t = t;
+    dt->result = NULL; /* Not used. Not tested */
+
+    flow = aux_network_find_flow(dt, net, false);
+    path = flow->path;
+    fail_unless(!slist_is_empty(path));
+
+    while (path != NULL) {
+        current_edge = slist_head_data(path);
+
+        fail_unless(*edge_get_first(current_edge) == sequence[expected]);
+
+        expected += 1;
+        path = slist_next(path);
+    }
+
+    fail_unless(expected == 4, "La secuencia termino antes?");
 }
 END_TEST
 
@@ -432,6 +516,7 @@ Suite *dinic_suite(void){
     tcase_add_test(tc_functionality, test_dinic_aux_net_2);
     tcase_add_test(tc_functionality, test_dinic_aux_net_backward);
     tcase_add_test(tc_functionality, test_dinic_aux_net_no_t);
+    tcase_add_test(tc_functionality, test_dinic_aux_net_find_flow);
     suite_add_tcase(s, tc_functionality);
 
     return s;
@@ -441,6 +526,3 @@ Suite *dinic_suite(void){
 void dinic_memory_test(void){
 
 }
-
-#undef s
-#undef t

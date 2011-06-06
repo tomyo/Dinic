@@ -117,6 +117,16 @@ Edge *network_del_edge(Network *self, Edge *e);
  */
 Edge *network_del_edge_backward(Network *self, Edge *e);
 
+/**
+ * @brief Actualiza un camino del network con el flow pasado.
+ * @pre path es un camino aumentante.
+ * @pos El network no tiene edges backward si estos no pueden devolver flujo.
+ * @param self network donde ejecutar la operacion.
+ * @param path camino de edges para actualidar el flujo.
+ * @param flow valor con que actualizar las aristas. Este valor es del
+ * incremento (o decremento) del flow que ya tienen las aristas.
+ */
+void network_update(Network *self, SList *path, Flow flow);
 
 void _network_add_edge(Network *network, Edge *edge, char mode);
 

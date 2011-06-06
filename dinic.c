@@ -241,17 +241,19 @@ DinicFlow *aux_network_find_flow(dinic_t *data, Network *aux_net, bool verbose) 
             Edge *edge = NULL;
 
             edge = slist_head_data(neighbours);
+            mode = (*edge_get_first(edge) == *expected_node)?'f':'b';
 
             /* TODO: Ver si se llego a t. Comentar porque t no tiene vecinos. */
             /* TODO: Ahora no es verdad */
-            if (can_send_flow(current_edge, mode)) {
+            if (can_send_flow(edge, mode)) {
                 /* Tengo flujo para mandar, lo agrego al camino actual */
                 stack_push(flow_edges, edge);
             } else {
                 /* No puedo mandar nada por ese edge, lo borro del network, pero
                  * es menester actualizar mode */
-                mode = (*edge_get_first(current_edge) == *expected_node)?'f':'b';
+                 puts("entre aca");
                 _network_del_edge(aux_net, edge, mode);
+                expected_node = edge_get_first(current_edge) == expected_node?edge_get_second(current_edge):edge_get_first(current_edge);
             }
         } else {
             /* No tiene vecinos */
@@ -267,9 +269,15 @@ DinicFlow *aux_network_find_flow(dinic_t *data, Network *aux_net, bool verbose) 
                 } else {
                     expected_node = edge_get_second(current_edge);
                 }
+                if (!stack_is_empty(flow_edges)) {
+                    current_edge = (Edge *) stack_head(flow_edges);
+                    expected_node = *edge_get_first(current_edge) == *expected_node?edge_get_second(current_edge):edge_get_first(current_edge);
+                }
             }
         }
     }
+
+
 
     /* path es una lista de la forma [(s, a), (a, b), ..., (r, t)]  o []*/
     path = slist_reverse(stack_to_list(flow_edges));

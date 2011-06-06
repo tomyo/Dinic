@@ -172,7 +172,7 @@ SList *slist_reverse(SList *self) {
     SList *iter = self;
 
     while(iter != NULL) {
-        slist_prepend(result, iter->data);
+        result = slist_prepend(result, iter->data);
         iter = slist_next(iter);
     }
 
