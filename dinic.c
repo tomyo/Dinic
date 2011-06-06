@@ -188,7 +188,6 @@ static void flow_pretty_print(dinic_t *data, DinicFlow *to_print) {
             path = slist_next(path);
         }
         printf(" (flujo transportado: %u)\n", to_print->flow_value);
-
     }
 }
 
@@ -201,10 +200,11 @@ static void flow_pretty_print(dinic_t *data, DinicFlow *to_print) {
  * @returns DinicFlow con el camino encontrado y su flujo
  */
 DinicFlow *aux_network_find_flow(dinic_t *data, Network *aux_net, bool verbose) {
-    Node *expected_node = NULL;
+
+    Node *next_node = NULL;
     Stack *dfs_stack = NULL;
     SList *neighbours = NULL, *path = NULL;
-    bool is_t_found = false;
+    bool is_t_reached = false;
     DinicFlow *result = NULL;
 
     /* Precondicion */
@@ -212,21 +212,31 @@ DinicFlow *aux_network_find_flow(dinic_t *data, Network *aux_net, bool verbose) 
     assert(data != NULL);
     assert(data->network != NULL);
     assert(network_has_node(aux_net, data->s));
+
     assert(network_has_node(aux_net, data->t));
 
     result = (DinicFlow *) calloc(1, sizeof(*result));
     memory_check(result);
 
-    /* En dfs_stack vamos mateniendo las aristas por las que pasamos */
+
+    /* dfs_stack matiene las aristas por las que pasamos */
+    /* Como invariante, en dfs siempre hay un solo camino */
     dfs_stack = stack_new();
 
-    /* TODO: comentario */
-    while (!is_t_found && (!stack_is_empty(dfs_stack) ||
+    /* Invariante del ciclo:
+     * No llegamos a t
+     * (Si no ya encontramos el path)
+     *
+     * Si es stack esta vacio, tiene que que haber algun vecino que salga de s
+     * (Si no, t no es alcanzable) */
+
+    while (!is_t_reached && (!stack_is_empty(dfs_stack) ||
            !slist_is_empty(network_get_edges(aux_net, data->s)))) {
+
         Edge *current_edge = NULL;
         char mode = 'f';
 
-        /* TODO: comentario */
+        /* Si el stack esta vacio, pusheamos alguna de las aristas de s */
         if (stack_is_empty(dfs_stack)) {
             SList *edges = NULL;
             Edge *edge = NULL;
@@ -240,57 +250,101 @@ DinicFlow *aux_network_find_flow(dinic_t *data, Network *aux_net, bool verbose) 
                 _network_del_edge(aux_net, edge, 'f');
             }
             
-            expected_node = &data->s;
+            next_node = &data->s;
         }
 
         current_edge = (Edge *) stack_head(dfs_stack);
-        /* TODO: Comentar esto, con dibujito */
-        if (*edge_get_first(current_edge) == *expected_node) {
+
+        /* Actualizo el proximo nodo esperado
+         *
+         * Edge:
+         *   (A - B)
+         *
+         * Si el nodo que debia agregar era el primero (A), este lado se agrego por
+         * fordward, por lo que el proximo que tengo que agregar es el
+         * segundo (B).
+         *
+         * Si el nodo que debia agregar era el segundo (B), este lado es backwards,
+         * por lo que el proximo que tengo que agregar es el primero (A).
+         *
+         */
+        if (*edge_get_first(current_edge) == *next_node) {
             mode = 'f';
-            expected_node = edge_get_second(current_edge);
+            next_node = edge_get_second(current_edge);
         } else {
             mode = 'b';
-            expected_node = edge_get_first(current_edge);
+            next_node = edge_get_first(current_edge);
         }
-        /* TODO: Cambiar nombre neighbours */
-        neighbours = network_get_edges(aux_net, *expected_node);
+
+        neighbours = network_get_edges(aux_net, *next_node);
 
         if (!slist_is_empty(neighbours)) {
             Edge *edge = NULL;
 
             edge = slist_head_data(neighbours);
-            mode = (*edge_get_first(edge) == *expected_node)?'f':'b';
+            mode = (*edge_get_first(edge) == *next_node)?'f':'b';
 
-            /* TODO: Ver si se llego a t. Comentar porque t no tiene vecinos. */
-            /* TODO: Ahora no es verdad */
+            /* No hacemos chequeo de si llegamos a t porque t no tiene vecinos */
             if (can_send_flow(edge, mode)) {
                 /* Tengo flujo para mandar, lo agrego al camino actual */
                 stack_push(dfs_stack, edge);
             } else {
-                /* No puedo mandar nada por ese edge, lo borro del network, pero
-                 * es menester actualizar mode */
+                /* No puedo mandar nada por ese edge, lo borro del network */
                 _network_del_edge(aux_net, edge, mode);
-                expected_node = (edge_get_first(current_edge) ==\
-                expected_node)?edge_get_second(current_edge):\
-                edge_get_first(current_edge);
+
+                if (*edge_get_first(current_edge) == *next_node) {
+                    next_node = edge_get_second(current_edge);
+                } else {
+                    next_node = edge_get_first(current_edge);
+                }
             }
         } else {
             /* No tiene vecinos */
-            if ((*expected_node == data->t) && can_send_flow(current_edge, 'f')) {
-                is_t_found = true;
+            if (*next_node == data->t && can_send_flow(current_edge, mode)) {
+                is_t_reached = true;
             } else {
-                /* Ese camino no me lleva a ningun lado, borremoslo del network
-                 * y quitemoslo de nuestros posibles caminos */
+                /* Ese camino no me lleva a ningun lado.
+                 * Ejemplo:
+                 *
+                 * (...) -> C -> A -> B
+                 *
+                 * Edges en stack:
+                 * (A - B) (C - A) (...)
+                 *
+                 * La proxima arista que se deberia agregar sale de B (O
+                 * vuelve, si es backwards). Este es nuestro next_node.
+                 *
+                 * Si llegamos a esta instancia, B no tiene vecinos.
+                 * Nos volvemos un paso, asignando next_node a A.
+                 *
+                 * Borramos el arista, y la sacamos del stack.
+                 * El stack nos queda:
+                 * (C - A) (...)
+                 *
+                 * Entonces tenemos dar otro paso hacia atras.
+                 * Esto es para que next_node quede en C y sepa que ha
+                 * agregado a ese lado como forward (En este caso).
+                 */
+
+                 /* Lo borramos del network y lo quitamos del stack */
                 _network_del_edge(aux_net, current_edge, mode);
                 stack_pop(dfs_stack);
+
+                /* Volvemos un paso */
                 if (mode == 'f') {
-                    expected_node = edge_get_first(current_edge);
+                    next_node = edge_get_first(current_edge);
                 } else {
-                    expected_node = edge_get_second(current_edge);
+                    next_node = edge_get_second(current_edge);
                 }
+
+                /* Nos volvemos otro */
                 if (!stack_is_empty(dfs_stack)) {
                     current_edge = (Edge *) stack_head(dfs_stack);
-                    expected_node = *edge_get_first(current_edge) == *expected_node?edge_get_second(current_edge):edge_get_first(current_edge);
+                    if (*edge_get_first(current_edge) == *next_node) {
+                        next_node = edge_get_second(current_edge);
+                    } else {
+                        next_node = edge_get_first(current_edge);
+                    }
                 }
             }
         }
@@ -302,20 +356,21 @@ DinicFlow *aux_network_find_flow(dinic_t *data, Network *aux_net, bool verbose) 
 
     {
         Flow current_flow = UINT_MAX;
-        Node next_node = data->s;
+        next_node = &data->s;
 
         result->path = path;
         while (path != NULL) {
-            /* Calcular el valor del flujo de current_flow) */
             Edge *edge = slist_head_data(path);
-            if(*edge_get_first(edge) == next_node) {
-                /* Forward */
+
+            /* Calculamos el valor del flujo del camino en current_flow */
+            if(*edge_get_first(edge) == *next_node) {
+                /* Arista Forward */
                 current_flow = min(current_flow, edge_get_capacity(edge) - edge_get_flow(edge));
-                next_node = *edge_get_second(edge);
+                next_node = edge_get_second(edge);
             } else {
                 /* Backward */
                 current_flow = min(current_flow, edge_get_flow(edge));
-                next_node = *edge_get_first(edge);
+                next_node = edge_get_first(edge);
             }
             path = slist_next(path);
         }
@@ -325,16 +380,11 @@ DinicFlow *aux_network_find_flow(dinic_t *data, Network *aux_net, bool verbose) 
     if (verbose) {
         flow_pretty_print(data, result);
     }
-    
+
     /* Postcondiciones */
 
     assert(result != NULL);
     assert(data->network != NULL);
-    if (!slist_is_empty(result->path))
-    {
-        assert(result->flow_value > 0);
-    }
-    
     
     return result;
 }
