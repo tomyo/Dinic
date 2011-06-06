@@ -27,8 +27,12 @@ void network_add_edge(Network *self, Edge *e);
 SList *network_neighbours(Network *self, const Node n);
 
 /** Devuelve una lista con todas las aristas que salen desde n.
- *  Esta lista no debe ser liberada. */
+ *  Esta lista debe ser liberada con slist_free. */
 SList *network_get_edges(Network *self, const Node n);
+
+/** Devuelve una lista con todos los nodos.
+ *  Esta lista debe ser liberada con slist_free. */
+SList *network_get_nodes(Network *self);
 
 /**
  * Pregunta por la precencia de un nodo en el netwok.
