@@ -137,7 +137,7 @@ SList *network_get_edges(Network *self, const Node node) {
     /* Checkeo de precondiciones */
     assert(self != NULL);
 
-    result = ht_lookup(self->node_to_edges, (void *) &node);
+    result = ht_lookup(self->node_to_edges, &node);
 
     if (result != NULL) {
         result = slist_next(result);
@@ -148,7 +148,7 @@ SList *network_get_edges(Network *self, const Node node) {
 
 bool network_has_node(Network *self, const Node node) {
     assert(self != NULL);
-    return (ht_lookup(self->node_to_edges, (void *) &node) != NULL);
+    return (ht_lookup(self->node_to_edges, &node) != NULL);
 }
 
 void network_destroy(Network *self) {
