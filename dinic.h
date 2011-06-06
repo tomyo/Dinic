@@ -41,7 +41,7 @@ typedef struct s_dinic_result {
  */
 dinic_result *dinic(Network * n, Node s, Node t, bool);
 
-/* *********** TEMPORALMENTE MOVIDO ACA ESTO VA EN EL .h ************ */
+/* *********** TEMPORALMENTE MOVIDO ACA ESTO VA EN EL .c ************ */
 
 /**
  * @brief Estructura interna de Dinic
@@ -74,7 +74,7 @@ typedef struct {
 Network *aux_network_new(dinic_t *);
 DinicFlow *aux_network_find_flow(dinic_t *, Network *, bool );
 
-/* *********** TEMPORALMENTE MOVIDO ACA ESTO VA EN EL .h ************ */
+/* *********** TEMPORALMENTE MOVIDO ACA ESTO VA EN EL .c ************ */
 
 
 #endif

@@ -19,7 +19,6 @@
 bool aux_network_find_blocking_flow(dinic_t *, Network *, bool);
 static int compare_nodes(const void *x1, const void *x2);
 
-/* ************************ Funciones ************************ */
 
 /* TODO: Descripcion */
 static int compare_nodes(const void *x1, const void *x2) {
@@ -51,6 +50,8 @@ static bool can_send_flow(Edge *edge, char mode) {
 
     return result;
 }
+
+/* ************************ Funciones ************************ */
 
 /**
  * Funcion de creacion de un nuevo network auxiliar a partir de un
@@ -131,8 +132,8 @@ Network *aux_network_new(dinic_t *data) {
                     }
                 } else {
                     /* Solo la agregamos si pertenece al nivel siguiente */
-                    if (queue_find_custom(next_level, neighbour, compare_nodes) &&
-                        can_send_flow(current_edge, mode)) {
+                    if (queue_find_custom(next_level, neighbour, compare_nodes)
+                        && can_send_flow(current_edge, mode)) {
                         _network_add_edge(result, current_edge, mode);
                     }
                 }
@@ -281,7 +282,7 @@ DinicFlow *aux_network_find_flow(dinic_t *data, Network *aux_net, bool verbose) 
 }
 
 bool aux_network_find_blocking_flow(dinic_t *data, Network *aux_net,
-                                    bool verbose){
+                                    bool verbose) {
     DinicFlow *partial = NULL;
     static unsigned int aux_net_number = 1;
     bool result = false;
@@ -317,7 +318,7 @@ bool aux_network_find_blocking_flow(dinic_t *data, Network *aux_net,
     return result;
 }
 
-dinic_result *dinic(Network *network, Node s, Node t, bool verbose) {
+dinic_result *dinic(Network *network, const Node s, const Node t, bool verbose) {
     dinic_t data;
     Network *aux_net = NULL;
     bool found_flow = true;
@@ -334,13 +335,19 @@ dinic_result *dinic(Network *network, Node s, Node t, bool verbose) {
     while (found_flow) {
         aux_net = aux_network_new(&data);
         found_flow = aux_network_find_blocking_flow(&data, aux_net, verbose);
+        
         if (found_flow) {
+            /* Encontramos flujo (nuevos caminos), pero aun no es maximal, para
+             * eso debemos encontrar el corte minimal */
             network_free(aux_net);
         }
+        /* Aca ya tenemos Max-Flow y Min-Cut (we're good to go) */
     }
     /* El Corte Minimal son los nodos que quedan en el ultimo NA */
     data.result->min_cut = network_get_nodes(aux_net);
-    /* TODO: assert(t not in data.result->min_cut) */
+    
+    /* Post Condicion */
+    assert(slist_find_custom(data.result->min_cut, &t, compare_nodes) == NULL);
 
     return data.result;
 }
