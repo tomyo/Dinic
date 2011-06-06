@@ -1,16 +1,35 @@
-Hemos optado por utilizar algunos TADs de la librería GLib (GHash, GList y GQueue)
-por encontrarnos ya familiarizados con la misma y su correcto funcionamiento.
+Esta vez hemos implementado los TADs utilizados en el primer laboratorio.
+Nuestros TADs SList, Queue, Stack fueron escritos tomando como base la API de
+los TADs correspondientes en GLib. Esto tiene como motivo la reutilización del
+código del proyecto anterior, manteniendo la funcionalidad que necesitábamos.
 
-Para representar el network utilizamos una tabla Hash (GHash), que mappea cada
-nodo a una lista (GList) de las aristas que salen del mismo.
+Se ha reimplementado una hash para adaptarla a lo que necesitábamos en el
+Network (Fork de proyecto https://github.com/ankurs/Hash-Table).
 
-La Elección de dicha tabla se debe a que el orden de acceso a los vecinos es
-de orden constante, y al ser esta, una de las operaciones mas utilizadas en
-el algoritmo bfs, se logra obtener un buen rendimiento.
+Se ha extendido la estructura de las aristas para que tengan la noción de
+flujo.
 
-En el algoritmo de BFS, utilizamos:
+Se mantuvo la representación del network. Es una hash que mapea nodos con
+sus aristas vecinas. Pero por el algoritmo y la nueva propiedad de flujos en un
+network, el concepto de aristas vecinas se cambió.
+Una arista está en la lista de aristas vecinas a un nodo si:
+ * Tienen a ese nodo como primer elemento (Aristas Forward).
+ * Tienen a ese nodo como segundo elemento y pueden devolver flujo (flujo > 0).
+   (Aristas Backwards).
 
-1) Una Hash Table (GHash) para mappear un nodo con su padre y el flujo máximo
-que se envía hasta ese vértice, que al final utilizamos para recrear el camino y el flujo.
+Se eligió no restringir las aristas forward (Haciendo que solo estén si no se
+saturaron) para que siempre sean encontradas en la búsqueda del primer nodo. El
+flujo después nos dirá si pueden utilizarse o no.
 
-2) Una Cola (GQueue) para recorrer el network.
+Otra optimización que elegimos fue almacenar los nodos no sólo con sus listas
+de edges vecinos, si no también con un contador de referencias. El motivo fue
+conocer rápidamente si un nodo esta en el network o no.
+Por ejemplo:
+    Si agrego una arista s -> A a nuestro network, en la hash estará almacenada
+    la key s con su arista s -> A, pero no lo estará la key A (No hay flujo al
+    inicio del algoritmo, por lo que no puede agregarse como backward). Lo
+    solucionamos teniendo un contador de las referencias (Que estará en 1 en
+    ambas keys).
+
+Así, cualquier nodo del network está como key en la hash, haciendo la operación
+para ver si un nodo esta mucho más fácil.
