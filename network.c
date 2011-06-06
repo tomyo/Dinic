@@ -213,7 +213,7 @@ SList *network_forward_edges(Network *self){
 
             if(node == *edge_get_first(edge)) {
                 /* Arista fordward */
-                slist_prepend(result, edge);
+                result = slist_prepend(result, edge);
             }
             iter_edges = slist_next(iter_edges);
         }
@@ -222,6 +222,7 @@ SList *network_forward_edges(Network *self){
     }
     slist_free(nodes);
 
+    /* Post Condicion */
     return result;
 }
 
@@ -249,7 +250,9 @@ Edge *_network_del_edge(Network *network, Edge *edge, char mode) {
     unsigned int *rc_x2 = NULL;
     Node *x1 = NULL, *x2 = NULL;
     SList *neighbours_x1 = NULL, *neighbours_x2 = NULL;
-
+    
+    assert(network != NULL);
+    assert(edge != NULL);
     assert(mode == 'f' || mode == 'b');
 
     x1 = (mode=='f')?edge_get_first(edge):edge_get_second(edge);

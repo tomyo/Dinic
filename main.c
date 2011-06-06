@@ -32,14 +32,19 @@ int main(int argc, char *argv[]) {
 
     /* Parsear el network de la entrada estandar */
     network = parse_network(stdin);
-
-    /* Ya tenemos el network, a correrle BFS ahora */
+    memory_check(network);
+    assert(network_has_node(network, s));
+    assert(network_has_node(network, t));
+    
+    /* Ya tenemos el network, ahora le corremos Dinic*/
     result = dinic(network, s, t, options.verbose);
+    memory_check(result);
 
     print_output(result, options);
 
     /* Liberar la memoria alocada por los programas */
     network_destroy(network);
+    free(result);
 
     return 0;
 }

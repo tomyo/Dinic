@@ -85,7 +85,7 @@ START_TEST(test_network_get_edges)
 }
 END_TEST
 
-START_TEST(test_network_get_nodes)
+START_TEST(test_network_nodes)
 {
     Edge *e1 = NULL, *e2 = NULL, *e3 = NULL;
     SList *nodes = NULL;
@@ -100,7 +100,7 @@ START_TEST(test_network_get_nodes)
     network_add_edge(net, e2);
     network_add_edge(net, e3);
 
-    nodes = network_get_nodes(net);
+    nodes = network_nodes(net);
     fail_unless(nodes != NULL);
     fail_unless(slist_length(nodes) == 6);
     
@@ -168,7 +168,7 @@ Suite *network_suite(void){
 
     /* Funcionalidad */
     tcase_add_test(tc_functionality, test_network_get_edges);
-        tcase_add_test(tc_functionality, test_network_get_nodes);
+        tcase_add_test(tc_functionality, test_network_nodes);
     tcase_add_test(tc_functionality, test_network_get_neightbours);
     suite_add_tcase(s, tc_functionality);
 
