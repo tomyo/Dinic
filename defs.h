@@ -17,6 +17,4 @@
 #define INF -1 /* Funciona porque los pesos son unsigned */
 #define min(x,y) (x < y ? x : y)
 #define max(x,y) (x < y ? y : x)
-
-
 #endif /*DEFINITIONS_H*/

@@ -8,6 +8,7 @@
 
 
 static void destroy_slist(void *list);
+static int compare_edges(const void *a, const void *b);
 
 /**
  * \brief
@@ -20,6 +21,18 @@ struct s_Network {
 };
 
 /*------------------------ Funciones Auxiliares ---------------------------- */
+
+static int compare_edges(const void *a, const void *b) {
+    int result = 0;
+
+    if(edge_cmp(a, b)) {
+        result = 0;
+    } else {
+        result = 1;
+    }
+
+    return result;
+}
 
 static void destroy_slist(void *list) {
     SList *to_free = (SList *) list, *tmp;
@@ -56,12 +69,15 @@ Network *network_create(void) {
     return result;
 }
 
-void network_add_edge(Network *network, Edge *edge) {
+/* mode == 'f' forward, 'b' backward */
+static void _network_add_edge(Network *network, Edge *edge, char mode) {
     Node *x1 = NULL, *x2 = NULL;
     SList *neighbours_x1 = NULL, *neighbours_x2 = NULL;
 
-    x1 = edge_get_first(edge);
-    x2 = edge_get_second(edge);
+    assert(mode == 'f' || mode == 'b');
+
+    x1 = (mode == 'f')?edge_get_first(edge):edge_get_second(edge);
+    x2 = (mode == 'f')?edge_get_second(edge):edge_get_first(edge);
 
     neighbours_x1 = ht_lookup(network->node_to_edges, x1);
     neighbours_x2 = ht_lookup(network->node_to_edges, x2);
@@ -98,7 +114,7 @@ void network_add_edge(Network *network, Edge *edge) {
     }
 
     /* Si repetimos aristas, algo anda mal.. mmmmmmmm*/
-    assert((slist_find(neighbours_x1, (void *) edge) == NULL) &&
+    assert((slist_find_custom(neighbours_x1, (void *) edge, compare_edges) == NULL) &&
             "No soportamos aristas repetidas");
 
     /* En la pos 0 de las listas esta el reference counter */
@@ -150,14 +166,14 @@ SList *network_get_nodes(Network *self) {
     SList *result = NULL;
     /* Precondiciones */
     assert(self != NULL);
-    
+
     ht_iter_keys_reset(self->node_to_edges);
     while (!ht_iter_keys_is_done(self->node_to_edges)) {
         slist_prepend(result, (Node *) ht_iter_keys_next(self->node_to_edges));
     }
     /* Postcondicion */
     assert(result != NULL);
-    
+
     return result;
 }
 
@@ -172,14 +188,17 @@ void network_destroy(Network *self) {
     free(self); self = NULL;
 }
 
-Edge *network_del_edge(Network *network, Edge *edge) {
+/* mode == 'f' forward, 'b' backward */
+static Edge *_network_del_edge(Network *network, Edge *edge, char mode) {
     unsigned int *rc_x1 = NULL;
     unsigned int *rc_x2 = NULL;
     Node *x1 = NULL, *x2 = NULL;
     SList *neighbours_x1 = NULL, *neighbours_x2 = NULL;
 
-    x1 = edge_get_first(edge);
-    x2 = edge_get_second(edge);
+    assert(mode == 'f' || mode == 'b');
+
+    x1 = (mode=='f')?edge_get_first(edge):edge_get_second(edge);
+    x2 = (mode=='f')?edge_get_second(edge):edge_get_first(edge);
 
     neighbours_x1 = ht_lookup(network->node_to_edges, x1);
     neighbours_x2 = ht_lookup(network->node_to_edges, x2);
@@ -198,19 +217,33 @@ Edge *network_del_edge(Network *network, Edge *edge) {
     *rc_x1 = *rc_x1 - 1;
     *rc_x2 = *rc_x2 - 1;
 
-    assert(slist_find(neighbours_x1, edge));
+    assert(slist_find_custom(neighbours_x1, edge, compare_edges));
     slist_remove(neighbours_x1, edge);
     if (*rc_x1 == 0) {
         /* Este nodo ya no existe mas en la Hash */
         ht_remove(network->node_to_edges, x1);
     }
 
-    assert(slist_find(neighbours_x1, edge));
-    slist_remove(neighbours_x2, edge);
     if (*rc_x2 == 0) {
         /* Este nodo ya no existe mas en la Hash */
         ht_remove(network->node_to_edges, x2);
     }
 
     return edge;
+}
+
+void network_add_edge(Network *network, Edge *edge) {
+    _network_add_edge(network, edge, 'f');
+}
+
+void network_add_edge_backward(Network *network, Edge *edge) {
+    _network_add_edge(network, edge, 'b');
+}
+
+Edge *network_del_edge(Network *network, Edge *edge) {
+    return _network_del_edge(network, edge, 'f');
+}
+
+Edge *network_del_edge_backward(Network *network, Edge *edge) {
+    return _network_del_edge(network, edge, 'b');
 }
