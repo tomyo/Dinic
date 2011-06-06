@@ -473,7 +473,6 @@ START_TEST(test_dinic_aux_net_find_flow)
 
     while (path != NULL) {
         current_edge = slist_head_data(path);
-        edge_pprint(current_edge);
 
         fail_unless(*edge_get_first(current_edge) == sequence[expected]);
 
