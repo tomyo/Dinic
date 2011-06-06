@@ -63,6 +63,8 @@ SList *network_get_edges(Network *self, const Node n);
  *  Esta lista debe ser liberada con slist_free. */
 SList *network_get_nodes(Network *self);
 
+
+SList *network_get_fordware_edges(Network *self);
 /**
  * @brief Pregunta si esta un nodo en el network.
  * @param self network donde ejecutar la operacion.

@@ -186,6 +186,37 @@ SList *network_get_nodes(Network *self) {
     return result;
 }
 
+SList *network_get_fordware_edges(Network *self){
+    SList *edges =NULL, *nodes = NULL, *current = NULL, result = NULL;
+    Node node = 0; 
+    Edge *edge = NULL;
+    
+    /* Precondiciones */
+    assert(self != NULL);
+
+    nodes = network_get_nodes(self);
+    current = nodes;
+    while (current != NULL) {
+        node = *((Node *)slist_get_head(current));
+        edges = network_get_edges(self, node);
+        while (edges != NULL) {
+            edge = slist_get_head(edges);
+            if(node == *edge_get_first(edge) {
+                /* Arista fwd valida */
+                slist_prepend(result, edge);
+            }
+        }
+        slist_free(edges); edges = NULL;
+        current = slist_next(current);
+    }
+    slist_free(nodes);
+    
+    /* Postcondicion */
+    assert(result != NULL);
+
+    return result;
+
+}
 bool network_has_node(Network *self, const Node node) {
     assert(self != NULL);
     return (ht_lookup(self->node_to_edges, &node) != NULL);

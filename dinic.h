@@ -19,7 +19,7 @@ typedef struct s_dinic_result {
 
     /**
      * @brief Lista con los valores de los flujos obtenidos.
-     * Formato: {Nodo, Nodo, Flujo, Capacidad}
+     * Formato: {Edge, Edge, .... }
      */
     SList *max_flow;
 
