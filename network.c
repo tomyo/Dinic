@@ -168,18 +168,18 @@ SList *network_get_edges(Network *self, const Node node) {
  */
 SList *network_get_nodes(Network *self) {
     SList *result = NULL;
-    Node *current = NULL; 
-    
+    Node *current = NULL;
+
     /* Precondiciones */
     assert(self != NULL);
 
     ht_iter_keys_reset(self->node_to_edges);
-    
+
     while (!ht_iter_keys_is_done(self->node_to_edges)) {
         current = (Node *) ht_iter_keys_next(self->node_to_edges);
         result = slist_prepend(result, current);
     }
-    
+
     /* Postcondicion */
     assert(result != NULL);
 
@@ -246,6 +246,48 @@ Edge *_network_del_edge(Network *network, Edge *edge, char mode) {
     }
 
     return edge;
+}
+
+void network_update(Network *self, SList *path, Flow flow){
+    Node *next_node = NULL;
+    SList *iter = NULL;
+
+    /* Precondicion */
+    assert(self != NULL);
+    assert(path != NULL);
+    assert(flow > 0);
+
+    iter = path;
+
+    next_node = edge_get_first((Edge *)slist_head_data(iter));
+    while (iter != NULL) {
+        Edge *edge = slist_head_data(iter);
+        if(*edge_get_first(edge) == *next_node) {
+            /* Forward */
+            Flow new_flow = 0;
+
+            new_flow = edge_get_flow(edge) + flow;
+            assert(new_flow <= edge_get_capacity(edge));
+            edge_set_flow(edge, new_flow);
+
+            next_node = edge_get_second(edge);
+        } else {
+            /* Backward */
+            Flow new_flow = 0;
+
+            new_flow = edge_get_flow(edge) -  flow;
+            /* new_flow es mayor o igual a cero siempre por ser unsigned */
+
+            if (new_flow == 0) {
+                network_del_edge_backward(self, edge);
+            } else {
+                edge_set_flow(edge, new_flow);
+            }
+
+            next_node = edge_get_first(edge);
+        }
+        iter = slist_next(iter);
+    }
 }
 
 void network_add_edge(Network *network, Edge *edge) {

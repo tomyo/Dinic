@@ -54,6 +54,10 @@ Node *edge_get_second(Edge *self) {
     return &self->x2;
 }
 
+void edge_set_flow(Edge *self, Flow f) {
+    assert(self != NULL);
+    self->f = f;
+}
 
 bool edge_cmp(const Edge *e1, const Edge *e2) {
     assert(e1 != NULL && e2 != NULL);
