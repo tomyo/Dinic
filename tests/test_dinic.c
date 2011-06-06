@@ -507,11 +507,11 @@ START_TEST(test_dinic_net_simple)
     Node s = 0, t = 1;
     Edge *single = NULL;
     bool verbose_mode = false; /* EDITME */
-    
+
     /* Network a crear
-             s —> t 
-     */      
-    
+             s —> t
+     */
+
     net = network_create();
     single = edge_create(s, t, 1, 0);
     network_add_edge(net, single);
@@ -530,41 +530,42 @@ START_TEST(test_dinic_net_small)
     Edge *e1 = NULL, *e2 = NULL, *e3 = NULL, *e4 = NULL;
     Edge *e5 = NULL, *e6 = NULL, *e7 = NULL;
     Node s = 0, t = 1;
-    bool verbose_mode = false; /* EDITME */
     
+    bool verbose_mode = false; /* EDITME */
+
     /*
        Network a representar
-                                         
-           ,2                             
-          / |                            
-         s——3——t                        
-          \ |                            
-           `4——5                           
+
+           ,2
+          / |
+         s——3——t
+          \ |
+           `4——5
         Todas las capacidades son 1 menos 3——t = 3
-        
+
        NA 1
-          ,2                             
-         /                             
-        s——3——t                        
-         \                             
+          ,2
+         /
+        s——3——t
+         \
           `4——5
        FLUJOS: s-3-t:1 (saturo s-3)
-                       
+
        NA 2
-          ,2                             
-         /  \                           
-        s    ——3——t                     
-         \  /                           
+          ,2
+         /  \
+        s    ——3——t
+         \  /
           `4———5
        FLUJOS: s-2-3-t: 1 (saturo s-2 y 2-3)
                s-4-3-t: 1 (saturo s-4 , 4-3 y 3-t)
-       
+
       NA 3
       s  (no se imprime)
-       
-    */   
+
+    */
     net = network_create();
-    
+
     /* Creo los lados forward */
     e1 = edge_create(s, 2, 1, 0);
     e2 = edge_create(s, 3, 1, 0);
@@ -573,7 +574,7 @@ START_TEST(test_dinic_net_small)
     e5 = edge_create(4, 3, 1, 0);
     e6 = edge_create(4, 5, 1, 0);
     e7 = edge_create(3, t, 3, 0);
-    
+
 
     /* Lleno el network con los lados forward */
     network_add_edge(net, e1);
@@ -582,11 +583,11 @@ START_TEST(test_dinic_net_small)
     network_add_edge(net, e4);
     network_add_edge(net, e5);
     network_add_edge(net, e6);
-    network_add_edge(net, e7);    
-    
+    network_add_edge(net, e7);
+
     result = dinic(net, s, t, verbose_mode);
 
-    
+
     fail_unless(result != NULL);
     {
     SList *edges = NULL;

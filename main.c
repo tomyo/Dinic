@@ -35,7 +35,7 @@ int main(int argc, char *argv[]) {
     memory_check(network);
     assert(network_has_node(network, s));
     assert(network_has_node(network, t));
-    
+
     /* Ya tenemos el network, ahora le corremos Dinic*/
     result = dinic(network, s, t, options.verbose);
     memory_check(result);
@@ -60,6 +60,7 @@ static void print_output(dinic_result *result, struct parse_result options) {
 
         while(max_flow != NULL){
             edge_pprint((Edge *) slist_head_data(max_flow));
+            max_flow = slist_next(max_flow);
         }
 
         printf("\n");
