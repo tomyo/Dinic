@@ -162,7 +162,28 @@ Network *aux_network_new(dinic_t *data) {
  * mencionada.
  */
 static void flow_pretty_print(dinic_t *data, DinicFlow *to_print) {
-    /* if to_print->path */
+    Node *next_node = &data->s;
+    SList *path = to_print->path;
+
+    /* Si la lista es vacia, no habia camino */
+    if (path != NULL) {
+        printf("0");
+        while (path != NULL) {
+            /* Calcular el valor del flujo de current_flow) */
+            Edge *edge = slist_head_data(path);
+            if(*edge_get_first(edge) == *next_node) {
+                /* Forward */
+                printf(" %u", *edge_get_second(edge));
+                next_node = edge_get_second(edge);
+            } else {
+                /* Backward */
+                printf(" <- %u", *edge_get_first(edge));
+                next_node = edge_get_first(edge);
+            }
+            path = slist_next(path);
+        }
+        printf(" (flujo transportado: %u)\n", to_print->flow_value);
+    }
 }
 
 /**
@@ -257,24 +278,26 @@ DinicFlow *aux_network_find_flow(dinic_t *data, Network *aux_net, bool verbose) 
     {
         Flow current_flow = UINT_MAX;
         Node next_node = data->s;
+
+        result->path = path;
         while (path != NULL) {
             /* Calcular el valor del flujo de current_flow) */
             Edge *edge = slist_head_data(path);
             if(*edge_get_first(edge) == next_node) {
                 /* Forward */
                 current_flow = min(current_flow, edge_get_capacity(edge) - edge_get_flow(edge));
+                next_node = *edge_get_second(edge);
             } else {
                 /* Backward */
                 current_flow = min(current_flow, edge_get_flow(edge));
+                next_node = *edge_get_first(edge);
             }
+            path = slist_next(path);
         }
-
-        result->path = path;
         result->flow_value = current_flow;
     }
 
     if (verbose) {
-        /* TODO: Escribir la funcion */
         flow_pretty_print(data, result);
     }
 
