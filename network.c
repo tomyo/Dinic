@@ -38,6 +38,7 @@ static void destroy_slist(void *list) {
     SList *to_free = (SList *) list, *tmp;
     void *edge = NULL;
 
+    /* TODO: No liberar lados backwards */
     /* Precondicion */
     assert(to_free != NULL);
 
@@ -163,15 +164,14 @@ SList *network_get_edges(Network *self, const Node node) {
     return result;
 }
 
-/** Devuelve nueva lista con todos los nodos del network
- *  El llamador debe liberarla con slist_free().
- */
-SList *network_get_nodes(Network *self) {
+SList *network_nodes(Network *self) {
     SList *result = NULL;
     Node *current = NULL;
 
     /* Precondiciones */
     assert(self != NULL);
+
+    /* TODO: cambiar ht_iter_keys_reset por ht_iter_keys_init */
 
     ht_iter_keys_reset(self->node_to_edges);
 
@@ -180,43 +180,48 @@ SList *network_get_nodes(Network *self) {
         result = slist_prepend(result, current);
     }
 
-    /* Postcondicion */
-    /*assert(result != NULL);*/
-
     return result;
 }
 
-SList *network_get_fordware_edges(Network *self){
-    SList *edges =NULL, *nodes = NULL, *current = NULL, *result = NULL;
-    Node node = 0; 
-    Edge *edge = NULL;
-    
+SList *network_forward_edges(Network *self){
+    SList *nodes = NULL, *iter_nodes = NULL, *result = NULL;
+
     /* Precondiciones */
     assert(self != NULL);
 
-    nodes = network_get_nodes(self);
-    current = nodes;
-    while (current != NULL) {
-        node = *((Node *)slist_head_data(current));
+    /* Itero sobre los nodos del network */
+    nodes = network_nodes(self);
+    iter_nodes = nodes;
+
+    while (iter_nodes != NULL) {
+        SList *edges = NULL, *iter_edges = NULL;
+        Node node = 0;
+
+        node = *((Node *)slist_head_data(iter_nodes));
+
+        /* Itero sobre las aristas vecinas del nodo actual */
         edges = network_get_edges(self, node);
-        while (edges != NULL) {
-            edge = slist_head_data(edges);
+        iter_edges = edges;
+
+        while (iter_edges != NULL) {
+            Edge *edge = NULL;
+
+            edge = slist_head_data(iter_edges);
+
             if(node == *edge_get_first(edge)) {
-                /* Arista fwd valida */
+                /* Arista fordward */
                 slist_prepend(result, edge);
             }
+            iter_edges = slist_next(iter_edges);
         }
-        slist_free(edges); edges = NULL;
-        current = slist_next(current);
+        slist_free(edges);
+        iter_nodes = slist_next(iter_nodes);
     }
     slist_free(nodes);
-    
-    /* Postcondicion */
-    assert(result != NULL);
 
     return result;
-
 }
+
 bool network_has_node(Network *self, const Node node) {
     assert(self != NULL);
     return (ht_lookup(self->node_to_edges, &node) != NULL);
@@ -310,6 +315,7 @@ void network_update(Network *self, SList *path, Flow flow){
             /* new_flow es mayor o igual a cero siempre por ser unsigned */
 
             if (new_flow == 0) {
+                /* El lado se vacio */
                 network_del_edge_backward(self, edge);
             } else {
                 edge_set_flow(edge, new_flow);
