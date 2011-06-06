@@ -401,7 +401,7 @@ dinic_result *dinic(Network *network, const Node s, const Node t, bool verbose) 
         } else {
             /* 2b -> Terminamos */
             /* El Corte Minimal son los nodos que quedan en el ultimo NA*/
-            result->min_cut = network_get_nodes(aux_net);
+            result->min_cut = network_nodes(aux_net);
             result->flow_value = flow_value;
             result->max_flow = network_forward_edges(network);
             found_max_flow = true;
