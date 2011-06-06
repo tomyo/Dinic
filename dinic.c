@@ -300,6 +300,7 @@ dinic_result *dinic(Network *network, Node s, Node t, bool verbose) {
     /* El Corte Minimal son los nodos que quedan en el ultimo NA */
     data.result->min_cut = network_get_nodes(aux_net);
     /* TODO: assert(t not in data.result->min_cut) */
+    
     network_destroy(data.backwards);
     return data.result;
 }

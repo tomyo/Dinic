@@ -152,8 +152,8 @@ SList *network_get_nodes(Network *self) {
     assert(self != NULL);
     
     ht_iter_keys_reset(self->node_to_edges);
-    while (!ht_iter_keys_is_done(self)) {
-        slist_prepend(result, (Node *) ht_iter_keys_next(self));
+    while (!ht_iter_keys_is_done(self->node_to_edges)) {
+        slist_prepend(result, (Node *) ht_iter_keys_next(self->node_to_edges));
     }
     /* Postcondicion */
     assert(result != NULL);
