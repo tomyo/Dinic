@@ -64,7 +64,7 @@ SList *network_get_edges(Network *self, const Node n);
 SList *network_get_nodes(Network *self);
 
 
-SList *network_get_fordware_edges(Network *self);
+SList *network_forward_edges(Network *self);
 /**
  * @brief Pregunta si esta un nodo en el network.
  * @param self network donde ejecutar la operacion.

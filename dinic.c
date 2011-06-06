@@ -162,13 +162,11 @@ Network *aux_network_new(dinic_t *data) {
  * mencionada.
  */
 static void flow_pretty_print(dinic_t *data, DinicFlow *to_print) {
-    static unsigned int count = 1;
     Node *next_node = &data->s;
     SList *path = to_print->path;
 
     /* Si la lista es vacia, no habia camino */
     if (path != NULL) {
-        printf("N.A. %u\n", count); count ++;
         printf("0");
         while (path != NULL) {
             /* Calcular el valor del flujo de current_flow) */
@@ -185,8 +183,6 @@ static void flow_pretty_print(dinic_t *data, DinicFlow *to_print) {
             path = slist_next(path);
         }
         printf(" (flujo transportado: %u)\n", to_print->flow_value);
-        printf("El N.A. %u aumenta el flujo en %u.\n", 
-                count, to_print->flow_value);
 
     }
 }
@@ -316,18 +312,7 @@ DinicFlow *aux_network_find_flow(dinic_t *data, Network *aux_net, bool verbose) 
     
     /* Postcondiciones */
     assert(result != NULL);
-    if (result->path != NULL)
-    {
-        SList *iter = result->path;
-        Edge *e = (Edge *)slist_head_data(result->path);
-        printf("Path_len: %d\n Flow: %d\n", 
-               slist_length(result->path), result->flow_value);
-        while(iter != NULL) {
-            e = (Edge *)slist_head_data(iter);
-            edge_pprint(e);
-            iter = slist_next(iter);
-        }
-    }
+    
     return result;
 }
 
@@ -338,6 +323,8 @@ dinic_result *dinic(Network *network, const Node s, const Node t, bool verbose) 
     Network *aux_net = NULL;
     DinicFlow *current = NULL;
     bool found_max_flow = false;
+    unsigned int na_count = 1; /* Cuenta de los N.A.s */ 
+    Flow flow_value = 0, na_flow_value = 0; /* Cuenta del flujo total del network */
 
     /* Inicializando las estructuras */
     data.network = network;
@@ -347,44 +334,87 @@ dinic_result *dinic(Network *network, const Node s, const Node t, bool verbose) 
     result = calloc(1, sizeof(dinic_result));
     result->flow_value = 0;
     result->max_flow = NULL;
-
+    
+    /* Pasos Basicos:
+     * 1) Crear network auxiliar
+     * 2) es un corte minimal?:
+     *                         a) No -> Buscar flujo bloqueante.
+     *                         b) Si -> terminamos.
+     *                            
+     *    a) 
+     *      i) Buscar camino aumentante.
+     *      ii) Actualizar network con el flujo que se manda por el mismo.
+     *      iii) Si piden verbose -> imprimir Info.
+     *      iv) Actualizar contador de flujo total enviado.
+     *      v) Goto 1)
+     *    
+     *
+     *    b) Guardar resultados en result y setear flag para salir.
+     *    
+     */
+     
     while (!found_max_flow) {
-        /* Buscando flujo bloqueante */
+        /* Verbose Info: */
+        if (verbose) printf("N.A %u:\n", na_count); na_count ++;
+        
+        /* 1 */
         aux_net = aux_network_new(&data);
+        
+        printf("CHECK_POINT\n");
+        
+        /* 2 */
         if (network_has_node(aux_net, t)) {
+            /* Buscamos flujo bloqueante */
+            
+            /* Inicializamos ciclo buscando el primer camino aumentante */
             current = aux_network_find_flow(&data, aux_net, verbose);
             memory_check(current);
-            /* Buscamos caminos aumentantes en este NA para actualizar flujo */
-            while (!slist_is_empty(current->path)) {
-                assert (current->flow_value > 0);
+            
+            while (!slist_is_empty(current->path) && 
+                  (current->flow_value > 0)) {
 
-                /* Nuevo camino aumentante, actualizamos flujo en network */
+                /* 2a */
+                /* Actualizamos el flujo enviado por el camino aumentante */
                 network_update(data.network, current->path,current->flow_value);
+                
+                na_flow_value += current->flow_value;
 
                 slist_free(current->path);
                 free(current); current = NULL;
+                
                 current = aux_network_find_flow(&data, aux_net, verbose);
                 memory_check(current);
             }
-            /* Encontramos flujo bloqueante en este NA */
+            
+            /* Tenemos flujo bloqueante en este NA */
+            if (verbose) {
+                printf("El N.A. %u aumenta el flujo en %u.\n", 
+                        na_count, na_flow_value);
+            }
+            
+            /* Actualizamos la cuenta del flujo global */
+            flow_value += na_flow_value;
+            na_flow_value = 0;
+            
             network_free(aux_net);
 
         } else {
-            /* Si no esta t en el NA, es un corte minimal, terminamos */
+            /* 2b -> Terminamos */
+            /* El Corte Minimal son los nodos que quedan en el ultimo NA*/
+            result->min_cut = network_get_nodes(aux_net);
+            result->flow_value = flow_value;
+            result->max_flow = network_forward_edges(network);
             found_max_flow = true;
+
         }
+        /* 3 */
     }
-    /* Aca ya tenemos Max-Flow - Min-Cut (we're good to go) */
-    /* El Corte Minimal son los nodos que quedan en el ultimo NA sin liberar */
-
-    /* Post Condicion */
-    assert(!network_has_node(aux_net, t));
-
-    result->min_cut = network_get_nodes(aux_net);
-    result->flow_value = current->flow_value;
-    result->max_flow = network_get_fordware_edges(network);
-
-
+    
+    network_free(aux_net);
+    /* TODO: Cuando destruimos todo? */
+    
+    /* Postcondicion */
+    assert(result != NULL);
     return result;
 }
 

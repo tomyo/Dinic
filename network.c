@@ -186,7 +186,7 @@ SList *network_get_nodes(Network *self) {
     return result;
 }
 
-SList *network_get_fordware_edges(Network *self){
+SList *network_forward_edges(Network *self){
     SList *edges =NULL, *nodes = NULL, *current = NULL, *result = NULL;
     Node node = 0; 
     Edge *edge = NULL;
