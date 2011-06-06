@@ -79,10 +79,18 @@ bool network_has_node(Network *self, const Node n);
 void network_pretty_print(Network *self, FILE *f);
 
 /**
- * @brief Destruye un network.
+ * @brief Destruye el network y sus aristas, en caso de queres conservarlas,
+ * utilizar network_free.
  * @param self network donde ejecutar la operacion.
  */
 void network_destroy(Network *self);
+
+/**
+ * @brief Libera la estructura del network, sin eliminar aristas, en caso de
+ * queres liberar todo, usar network_destroy.
+ * @param self network donde ejecutar la operacion.
+ */
+void network_free(Network *self);
 
 /**
  * @brief Elimina una arista del network.
