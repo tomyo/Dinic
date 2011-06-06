@@ -144,9 +144,9 @@ Network *aux_network_new(dinic_t *data) {
                     if (can_send_flow(current_edge, mode)) {
                         network_add_edge_m(result, current_edge, mode);
                         queue_push_head(next_level, neighbour);
-                    }
-                    if (*neighbour == t) {
-                        is_t_found = true;
+                        if (*neighbour == t) {
+                            is_t_found = true;
+                        }
                     }
                 } else {
                     /* Solo la agregamos si pertenece al nivel siguiente */

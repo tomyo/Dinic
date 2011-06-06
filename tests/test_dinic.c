@@ -231,6 +231,100 @@ START_TEST(test_dinic_aux_net_2)
 }
 END_TEST
 
+START_TEST(test_dinic_aux_net_backward)
+{
+    Network *net = NULL, *aux_net = NULL;
+    dinic_t *dt = NULL;
+    Edge *e1 = NULL, *e2 = NULL, *e3 = NULL;
+    Edge *e4 = NULL, *e5 = NULL, *e6 = NULL;
+    Edge *b1 = NULL, *b2 = NULL, *b3 = NULL;
+    SList *n1 = NULL;
+    Edge *head = NULL;
+    Node s = 0, t = 1;
+
+    /*
+       Network a representar              |       Network auxiliar
+                                          |
+           4 ——————                       |
+          /    \    \                     |
+         s      3 —— t                    |      s —— 2 —— 3 —<— 4 —— t
+          \    /                          |
+           2 —                            |
+
+       Capacidades:
+        x1_|__x2_|__flow_|__cap
+        s  |  1  |   3   |   3
+        s  |  2  |   0   |   5
+        1  |  3  |   3   |   5
+        1  |  t  |   0   |   5
+        2  |  3  |   0   |   5
+        3  |  t  |   3   |   3
+    */
+
+    /* Creo un network vacio */
+    net = network_create();
+
+    /* Creo los lados forward */
+    e1 = edge_create(s, 4, 3, 3); /* Tambien Backward */
+    e2 = edge_create(s, 2, 5, 0);
+    e3 = edge_create(4, 3, 5, 3); /* Tambien Backward */
+    e4 = edge_create(4, t, 5, 0);
+    e5 = edge_create(2, 3, 5, 0);
+    e6 = edge_create(3, t, 3, 3); /* Tambien Backward */
+
+    /* Lleno el network con los lados forward */
+    network_add_edge(net, e1);
+    network_add_edge(net, e2);
+    network_add_edge(net, e3);
+    network_add_edge(net, e4);
+    network_add_edge(net, e5);
+    network_add_edge(net, e6);
+    /* Lleno los backwards */
+    network_add_edge_backward(net, e1);
+    network_add_edge_backward(net, e3);
+    network_add_edge_backward(net, e6);
+
+    /* Completo la estructura con los datos */
+    dt = (dinic_t *) calloc(1, sizeof(*dt));
+    dt->network = net;
+    dt->s = s;
+    dt->t = t;
+    dt->result = NULL; /* Not used. Not tested */
+
+    /* Creo el network auxiliar */
+    aux_net = aux_network_new(dt);
+
+    /* Verifico los vecinos de s, tiene que ser solamente 2 */
+    n1 = network_get_edges(aux_net, s);
+    fail_unless(slist_length(n1) == 1);
+    head = (Edge *) slist_head_data(n1);
+    fail_unless(*edge_get_second(head) == 2);
+
+    /* Verifico los vecinos de 2, tiene que ser solamente 3 */
+    n1 = network_get_edges(aux_net, 2);
+    fail_unless(slist_length(n1) == 1);
+    head = (Edge *) slist_head_data(n1);
+    fail_unless(*edge_get_second(head) == 3);
+
+    /* Verifico los vecinos de 3, tiene que ser 1 y como backward */
+    n1 = network_get_edges(aux_net, 3);
+    fail_unless(slist_length(n1) == 1);
+    head = (Edge *) slist_head_data(n1);
+    fail_unless(*edge_get_first(head) == 4);
+    fail_unless(*edge_get_second(head) == 3);
+
+    /* Verifico los vecinos de 4, tiene que ser solamente t */
+    n1 = network_get_edges(aux_net, 4);
+    fail_unless(slist_length(n1) == 1);
+    head = (Edge *) slist_head_data(n1);
+    fail_unless(*edge_get_second(head) == t);
+
+    /* Verifico los vecinos de t, tiene que ser una lista vacia */
+    n1 = network_get_edges(aux_net, t);
+    fail_unless(slist_is_empty(n1));
+}
+END_TEST
+
 /* Armado de la test suite */
 Suite *dinic_suite(void){
     Suite *s = suite_create("dinic");
@@ -248,6 +342,7 @@ Suite *dinic_suite(void){
     /* Funcionalidad */
     tcase_add_test(tc_functionality, test_dinic_aux_net);
     tcase_add_test(tc_functionality, test_dinic_aux_net_2);
+    tcase_add_test(tc_functionality, test_dinic_aux_net_backward);
     suite_add_tcase(s, tc_functionality);
 
     return s;
