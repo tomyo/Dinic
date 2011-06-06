@@ -196,6 +196,13 @@ void network_destroy(Network *self) {
     free(self); self = NULL;
 }
 
+void network_free(Network *self) {
+    assert(self != NULL);
+    ht_free(self->node_to_edges);
+    free(self); self = NULL;
+}
+
+
 /* mode == 'f' forward, 'b' backward */
 static Edge *_network_del_edge(Network *network, Edge *edge, char mode) {
     unsigned int *rc_x1 = NULL;
