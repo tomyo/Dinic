@@ -66,7 +66,7 @@ void network_add_edge(Network *network, Edge *edge) {
     neighbours_x1 = ht_lookup(network->node_to_edges, x1);
     neighbours_x2 = ht_lookup(network->node_to_edges, x2);
 
-    /* Yo se, que en la primera posicion de la lista deberia ir el Ref Coun */
+    /* Yo se, que en la primera posicion de la lista deberia ir el Ref Count */
     if (neighbours_x1 == NULL) {
         /* No estaba en la Hash */
         unsigned int *reference_counter_x1 = NULL;
@@ -85,7 +85,7 @@ void network_add_edge(Network *network, Edge *edge) {
         neighbours_x2 = slist_prepend(neighbours_x2, reference_counter_x2);
         ht_insert(network->node_to_edges, x2, neighbours_x2);
     }
-    /* Actualizar Refernce Counters */
+    /* Actualizar Reference Counters */
     {
         unsigned int *rc_x1 = NULL;
         unsigned int *rc_x2 = NULL;
@@ -98,12 +98,18 @@ void network_add_edge(Network *network, Edge *edge) {
     }
 
     /* Si repetimos aristas, algo anda mal.. mmmmmmmm*/
-    assert((slist_find(neighbours_x1, (void *) edge) != NULL) &&
+    assert((slist_find(neighbours_x1, (void *) edge) == NULL) &&
             "No soportamos aristas repetidas");
 
     /* En la pos 0 de las listas esta el reference counter */
     /* En la pos 1 empieza la lista de vecinos */
     slist_insert(neighbours_x1, (void *) edge, 1);
+
+    /* Postcondicion, salteandome el primero (Ref counter) tiene que estar
+     * el que yo quiero agregar */
+    neighbours_x1 = ht_lookup(network->node_to_edges, x1);
+    neighbours_x1 = slist_next(neighbours_x1);
+    assert(slist_head_data(neighbours_x1) == edge);
 }
 
 SList *network_neighbours(Network *self, const Node n) {
@@ -130,7 +136,6 @@ SList *network_get_edges(Network *self, const Node node) {
 
     /* Checkeo de precondiciones */
     assert(self != NULL);
-    assert(node != NULL);
 
     result = ht_lookup(self->node_to_edges, (void *) &node);
 
@@ -143,7 +148,6 @@ SList *network_get_edges(Network *self, const Node node) {
 
 bool network_has_node(Network *self, const Node node) {
     assert(self != NULL);
-    assert(node != NULL);
     return (ht_lookup(self->node_to_edges, (void *) &node) != NULL);
 }
 

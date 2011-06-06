@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include "slist.h"
+#include "defs.h" /* Para memory_check */
 
 SList *slist_alloc(void) {
     SList *result = NULL;
@@ -85,22 +86,27 @@ SList *slist_prepend(SList *self, void *data) {
 
 SList *slist_insert(SList *self, void *data, int position) {
     SList *result = NULL;
+    int previous_length = 0;
 
     /* Precondition */
     assert(position >= 0);
     assert(position <= slist_length(self));
+
+    previous_length = slist_length(self);
 
     if(position == 0) {
         result = slist_prepend(self, data);
     } else {
         SList *toAdd;
         result = self;
+
         toAdd = slist_alloc();
-        if(toAdd != NULL) {
+        memory_check(toAdd);
+        {
             int currPos = 0, previous = position - 1;
             SList *next = self;
             toAdd->data = data;
-            assert(position >= 0);
+
             while(currPos != previous && (next != NULL)) {
                 next = slist_next(next);
                 currPos++;
@@ -117,6 +123,9 @@ SList *slist_insert(SList *self, void *data, int position) {
             }
         }
     }
+
+    /* Postcondicion */
+    assert(slist_length(result) == previous_length + 1);
 
     return result;
 }
