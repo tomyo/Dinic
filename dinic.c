@@ -10,6 +10,17 @@
 #include "stack.h"
 #include "defs.h"
 
+
+#define network_add_edge_m(network, edge, mode) do\
+{\
+    assert(mode == 'f' || mode == 'b');\
+    if (mode == 'f')\
+        network_add_edge(network, edge);\
+    else\
+        network_add_edge_backward(network, edge);\
+} while(0)
+
+
 /* ******************* Estructuras internas ****************** */
 
 /**
@@ -30,27 +41,28 @@ bool aux_network_find_blocking_flow(dinic_t *, Network *, bool);
 /* ************************ Funciones ************************ */
 
 /**
- * @brief Deterina si se puede agregar edge al network auxiliar.
- * @param fwd_net network con los lados forward.
- * @param bwd_net network con los lados backward.
+ * @brief Determina si se puede mandar flujo o devolverlo por edge.
  * @param edge el lado a examinar
+ * @param mode 'f' si quiere mandar flujo o 'b' si quiero devolverlo
  */
-static bool can_add_edge(Network *fwd_net, Network *bwd_net, Edge *edge) {
-    /* Asumimos que primero se pregunta por los lados backward */
-    Node node = *edge_get_first(edge);
+static bool can_send_flow(Edge *edge, char mode) {
+    /* TODO: Modificar esto porque ya no hay lados backwards */
+    /* Asumimos que primero se pregunta por los lados fordward */
     bool result = false;
 
-    if (!slist_is_empty(network_get_edges(fwd_net, node))) {
+    assert(mode == 'f' || mode == 'b');
+
+    if (mode == 'f') {
         /* Podemos mandar flujo? */
         result = ((edge_get_capacity(edge) - edge_get_flow(edge)) > 0);
+    } else {
+        /* Podemos devolver flujo? */
+        /* Por construccion, no deberiamos tener lados backwards que no se
+         * pueden usar */
+        assert(edge_get_flow(edge) > 0);
+        result = true;
     }
 
-    if (!result) {
-        /* Podemos devolver flujo? */
-        if (!slist_is_empty(network_get_edges(bwd_net, node))) {
-            result = true;
-        }
-    }
     return result;
 }
 
@@ -61,11 +73,11 @@ static bool can_add_edge(Network *fwd_net, Network *bwd_net, Edge *edge) {
  * @returns network (network auxiliar)
  */
 Network *aux_network_new(dinic_t *data) {
-    Network *main_network = NULL, *backwards = NULL, *result = NULL;
+    Network *main_network = NULL, *result = NULL;
     Queue *bfs_queue = NULL, *next_level = NULL;
     Node *current_node = NULL;
     Node s = 0, t = 0;
-    SList *fwd_edges = NULL, *bwd_edges = NULL, *edges = NULL;
+    SList *edges = NULL;
     bool is_t_found = false;
 
     assert(data != NULL);
@@ -87,7 +99,6 @@ Network *aux_network_new(dinic_t *data) {
     main_network = data->network;
     s = data->s;
     t = data->t;
-    backwards = data->backwards;
 
     /* Inicializando variables */
     result = network_create(); /* NA (vacio) */
@@ -103,20 +114,29 @@ Network *aux_network_new(dinic_t *data) {
         /* 2 */
         while (!queue_is_empty(bfs_queue)) {
             current_node = queue_pop_head(bfs_queue);
-            fwd_edges = network_get_edges(main_network, *current_node);
-            bwd_edges = network_get_edges(backwards, *current_node);
-            edges = slist_concat(fwd_edges, bwd_edges);
+            edges = network_get_edges(main_network, *current_node);
             /* edges tiene todas las posibles aristas del proximo nivel */
             current_edges = edges;
 
             while (current_edges != NULL) {
+                char mode = 'f';
+
                 current_edge = slist_head_data(current_edges);
-                neighbour = edge_get_second(current_edge);
+
+                if (*edge_get_first(current_edge) == *current_node) {
+                    mode = 'f';
+                    neighbour = edge_get_second(current_edge);
+                } else {
+                    mode = 'b';
+                    neighbour = edge_get_first(current_edge);
+                }
 
                 /* Ver si corresponde agregar la arista al NA (result) */
                 if (!network_has_node(result, *neighbour)) {
-                    if (can_add_edge(main_network, backwards, current_edge)) {
-                        network_add_edge(result, current_edge);
+                    /* Si no esta en el network, solo me tengo que fijar que
+                     * puedo mandar o devolver flujo */
+                    if (can_send_flow(current_edge, mode)) {
+                        network_add_edge_m(result, current_edge, mode);
                         queue_push_head(next_level, neighbour);
                     }
                     if (*neighbour == t) {
@@ -125,8 +145,8 @@ Network *aux_network_new(dinic_t *data) {
                 } else {
                     /* Solo la agregamos si pertenece al nivel siguiente */
                     if (queue_find(next_level, neighbour) &&
-                        can_add_edge(main_network, backwards, current_edge)) {
-                        network_add_edge(result, current_edge);
+                        can_send_flow(current_edge, mode)) {
+                        network_add_edge_m(result, current_edge, mode);
                     }
                 }
                 current_edges = slist_next(current_edges);
@@ -135,7 +155,8 @@ Network *aux_network_new(dinic_t *data) {
 
             /* Revisamos (y agregamos segun correspondia) todas las
              * arista que contenian los vecinos de current_node */
-            slist_free(edges);
+            /* No hay que liberar esto, es parte de network */
+            /* slist_free(edges); */
         }
 
         /* 3 */
@@ -144,6 +165,7 @@ Network *aux_network_new(dinic_t *data) {
         next_level = queue_new();
     }
     queue_free(bfs_queue);
+    queue_free(next_level);
 
     return result;
 }
@@ -284,7 +306,6 @@ dinic_result *dinic(Network *network, Node s, Node t, bool verbose) {
     data.network = network;
     data.s = s;
     data.t = t;
-    data.backwards = network_create();
     data.result = calloc(1, sizeof(dinic_result));
 
     data.result->flow_value = 0;
@@ -301,7 +322,6 @@ dinic_result *dinic(Network *network, Node s, Node t, bool verbose) {
     data.result->min_cut = network_get_nodes(aux_net);
     /* TODO: assert(t not in data.result->min_cut) */
 
-    network_destroy(data.backwards);
     return data.result;
 }
 

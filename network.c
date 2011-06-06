@@ -165,14 +165,14 @@ SList *network_get_edges(Network *self, const Node node) {
 SList *network_get_nodes(Network *self) {
     SList *result = NULL;
     /* Precondiciones */
-    assert(self != NULL);
+/*    assert(self != NULL);
 
     ht_iter_keys_reset(self->node_to_edges);
     while (!ht_iter_keys_is_done(self->node_to_edges)) {
         slist_prepend(result, (Node *) ht_iter_keys_next(self->node_to_edges));
-    }
+    }*/
     /* Postcondicion */
-    assert(result != NULL);
+    /*assert(result != NULL);*/
 
     return result;
 }

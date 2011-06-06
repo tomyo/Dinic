@@ -23,7 +23,7 @@ END_TEST
 /* Functionality test */
 START_TEST(test_dinic_aux_net)
 {
-    Network *net = NULL, *backwards = NULL, *aux_net = NULL;
+    Network *net = NULL, *aux_net = NULL;
     dinic_t *dt = NULL;
     Edge *e1 = NULL, *e2 = NULL, *e3 = NULL, *e4 = NULL;
     Edge *e5 = NULL, *e6 = NULL, *e7 = NULL, *e8 = NULL;
@@ -45,7 +45,6 @@ START_TEST(test_dinic_aux_net)
 
     /* Creo un network vacio */
     net = network_create();
-    backwards = network_create();
 
     /* Creo los lados */
     e1 = edge_create(s, 2, 1, 0);
@@ -72,7 +71,6 @@ START_TEST(test_dinic_aux_net)
     dt->network = net;
     dt->s = s;
     dt->t = t;
-    dt->backwards = backwards;
     dt->result = NULL; /* Not used. Not tested */
 
     /* Creo el network auxiliar */
