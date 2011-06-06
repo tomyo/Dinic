@@ -293,8 +293,13 @@ dinic_result *dinic(Network *network, Node s, Node t, bool verbose) {
     while (found_flow) {
         aux_net = aux_network_new(&data);
         found_flow = aux_network_find_blocking_flow(&data, aux_net, verbose);
-        network_destroy(aux_net);
+        if (found_flow) {
+            /* TODO: network_free(aux_net); */
+        }
     }
+    /* El Corte Minimal son los nodos que quedan en el ultimo NA */
+    data.result->min_cut = network_get_nodes(aux_net);
+    /* TODO: assert(t not in data.result->min_cut) */
     network_destroy(data.backwards);
     return data.result;
 }

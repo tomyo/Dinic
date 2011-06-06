@@ -146,6 +146,21 @@ SList *network_get_edges(Network *self, const Node node) {
     return result;
 }
 
+SList *network_get_nodes(Network *self) {
+    SList *result = NULL;
+    /* Precondiciones */
+    assert(self != NULL);
+    
+    ht_iter_keys_reset(self->node_to_edges);
+    while (!ht_iter_keys_is_done(self)) {
+        slist_prepend(result, (Node *) ht_iter_keys_next(self));
+    }
+    /* Postcondicion */
+    assert(result != NULL);
+    
+    return result;
+}
+
 bool network_has_node(Network *self, const Node node) {
     assert(self != NULL);
     return (ht_lookup(self->node_to_edges, (void *) &node) != NULL);
