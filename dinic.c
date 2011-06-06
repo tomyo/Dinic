@@ -211,21 +211,9 @@ DinicFlow *aux_network_find_flow(dinic_t *data, Network *aux_net, bool verbose) 
 
     /* TODO: comentario */
     while (!is_t_found && (!stack_is_empty(flow_edges) ||
-                   !slist_is_empty(network_get_edges(aux_net, data->s)))) {
+           !slist_is_empty(network_get_edges(aux_net, data->s)))) {
         Edge *current_edge = NULL;
         char mode = 'f';
-
-        {
-            static int iteration_number = 0;
-            SList *mi_lista = stack_to_list(flow_edges);
-            printf("Iteracion numero : %d\n", iteration_number);
-            while (mi_lista != NULL) {
-                edge_pprint((Edge *)slist_head_data(mi_lista));
-                mi_lista = slist_next(mi_lista);
-            }
-            iteration_number++;
-        }
-
 
         /* TODO: comentario */
         if (stack_is_empty(flow_edges)) {
@@ -278,9 +266,15 @@ DinicFlow *aux_network_find_flow(dinic_t *data, Network *aux_net, bool verbose) 
                 } else {
                     expected_node = edge_get_second(current_edge);
                 }
+                if (!stack_is_empty(flow_edges)) {
+                    current_edge = (Edge *) stack_head(flow_edges);
+                    expected_node = *edge_get_first(current_edge) == *expected_node?edge_get_second(current_edge):edge_get_first(current_edge);
+                }
             }
         }
     }
+
+
 
     /* path es una lista de la forma [(s, a), (a, b), ..., (r, t)]  o []*/
     path = slist_reverse(stack_to_list(flow_edges));
