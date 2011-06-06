@@ -11,11 +11,6 @@
 #include "edge.h"
 #include "defs.h"
 
-
-/* Nodos destino y origen estandard */
-#define s 0
-#define t 1
-
 /* Precondition tests */
 START_TEST(test_dinic_aux_net_null)
 {
@@ -28,12 +23,13 @@ END_TEST
 /* Functionality test */
 START_TEST(test_dinic_aux_net)
 {
-    Network *net = NULL, *backwards = NULL;
+    Network *net = NULL, *backwards = NULL, *aux_net = NULL;
     dinic_t *dt = NULL;
     Edge *e1 = NULL, *e2 = NULL, *e3 = NULL, *e4 = NULL;
     Edge *e5 = NULL, *e6 = NULL, *e7 = NULL, *e8 = NULL;
     SList *n1 = NULL;
-    Node *head = NULL;
+    Node head = 0;
+    Node s = 0, t = 1;
 
     /*
        Network a representar              |       Network auxiliar
@@ -53,7 +49,7 @@ START_TEST(test_dinic_aux_net)
 
     /* Creo los lados */
     e1 = edge_create(s, 2, 1, 0);
-    e2 = edge_create(s, 3, 1, 0);
+    e2 = edge_create(s, 4, 1, 0);
     e3 = edge_create(2, 3, 1, 0);
     e4 = edge_create(4, 3, 1, 0);
     e5 = edge_create(4, 5, 1, 0);
@@ -86,9 +82,8 @@ START_TEST(test_dinic_aux_net)
     n1 = network_neighbours(aux_net, s);
     fail_unless(slist_length(n1) == 2);
     while (n1 != NULL) {
-        head = slist_head_data(n1);
-        /* printf("%u\n", *head); */
-        fail_unless(*head == 2 || *head == 4)
+        head = *((Node *) slist_head_data(n1));
+        fail_unless(head == 2 || head == 4);
         n1 = slist_next(n1);
     }
     slist_free(n1);
@@ -96,15 +91,17 @@ START_TEST(test_dinic_aux_net)
     /* Verifico los vecinos de 2. Tiene que ser solamente 3 */
     n1 = network_neighbours(aux_net, 2);
     fail_unless(slist_length(n1) == 1);
-    fail_unless(slist_head_data(n1) == 3);
+    head = *((Node *) slist_head_data(n1));
+    fail_unless(head == 3);
     slist_free(n1);
 
     /* Verifico los vecinos de 4. Tienen que ser 3 y 5 */
     n1 = network_neighbours(aux_net, 4);
     fail_unless(slist_length(n1) == 2);
     while (n1 != NULL) {
-        head = slist_head_data(n1);
-        fail_unless(head == 3 || head == 4);
+        head = *((Node *) slist_head_data(n1));
+        printf("%u\n", head);
+        fail_unless(head == 3 || head == 5);
         n1 = slist_next(n1);
     }
     slist_free(n1);
@@ -112,12 +109,14 @@ START_TEST(test_dinic_aux_net)
     /* Verifico los vecinos de 3. Tiene que ser solamente t */
     n1 = network_neighbours(aux_net, 3);
     fail_unless(slist_length(n1) == 1);
-    fail_unless(slist_head_data(n1); == t);
+    head = *((Node *) slist_head_data(n1));
+    fail_unless(head == t);
     slist_free(n1);
 
     /* Verifico los vecinos de 5, tiene que ser 6 */
     n1 = network_neighbours(aux_net, t);
-    fail_unless(slist_head_data(n1) == 6);
+    head = *((Node *) slist_head_data(n1));
+    fail_unless(head == 6);
 
     /* Verifico los vecinos de t, tiene que ser una lista vacia */
     n1 = network_neighbours(aux_net, t);

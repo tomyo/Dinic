@@ -70,6 +70,7 @@ START_TEST(test_network_get_edges)
     network_add_edge(net, e3);
 
     el = network_get_edges(net, 0);
+    fail_unless(!slist_is_empty(el));
 
     tmp = el;
     while(tmp != NULL){
@@ -100,6 +101,7 @@ START_TEST(test_network_get_neightbours)
     network_add_edge(net, e3);
 
     el = network_neighbours(net, 2);
+    fail_unless(!slist_is_empty(el));
 
     tmp = el;
     while(tmp != NULL){

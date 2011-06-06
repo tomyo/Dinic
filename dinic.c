@@ -245,7 +245,7 @@ bool aux_network_find_blocking_flow(dinic_t *data, Network *aux_net,
     bool result = false;
 
     if (verbose) {
-        printf(stdout, "N.A. %d:\n", aux_net_number);
+        printf("N.A. %d:\n", aux_net_number);
     }
     partial = aux_network_find_flow(data, aux_net, verbose);
     if (slist_is_empty(partial->path)) {
@@ -300,7 +300,7 @@ dinic_result *dinic(Network *network, Node s, Node t, bool verbose) {
     /* El Corte Minimal son los nodos que quedan en el ultimo NA */
     data.result->min_cut = network_get_nodes(aux_net);
     /* TODO: assert(t not in data.result->min_cut) */
-    
+
     network_destroy(data.backwards);
     return data.result;
 }
