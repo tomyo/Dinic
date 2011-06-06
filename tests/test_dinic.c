@@ -19,6 +19,13 @@ START_TEST(test_dinic_aux_net_null)
 }
 END_TEST
 
+START_TEST(test_dinic_net_null)
+{
+    dinic(NULL, 0, 1, false);
+
+}
+END_TEST
+
 
 /* Functionality test */
 START_TEST(test_dinic_aux_net)
@@ -71,7 +78,6 @@ START_TEST(test_dinic_aux_net)
     dt->network = net;
     dt->s = s;
     dt->t = t;
-    dt->result = NULL; /* Not used. Not tested */
 
     /* Creo el network auxiliar */
     aux_net = aux_network_new(dt);
@@ -178,7 +184,6 @@ START_TEST(test_dinic_aux_net_2)
     dt->network = net;
     dt->s = s;
     dt->t = t;
-    dt->result = NULL; /* Not used. Not tested */
 
     /* Creo el network auxiliar */
     aux_net = aux_network_new(dt);
@@ -288,7 +293,6 @@ START_TEST(test_dinic_aux_net_backward)
     dt->network = net;
     dt->s = s;
     dt->t = t;
-    dt->result = NULL; /* Not used. Not tested */
 
     /* Creo el network auxiliar */
     aux_net = aux_network_new(dt);
@@ -370,7 +374,6 @@ START_TEST(test_dinic_aux_net_no_t)
     dt->network = net;
     dt->s = s;
     dt->t = t; /* Not used. Not tested */
-    dt->result = NULL; /* Not used. Not tested */
 
     /* Creo el network auxiliar */
     aux_net = aux_network_new(dt);
@@ -478,7 +481,6 @@ START_TEST(test_dinic_aux_net_find_flow)
     dt->network = NULL; /* Not used. Not tested */
     dt->s = s;
     dt->t = t;
-    dt->result = NULL; /* Not used. Not tested */
 
     flow = aux_network_find_flow(dt, net, false);
     path = flow->path;
@@ -497,6 +499,31 @@ START_TEST(test_dinic_aux_net_find_flow)
 }
 END_TEST
 
+
+START_TEST(test_dinic_net_simple)
+{
+    Network *net = NULL;
+    dinic_result *result = NULL;
+    Node s = 0, t = 1;
+    Edge *single = NULL;
+    bool verbose_mode = true;
+    
+    /* Network a crear
+             s —> t 
+     */      
+    
+    net = network_create();
+    single = edge_create(s, t, 1, 0);
+    network_add_edge(net, single);
+    
+    result = dinic(net, s, t, verbose_mode);
+
+    
+    fail_unless(result != NULL);
+
+}
+END_TEST
+
 /* Armado de la test suite */
 Suite *dinic_suite(void){
     Suite *s = suite_create("dinic");
@@ -506,6 +533,7 @@ Suite *dinic_suite(void){
 
     /* Precondiciones */
     tcase_add_test_raise_signal(tc_preconditions, test_dinic_aux_net_null, SIGABRT);
+    tcase_add_test_raise_signal(tc_preconditions, test_dinic_net_null, SIGABRT);
     suite_add_tcase(s, tc_preconditions);
 
     /* Creation */
@@ -517,6 +545,7 @@ Suite *dinic_suite(void){
     tcase_add_test(tc_functionality, test_dinic_aux_net_backward);
     tcase_add_test(tc_functionality, test_dinic_aux_net_no_t);
     tcase_add_test(tc_functionality, test_dinic_aux_net_find_flow);
+    tcase_add_test(tc_functionality, test_dinic_net_simple);
     suite_add_tcase(s, tc_functionality);
 
     return s;

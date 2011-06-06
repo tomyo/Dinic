@@ -181,13 +181,13 @@ SList *network_get_nodes(Network *self) {
     }
 
     /* Postcondicion */
-    assert(result != NULL);
+    /*assert(result != NULL);*/
 
     return result;
 }
 
 SList *network_get_fordware_edges(Network *self){
-    SList *edges =NULL, *nodes = NULL, *current = NULL, result = NULL;
+    SList *edges =NULL, *nodes = NULL, *current = NULL, *result = NULL;
     Node node = 0; 
     Edge *edge = NULL;
     
@@ -197,11 +197,11 @@ SList *network_get_fordware_edges(Network *self){
     nodes = network_get_nodes(self);
     current = nodes;
     while (current != NULL) {
-        node = *((Node *)slist_get_head(current));
+        node = *((Node *)slist_head_data(current));
         edges = network_get_edges(self, node);
         while (edges != NULL) {
-            edge = slist_get_head(edges);
-            if(node == *edge_get_first(edge) {
+            edge = slist_head_data(edges);
+            if(node == *edge_get_first(edge)) {
                 /* Arista fwd valida */
                 slist_prepend(result, edge);
             }

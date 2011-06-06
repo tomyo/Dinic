@@ -56,8 +56,6 @@ typedef struct {
     /** Nodo destino */
     Node t;
 
-    /** La estructura que devuelve el resultado */
-    dinic_result *result;
 } dinic_t;
 
 /**

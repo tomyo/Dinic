@@ -40,6 +40,7 @@ Node *edge_get_second(Edge *self);
 
 /** Actualiza el valor de un flujo del edge (Pisando el anterior) */
 void edge_set_flow(Edge *self, Flow f);
+
 /**
  * Funcion para comparar dos aristas, o sea para saber si
  * dos aristas son iguales.

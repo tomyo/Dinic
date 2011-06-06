@@ -162,11 +162,13 @@ Network *aux_network_new(dinic_t *data) {
  * mencionada.
  */
 static void flow_pretty_print(dinic_t *data, DinicFlow *to_print) {
+    static unsigned int count = 1;
     Node *next_node = &data->s;
     SList *path = to_print->path;
 
     /* Si la lista es vacia, no habia camino */
     if (path != NULL) {
+        printf("N.A. %u\n", count); count ++;
         printf("0");
         while (path != NULL) {
             /* Calcular el valor del flujo de current_flow) */
@@ -183,6 +185,9 @@ static void flow_pretty_print(dinic_t *data, DinicFlow *to_print) {
             path = slist_next(path);
         }
         printf(" (flujo transportado: %u)\n", to_print->flow_value);
+        printf("El N.A. %u aumenta el flujo en %u.\n", 
+                count, to_print->flow_value);
+
     }
 }
 
@@ -308,7 +313,21 @@ DinicFlow *aux_network_find_flow(dinic_t *data, Network *aux_net, bool verbose) 
     if (verbose) {
         flow_pretty_print(data, result);
     }
-
+    
+    /* Postcondiciones */
+    assert(result != NULL);
+    if (result->path != NULL)
+    {
+        SList *iter = result->path;
+        Edge *e = (Edge *)slist_head_data(result->path);
+        printf("Path_len: %d\n Flow: %d\n", 
+               slist_length(result->path), result->flow_value);
+        while(iter != NULL) {
+            e = (Edge *)slist_head_data(iter);
+            edge_pprint(e);
+            iter = slist_next(iter);
+        }
+    }
     return result;
 }
 
@@ -324,30 +343,34 @@ dinic_result *dinic(Network *network, const Node s, const Node t, bool verbose) 
     data.network = network;
     data.s = s;
     data.t = t;
-    data.result = NULL; /* DEPRECATED */
 
     result = calloc(1, sizeof(dinic_result));
     result->flow_value = 0;
     result->max_flow = NULL;
 
-    /* Buscando flujo bloqueante */
     while (!found_max_flow) {
+        /* Buscando flujo bloqueante */
         aux_net = aux_network_new(&data);
-        current = aux_network_find_flow(&data, aux_net, verbose);
-        
         if (network_has_node(aux_net, t)) {
+            current = aux_network_find_flow(&data, aux_net, verbose);
+            memory_check(current);
+            /* Buscamos caminos aumentantes en este NA para actualizar flujo */
             while (!slist_is_empty(current->path)) {
-                /* Buscamos y actualizamos los caminos de s a t en este NA */
-                network_update(data.network, current->path,
-                               current->flow_value);
-                slist_free(current->path);/* TODO: chequer falta de memoria */
+                assert (current->flow_value > 0);
+
+                /* Nuevo camino aumentante, actualizamos flujo en network */
+                network_update(data.network, current->path,current->flow_value);
+
+                slist_free(current->path);
                 free(current); current = NULL;
                 current = aux_network_find_flow(&data, aux_net, verbose);
+                memory_check(current);
             }
-            /* Ya encontramos flujo bloqueante para este NA */
+            /* Encontramos flujo bloqueante en este NA */
             network_free(aux_net);
 
         } else {
+            /* Si no esta t en el NA, es un corte minimal, terminamos */
             found_max_flow = true;
         }
     }
