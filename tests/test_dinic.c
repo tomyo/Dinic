@@ -418,12 +418,13 @@ START_TEST(test_dinic_aux_net_find_flow)
     Network *net = NULL;
     dinic_t *dt = NULL;
     Edge *e1 = NULL, *e2 = NULL, *e3 = NULL;
-    Edge *e4 = NULL, *e5 = NULL, *e6 = NULL, *e7 = NULL;
+    Edge *e4 = NULL, *e5 = NULL, *e6 = NULL, *e7 = NULL, *e8 = NULL;
+    Edge *e9 = NULL, *e10 = NULL, *e11 = NULL, *e12 = NULL, *e13 = NULL;
     Node s = 0, t = 1;
     DinicFlow *flow = NULL;
     SList *path = NULL;
     Edge *current_edge = NULL;
-    unsigned int sequence[] = {0, 4, 5, 6, 1};
+    unsigned int sequence[] = {0, 4, 5, 10, 1};
     int expected = 0;
 
 
@@ -432,9 +433,9 @@ START_TEST(test_dinic_aux_net_find_flow)
 
            2
           /  \
-         s    3
-          \  /
-           4 —— 5 — 6 — t
+         s    3 —— 10 —— t    11
+          \  /   /          /
+           4 —— 5 — 6 — 7 — 8 — 9
 
         Todas las capacidades son 1
     */
@@ -444,20 +445,32 @@ START_TEST(test_dinic_aux_net_find_flow)
 
     /* Creo los lados */
     e1 = edge_create(s, 2, 1, 0);
-    e2 = edge_create(s, 4, 1, 0);
     e3 = edge_create(2, 3, 1, 0);
-    e4 = edge_create(4, 3, 1, 0);
+    e10 = edge_create(7, 8, 1, 0);
     e5 = edge_create(5, 6, 1, 0);
-    e6 = edge_create(6, t, 1, 0);
+    e8 = edge_create(10, t, 1, 0);
+    e2 = edge_create(s, 4, 1, 0);
+    e9 = edge_create(6, 7, 1, 0);
+    e6 = edge_create(5, 10, 1, 0);
+    e4 = edge_create(4, 3, 1, 0);
+    e11 = edge_create(8, 9, 1, 0);
     e7 = edge_create(4, 5, 1, 0);
+    e12 = edge_create(8, 11, 1, 0);
+    e13 = edge_create(3, 10, 0, 0);
 
-    network_add_edge(net, e2);
-    network_add_edge(net, e1);
-    network_add_edge(net, e3);
-    network_add_edge(net, e4);
-    network_add_edge(net, e5);
     network_add_edge(net, e6);
+    network_add_edge(net, e5);
+    network_add_edge(net, e2);
+    network_add_edge(net, e4);
+    network_add_edge(net, e10);
     network_add_edge(net, e7);
+    network_add_edge(net, e12);
+    network_add_edge(net, e11);
+    network_add_edge(net, e1);
+    network_add_edge(net, e8);
+    network_add_edge(net, e3);
+    network_add_edge(net, e9);
+    network_add_edge(net, e13);
 
 
     /* Completo la estructura con los datos */
