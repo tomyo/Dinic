@@ -474,6 +474,11 @@ dinic_result *dinic(Network *network, Node *s, Node *t, bool verbose) {
             na_flow_value = 0;
 
         } else {
+            if (verbose) {
+                printf("N.A %u:\n", na_count);
+                printf("El N.A. %u aumenta el flujo en %u.\n\n", na_count, 0);
+            }
+
             /* 2b -> Terminamos */
             /* El Corte Minimal son los nodos que quedan en el ultimo NA*/
             assert(aux_net != NULL);
