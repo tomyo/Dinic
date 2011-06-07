@@ -109,6 +109,8 @@ static void print_output(dinic_result *result, struct parse_result options) {
     }
     printf("Valor del Flujo: %u\n", result->flow_value);
 
+    printf("Valor del Flujo: %u\n", result->flow_value);
+
     if (options.corte) {
         min_cut = result->min_cut;
 

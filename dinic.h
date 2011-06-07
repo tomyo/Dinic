@@ -15,8 +15,6 @@
  * Define la interfaz para correr el algortimo.
  */
 
-/* ******************* Estructuras exportadas ******************* */
-
 /**
  * @brief Estructura para almacenar variables de Dinic.
  */
@@ -57,8 +55,6 @@ typedef struct {
 
 
 
-/* ******************* Estructuras para debugueo ******************* */
-
 /**
  * @brief Paquete para devolver los resultados de dinic
  */
@@ -85,9 +81,6 @@ typedef struct {
 } dinic_result;
 
 
-
-/* ******************* Funciones exportadas ******************* */
-
 /**
  * @brief Funcion que corre el algoritmo de Dinic en un Network.
  * @warning El resultado contiene punteros a las aristas del network pasado.
@@ -99,9 +92,6 @@ typedef struct {
  */
 dinic_result *dinic(Network *n, Node *s, Node *t, bool verbose);
 
-
-
-/* ******************* Funciones de debugueo ******************* */
 
 /**
  * @brief Devuelve el network auxiliar.

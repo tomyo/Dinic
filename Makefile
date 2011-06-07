@@ -1,6 +1,6 @@
 TARGET=dinic
 CC=gcc
-CFLAGS+= -ansi -Wall -Wextra -Wdeclaration-after-statement -Wbad-function-cast -Wcast-qual -Wstrict-prototypes -Wmissing-declarations -Wmissing-prototypes -Wno-unused-parameter -pedantic -g -Werror
+CFLAGS+= -ansi -Wall -Wextra -Wdeclaration-after-statement -Wbad-function-cast -Wcast-qual -Wstrict-prototypes -Wmissing-declarations -Wmissing-prototypes -Wno-unused-parameter -pedantic -g -Werror -O2
 SOURCES=$(shell echo *.c)
 OBJECTS= $(SOURCES:.c=.o)
 HASHOBJECTS=$(shell echo hashtable/*.o)

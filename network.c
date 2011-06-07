@@ -42,13 +42,13 @@ static void destroy_slist_internal(void *list, bool aux_mode) {
     assert(list != NULL);
 
     current = (SList *) list;
-    
+
     if (aux_mode)
     {/* Solo liberamos las listas y el reference_counter. */
         /* Liberando el reference counter */
         free(slist_head_data(current));
         current = slist_next(current);
-        
+
     } else {
         /* Liberando los edges */
         while (current != NULL) {
@@ -119,7 +119,7 @@ void _network_add_edge(Network *network, Edge *edge, char mode) {
         memory_check(reference_counter_x1);
         *reference_counter_x1 = 0;
         neighbours_x1 = slist_prepend(neighbours_x1, reference_counter_x1);
-        
+
         assert(!ht_has_key(network->node_to_edges, x1));
         ht_insert(network->node_to_edges, x1, neighbours_x1);
     }
@@ -132,7 +132,7 @@ void _network_add_edge(Network *network, Edge *edge, char mode) {
         memory_check(reference_counter_x2);
         *reference_counter_x2 = 0;
         neighbours_x2 = slist_prepend(neighbours_x2, reference_counter_x2);
-        
+
         assert(!ht_has_key(network->node_to_edges, x2));
         ht_insert(network->node_to_edges, x2, neighbours_x2);
     }
@@ -149,7 +149,7 @@ void _network_add_edge(Network *network, Edge *edge, char mode) {
     }
 
     /* Si repetimos aristas, algo anda mal.. mmmmmmmm*/
-    assert((slist_find_custom(neighbours_x1, (void *) edge, compare_edges) 
+    assert((slist_find_custom(neighbours_x1, (void *) edge, compare_edges)
             == NULL) &&  "No soportamos aristas repetidas");
 
     /* En la pos 0 de las listas esta el reference counter */
@@ -218,7 +218,7 @@ SList *network_nodes(Network *self) {
 
 SList *network_forward_edges(Network *self){
     SList *nodes = NULL, *iter_nodes = NULL, *result = NULL;
-    
+
     /* Precondiciones */
     assert(self != NULL);
 
@@ -280,7 +280,7 @@ Edge *_network_del_edge(Network *network, Edge *edge, char mode) {
     unsigned int *rc_x2 = NULL;
     Node *x1 = NULL, *x2 = NULL;
     SList *neighbours_x1 = NULL, *neighbours_x2 = NULL;
-    
+
     assert(network != NULL);
     assert(edge != NULL);
     assert(mode == 'f' || mode == 'b');
@@ -337,8 +337,16 @@ void network_update(Network *self, SList *path, Flow flow){
         if(*edge_get_first(edge) == *next_node) {
             /* Forward */
             Flow new_flow = 0;
+            Flow previous_flow = 0;
 
-            new_flow = edge_get_flow(edge) + flow;
+            previous_flow = edge_get_flow(edge);
+
+            if (previous_flow == 0) {
+                /* Tengo que poner al lado como backward */
+                network_add_edge_backward(self, edge);
+            }
+
+            new_flow = previous_flow + flow;
             assert(new_flow <= edge_get_capacity(edge));
             edge_set_flow(edge, new_flow);
 

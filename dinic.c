@@ -17,7 +17,10 @@ bool aux_network_find_blocking_flow(dinic_t *, Network *, bool);
 static int compare_nodes(const void *x1, const void *x2);
 
 
-/* TODO: Descripcion */
+/**
+ * @brief Comprara dos edges segun su valor.
+ * Devuelve 0 si son distintos y 1 si son iguales
+ */
 static int compare_nodes(const void *x1, const void *x2) {
     return ((*(const Node *)x1) == (*(const Node *)x2))?0:1;
 }
@@ -28,7 +31,6 @@ static int compare_nodes(const void *x1, const void *x2) {
  * @param mode 'f' si quiere mandar flujo o 'b' si quiero devolverlo
  */
 static bool can_send_flow(Edge *edge, char mode) {
-    /* TODO: Modificar esto porque ya no hay lados backwards */
     /* Asumimos que primero se pregunta por los lados fordward */
     bool result = false;
 
@@ -59,13 +61,13 @@ Network *aux_network_new(dinic_t *data) {
 
     /* Precondicion */
     assert(data != NULL);
-    
+
     main_network = data->network;
     s = data->s;
     t = data->t;
 
     assert(network_has_node(data->network, *s));
-    
+
     /* Algoritmo Basicos:
      * 1) Revisar bfs_queue:
      *        a) Si esta vacia, terminamos -> Devolver Netwok Auxiliar (result)
@@ -80,8 +82,8 @@ Network *aux_network_new(dinic_t *data) {
      */
 
     /* Referencias a datos de *data* que vamos a necesitar constantemente */
-    
-    
+
+
     /* Inicializando variables */
     result = network_aux_create(); /* NA (vacio) */
     bfs_queue = queue_new();   /* BFS queue (vacia) */
@@ -417,8 +419,8 @@ dinic_result *dinic(Network *network, Node *s, Node *t, bool verbose) {
      *
      *
      *    b) Guardar resultados en result y setear flag para salir.
-     * 
-     * 3) liberar estructuras temporales desechables, Goto 1) 
+     *
+     * 3) liberar estructuras temporales desechables, Goto 1)
      */
 
     if (verbose) puts(""); /* Detallito, nueva linea antes de empezar */
@@ -444,7 +446,7 @@ dinic_result *dinic(Network *network, Node *s, Node *t, bool verbose) {
 
                 /* 2a */
                 /* Actualizamos el flujo enviado por el camino aumentante */
-                network_update(data.network, current->path,current->flow_value);
+                network_update(data.network, current->path, current->flow_value);
 
                 na_flow_value += current->flow_value;
 
@@ -457,7 +459,7 @@ dinic_result *dinic(Network *network, Node *s, Node *t, bool verbose) {
             /* eliminamos el ultimo DinicFlow */
             slist_free(current->path);
             free(current); current = NULL;
-                
+
             /* Tenemos flujo bloqueante en este NA */
             if (verbose) {
                 printf("El N.A. %u aumenta el flujo en %u.\n\n",\
@@ -470,6 +472,11 @@ dinic_result *dinic(Network *network, Node *s, Node *t, bool verbose) {
             na_flow_value = 0;
 
         } else {
+            if (verbose) {
+                printf("N.A %u:\n", na_count);
+                printf("El N.A. %u aumenta el flujo en %u.\n\n", na_count, 0);
+            }
+
             /* 2b -> Terminamos */
             /* El Corte Minimal son los nodos que quedan en el ultimo NA*/
             assert(aux_net != NULL);
@@ -484,16 +491,16 @@ dinic_result *dinic(Network *network, Node *s, Node *t, bool verbose) {
             result->max_flow = network_forward_edges(network);
             
             found_max_flow = true;
-            
+
         }
         /* 3 */
         network_destroy(aux_net);
         aux_net = NULL;
     }
-    
-    
+
+
     assert(aux_net == NULL); /* deberia estar borrada */
-        
+
 
     /* Postcondicion */
     assert(result != NULL);
