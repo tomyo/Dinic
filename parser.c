@@ -55,6 +55,8 @@ Network *parse_network(FILE *fh) {
         }
     }
 
+    printf("\n");
+
     return result;
 }
 

@@ -1,4 +1,5 @@
 *.o
+*.pyc
 .depend
 tests/runner
 tests/test.log
