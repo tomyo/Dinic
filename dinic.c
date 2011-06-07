@@ -81,7 +81,7 @@ Network *aux_network_new(dinic_t *data) {
     t = data->t;
 
     /* Inicializando variables */
-    result = network_create(); /* NA (vacio) */
+    result = network_aux_create(); /* NA (vacio) */
     bfs_queue = queue_new();   /* BFS queue (vacia) */
     next_level = queue_new(); /* Siguiente nivel queue (vacia) */
 
