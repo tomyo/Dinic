@@ -36,7 +36,7 @@ static int compare_edges(const void *a, const void *b) {
 
 static void destroy_slist_internal(void *list, bool aux_mode) {
     SList *current = NULL;
-    void *edge = NULL;
+    Edge *edge = NULL;
 
     /* Precondicion */
     assert(list != NULL);
@@ -51,8 +51,10 @@ static void destroy_slist_internal(void *list, bool aux_mode) {
 
     } else {
         /* Liberando los edges */
+        
         while (current != NULL) {
-            edge = slist_head_data(current);
+        
+            edge = (Edge *)slist_head_data(current);
             if (edge != NULL) {
                 edge_destroy(edge);
             }
@@ -149,7 +151,7 @@ void _network_add_edge(Network *network, Edge *edge, char mode) {
     }
 
     /* Si repetimos aristas, algo anda mal.. mmmmmmmm*/
-    assert((slist_find_custom(neighbours_x1, (void *) edge, compare_edges)
+    assert((slist_find_custom(slist_next(neighbours_x1), (void *) edge, compare_edges)
             == NULL) &&  "No soportamos aristas repetidas");
 
     /* En la pos 0 de las listas esta el reference counter */

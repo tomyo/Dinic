@@ -1,0 +1,43 @@
+
+[(1,2),(3,2),(2,7),(2,8)]
+
+
+Teorema Bordese-Hayes 1.2
+---------------------
+1) En los networks auxiliarias no se borran aristas
+2) Nunca (durante la ejecucion) se borran lados fordward
+3) Para toda lista de vecinos de i se cumple que existen xs,ys tq
+network_get_edges(network, i) = xs++ys
+
+xs == gamma_minus(network, i)
+ys == gamma_plus(network, i)
+
+3a) Si i != t && xs ++ ys != [] => ys != []
+3b) Si i == t => ys = []
+3c) Si i == t && len(xs) == 1 => No hay forma de saber que esta lista pertenece
+    a los vecinos de t
+3d) Si i == t && len(xs) > 1 => Se puede diferenciar esta lista de vecinos de 
+    cualquier otra, E x,y,fs tq xs = [(x,t),(y,t)] ++ fs
+
+--------------------------------------------------------------------------------
+
+D/
+
+1) Ver codigo
+
+2) Ver codigo, la unica funcion que borra lados del network original es
+network_update
+
+3) Esto se debe a que los lados forward se crean al crear el network, los lados
+backward se crean posteriormente haciendo prepends, por lo que estaran siempre
+al principio de la lista 
+
+3a) Si xs++ys != [], => supongo que ys = [], todas las aristas que pasan por el
+nodo i-esimo son backward, pero para haber usado una arista como backward tengo
+que haberla usado primero como forward, y por 2) => que esa arista sigue estando
+en gamma_plus de i, pero ys == [] => Absurdo
+
+QED.
+
+/D
+
