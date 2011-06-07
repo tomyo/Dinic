@@ -57,14 +57,16 @@ Network *aux_network_new(dinic_t *data) {
     SList *edges = NULL;
     bool is_t_found = false;
 
+    /* Precondicion */
+    assert(data != NULL);
+
     main_network = data->network;
     s = data->s;
     t = data->t;
 
     /* Precondicion */
-    assert(data != NULL);
     assert(network_has_node(data->network, *s));
-    
+
     /* Algoritmo Basicos:
      * 1) Revisar bfs_queue:
      *        a) Si esta vacia, terminamos -> Devolver Netwok Auxiliar (result)
@@ -79,14 +81,14 @@ Network *aux_network_new(dinic_t *data) {
      */
 
     /* Referencias a datos de *data* que vamos a necesitar constantemente */
-    
-    
+
+
     /* Inicializando variables */
     result = network_aux_create(); /* NA (vacio) */
     bfs_queue = queue_new();   /* BFS queue (vacia) */
     next_level = queue_new(); /* Siguiente nivel queue (vacia) */
 
-    queue_push_head(bfs_queue, &s); /* Empezamos desde *s* */
+    queue_push_head(bfs_queue, s); /* Empezamos desde *s* */
     while (!queue_is_empty(bfs_queue) && !is_t_found) {
         SList *current_edges = NULL;
         Edge *current_edge = NULL;
@@ -416,8 +418,8 @@ dinic_result *dinic(Network *network, Node *s, Node *t, bool verbose) {
      *
      *
      *    b) Guardar resultados en result y setear flag para salir.
-     * 
-     * 3) liberar estructuras temporales desechables, Goto 1) 
+     *
+     * 3) liberar estructuras temporales desechables, Goto 1)
      */
 
     if (verbose) puts(""); /* Detallito, nueva linea antes de empezar */
@@ -457,7 +459,7 @@ dinic_result *dinic(Network *network, Node *s, Node *t, bool verbose) {
             /* eliminamos el ultimo DinicFlow */
             slist_free(current->path);
             free(current); current = NULL;
-                
+
             /* Tenemos flujo bloqueante en este NA */
             if (verbose) {
                 printf("El N.A. %u aumenta el flujo en %u.\n\n",\
@@ -483,16 +485,16 @@ dinic_result *dinic(Network *network, Node *s, Node *t, bool verbose) {
             result->flow_value = flow_value;
             result->max_flow = network_forward_edges(network);
             found_max_flow = true;
-            
+
         }
         /* 3 */
         network_destroy(aux_net);
         aux_net = NULL;
     }
-    
-    
+
+
     assert(aux_net == NULL); /* deberia estar borrada */
-        
+
 
     /* Postcondicion */
     assert(result != NULL);
