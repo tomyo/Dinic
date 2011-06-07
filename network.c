@@ -58,7 +58,6 @@ static void destroy_slist_internal(void *list, bool aux_mode) {
             }
             current = slist_next(current);
         }
-
     }
     /* Liberando estructura de listas (ambos casos) */
     slist_free((SList *) list);
@@ -114,7 +113,9 @@ void _network_add_edge(Network *network, Edge *edge, char mode) {
     if (neighbours_x1 == NULL) {
         /* No estaba en la Hash */
         unsigned int *reference_counter_x1 = NULL;
-        reference_counter_x1 = (unsigned int *) calloc(1, sizeof(*reference_counter_x1));
+        
+        reference_counter_x1 = (unsigned int *) calloc(1, 
+                                                sizeof(*reference_counter_x1));
         memory_check(reference_counter_x1);
         *reference_counter_x1 = 0;
         neighbours_x1 = slist_prepend(neighbours_x1, reference_counter_x1);
@@ -125,7 +126,9 @@ void _network_add_edge(Network *network, Edge *edge, char mode) {
     if (neighbours_x2 == NULL) {
         /* No estaba en la hash */
         unsigned int *reference_counter_x2 = NULL;
-        reference_counter_x2 = (unsigned int *) calloc(1, sizeof(*reference_counter_x2));
+        
+        reference_counter_x2 = (unsigned int *) calloc(1, 
+                                                sizeof(*reference_counter_x2));
         memory_check(reference_counter_x2);
         *reference_counter_x2 = 0;
         neighbours_x2 = slist_prepend(neighbours_x2, reference_counter_x2);

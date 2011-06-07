@@ -57,12 +57,13 @@ Network *aux_network_new(dinic_t *data) {
     SList *edges = NULL;
     bool is_t_found = false;
 
+    /* Precondicion */
+    assert(data != NULL);
+    
     main_network = data->network;
     s = data->s;
     t = data->t;
 
-    /* Precondicion */
-    assert(data != NULL);
     assert(network_has_node(data->network, *s));
     
     /* Algoritmo Basicos:
@@ -86,7 +87,7 @@ Network *aux_network_new(dinic_t *data) {
     bfs_queue = queue_new();   /* BFS queue (vacia) */
     next_level = queue_new(); /* Siguiente nivel queue (vacia) */
 
-    queue_push_head(bfs_queue, &s); /* Empezamos desde *s* */
+    queue_push_head(bfs_queue, s); /* Empezamos desde *s* */
     while (!queue_is_empty(bfs_queue) && !is_t_found) {
         SList *current_edges = NULL;
         Edge *current_edge = NULL;
@@ -432,7 +433,6 @@ dinic_result *dinic(Network *network, Node *s, Node *t, bool verbose) {
         /* 2 */
         if (network_has_node(aux_net, *t)) {
             /* Buscamos flujo bloqueante */
-
             if (verbose) printf("N.A %u:\n", na_count);
 
             /* Inicializamos ciclo buscando el primer camino aumentante */
@@ -482,6 +482,7 @@ dinic_result *dinic(Network *network, Node *s, Node *t, bool verbose) {
             }
             result->flow_value = flow_value;
             result->max_flow = network_forward_edges(network);
+            
             found_max_flow = true;
             
         }
