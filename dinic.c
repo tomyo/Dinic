@@ -17,7 +17,10 @@ bool aux_network_find_blocking_flow(dinic_t *, Network *, bool);
 static int compare_nodes(const void *x1, const void *x2);
 
 
-/* TODO: Descripcion */
+/**
+ * @brief Comprara dos edges segun su valor.
+ * Devuelve 0 si son distintos y 1 si son iguales
+ */
 static int compare_nodes(const void *x1, const void *x2) {
     return ((*(const Node *)x1) == (*(const Node *)x2))?0:1;
 }
@@ -28,7 +31,6 @@ static int compare_nodes(const void *x1, const void *x2) {
  * @param mode 'f' si quiere mandar flujo o 'b' si quiero devolverlo
  */
 static bool can_send_flow(Edge *edge, char mode) {
-    /* TODO: Modificar esto porque ya no hay lados backwards */
     /* Asumimos que primero se pregunta por los lados fordward */
     bool result = false;
 
