@@ -22,6 +22,15 @@ typedef struct s_Network Network;
  */
 Network *network_create(void);
 
+
+/**
+ * @brief Idem network_create pero su funcion destructora no toca
+ * las aristas, que usualmente pertencen a un network ordinario.
+ * @returns Puntero al nuevo network creado.
+ * @returns NULL si no hay memoria suficiente.
+ */
+Network *network_aux_create(void);
+
 /**
  * @brief Agrega una arista al network.
  *

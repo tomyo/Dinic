@@ -34,30 +34,42 @@ static int compare_edges(const void *a, const void *b) {
     return result;
 }
 
-static void destroy_slist(void *list) {
-    SList *to_free = (SList *) list, *tmp = NULL;
+static void destroy_slist_internal(void *list, bool aux_mode) {
+    SList *current = NULL;
     void *edge = NULL;
 
     /* Precondicion */
-    assert(to_free != NULL);
+    assert(list != NULL);
 
-    /* Liberando el reference counter */
-    free(slist_head_data(list));
-    tmp = slist_next(to_free);
-
-    /* Liberando los edges */
-    while (tmp != NULL) {
-        edge = slist_head_data(tmp);
-        /* Podria haber liberado el edge si
-         * estaba insertado en otra posicion */
-        if (edge != NULL) {
-            edge_destroy(edge);
+    current = (SList *) list;
+    
+    if (aux_mode)
+    {/* Solo liberamos las listas y el reference_counter. */
+        /* Liberando el reference counter */
+        free(slist_head_data(current));
+        current = slist_next(current);
+        
+    } else {
+        /* Liberando los edges */
+        while (current != NULL) {
+            edge = slist_head_data(current);
+            if (edge != NULL) {
+                edge_destroy(edge);
+            }
+            current = slist_next(current);
         }
-        tmp = slist_next(tmp);
-    }
 
-    /* Liberando estructura de listas */
-    slist_free(to_free);
+    }
+    /* Liberando estructura de listas (ambos casos) */
+    slist_free((SList *) list);
+}
+
+static void destroy_slist(void *list) {
+    destroy_slist_internal(list, false);
+}
+
+static void destroy_slist_aux(void *list) {
+    destroy_slist_internal(list, true);
 }
 
 /*--------------------------- Funciones del ADT ----------------------------*/
@@ -68,6 +80,17 @@ Network *network_create(void) {
     result = calloc(1, sizeof(*result));
     if(result != NULL) {
         result->node_to_edges = ht_new_full(MODE_ALLREF, NULL, destroy_slist);
+    }
+
+    return result;
+}
+
+Network *network_aux_create(void) {
+    Network *result = NULL;
+
+    result = calloc(1, sizeof(*result));
+    if(result != NULL) {
+        result->node_to_edges = ht_new_full(MODE_ALLREF, NULL, destroy_slist_aux);
     }
 
     return result;
@@ -245,6 +268,7 @@ void network_free(Network *self) {
     ht_free(self->node_to_edges);
     free(self); self = NULL;
 }
+
 
 /* TODO: Comentar */
 /* mode == 'f' forward, 'b' backward */

@@ -483,8 +483,6 @@ dinic_result *dinic(Network *network, Node s, Node t, bool verbose) {
             /* Actualizamos la cuenta del flujo global */
             flow_value += na_flow_value;
             na_flow_value = 0;
-            
-            
 
         } else {
             /* 2b -> Terminamos */
@@ -503,7 +501,7 @@ dinic_result *dinic(Network *network, Node s, Node t, bool verbose) {
             
         }
         /* 3 */
-        network_free(aux_net);
+        network_destroy(aux_net);
         aux_net = NULL;
     }
     
