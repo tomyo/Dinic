@@ -4,11 +4,13 @@
 #include "slist.h"
 
 /**
- * @author Grupo xxx.
- * @brief Queue implementationImplementacion de colas
+ * @file queue.h
+ * @brief Interfaz del TAD queue.
  *
- * Interfaz de queues "similar" a la de la GLIB.
- * PELIGRO: muchas funciones no van a estar implementadas.
+ * La interfaz sigue la definida en GLib.
+ * Tambien sus comentarios.
+ *
+ * @warning Muchas funciones no estan implementadas.
  */
 
 typedef struct _Queue Queue;

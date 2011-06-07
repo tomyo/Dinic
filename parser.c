@@ -8,7 +8,7 @@
 
 #define FORMAT "%u %u %u"
 #define HELP_MESSAGE "Usage: dinic [OPTIONS]\n"\
-                     "Encuentra el flujo maximal y el corte minimal en"\
+                     "Encuentra el flujo maximal y el corte minimal en "\
                      "un network usando el algoritmo de Dinic\n\n"\
                      "Opciones:\n"\
                      "  -f --flujo      Imprime una tabla con los valores del flujo\n"\

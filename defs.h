@@ -3,7 +3,7 @@
 
 /**
  * @file defs.h
- * \brief Definición de algunas constantes
+ * \brief Definicion de constantes
  */
 
 #define memory_check(m) do\
@@ -17,4 +17,5 @@
 #define INF -1 /* Funciona porque los pesos son unsigned */
 #define min(x,y) (x < y ? x : y)
 #define max(x,y) (x < y ? y : x)
+
 #endif /*DEFINITIONS_H*/

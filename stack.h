@@ -1,6 +1,13 @@
 #ifndef STACK_H
 #define STACK_H
 
+/**
+ * @file stack.h
+ * @brief Interfaz del TAD stack.
+ *
+ * Tipo definido en base a la interfaz de queue.h.
+ */
+
 typedef Queue Stack;
 
 #define stack_new() queue_new()
