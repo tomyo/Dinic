@@ -41,7 +41,6 @@ static bool can_send_flow(Edge *edge, char mode) {
         /* Podemos devolver flujo? */
         /* Por construccion, no deberiamos tener lados backwards que no se
          * pueden usar */
-        assert(edge_get_flow(edge) > 0);
         result = true;
     }
 
@@ -54,14 +53,18 @@ Network *aux_network_new(dinic_t *data) {
     Network *main_network = NULL, *result = NULL;
     Queue *bfs_queue = NULL, *next_level = NULL;
     Node *current_node = NULL;
-    Node s = 0, t = 0;
+    Node *s = NULL, *t = NULL;
     SList *edges = NULL;
     bool is_t_found = false;
 
+    main_network = data->network;
+    s = data->s;
+    t = data->t;
+
     /* Precondicion */
     assert(data != NULL);
-    assert(network_has_node(data->network, s));
-
+    assert(network_has_node(data->network, *s));
+    
     /* Algoritmo Basicos:
      * 1) Revisar bfs_queue:
      *        a) Si esta vacia, terminamos -> Devolver Netwok Auxiliar (result)
@@ -76,10 +79,8 @@ Network *aux_network_new(dinic_t *data) {
      */
 
     /* Referencias a datos de *data* que vamos a necesitar constantemente */
-    main_network = data->network;
-    s = data->s;
-    t = data->t;
-
+    
+    
     /* Inicializando variables */
     result = network_aux_create(); /* NA (vacio) */
     bfs_queue = queue_new();   /* BFS queue (vacia) */
@@ -118,7 +119,7 @@ Network *aux_network_new(dinic_t *data) {
                     if (can_send_flow(current_edge, mode)) {
                         _network_add_edge(result, current_edge, mode);
                         queue_push_head(next_level, neighbour);
-                        if (*neighbour == t) {
+                        if (*neighbour == *t) {
                             is_t_found = true;
                         }
                     }
@@ -157,7 +158,7 @@ Network *aux_network_new(dinic_t *data) {
  * mencionada.
  */
 static void flow_pretty_print(dinic_t *data, DinicFlow *to_print) {
-    Node *next_node = &data->s;
+    Node *next_node = data->s;
     SList *path = to_print->path;
 
     /* Si la lista es vacia, no habia camino */
@@ -193,9 +194,9 @@ DinicFlow *aux_network_find_flow(dinic_t *data, Network *aux_net, bool verbose) 
     assert(aux_net != NULL);
     assert(data != NULL);
     assert(data->network != NULL);
-    assert(network_has_node(aux_net, data->s));
+    assert(network_has_node(aux_net, *data->s));
 
-    assert(network_has_node(aux_net, data->t));
+    assert(network_has_node(aux_net, *data->t));
 
     result = (DinicFlow *) calloc(1, sizeof(*result));
     memory_check(result);
@@ -213,7 +214,7 @@ DinicFlow *aux_network_find_flow(dinic_t *data, Network *aux_net, bool verbose) 
      * (Si no, t no es alcanzable) */
 
     while (!is_t_reached && (!stack_is_empty(dfs_stack) ||
-           !slist_is_empty(network_get_edges(aux_net, data->s)))) {
+           !slist_is_empty(network_get_edges(aux_net, *data->s)))) {
 
         Edge *current_edge = NULL;
         char mode = 'f';
@@ -223,7 +224,7 @@ DinicFlow *aux_network_find_flow(dinic_t *data, Network *aux_net, bool verbose) 
             SList *edges = NULL;
             Edge *edge = NULL;
 
-            edges = network_get_edges(aux_net, data->s);
+            edges = network_get_edges(aux_net, *data->s);
             edge = (Edge *)slist_head_data(edges);
             if (can_send_flow(edge, 'f')) {
                 stack_push(dfs_stack, slist_head_data(edges));
@@ -233,7 +234,7 @@ DinicFlow *aux_network_find_flow(dinic_t *data, Network *aux_net, bool verbose) 
                 continue;
             }
 
-            next_node = &data->s;
+            next_node = data->s;
         }
 
         current_edge = (Edge *) stack_head(dfs_stack);
@@ -283,7 +284,7 @@ DinicFlow *aux_network_find_flow(dinic_t *data, Network *aux_net, bool verbose) 
             }
         } else {
             /* No tiene vecinos */
-            if (*next_node == data->t && can_send_flow(current_edge, mode)) {
+            if (*next_node == *data->t && can_send_flow(current_edge, mode)) {
                 is_t_reached = true;
             } else {
                 /* Ese camino no me lleva a ningun lado.
@@ -339,7 +340,7 @@ DinicFlow *aux_network_find_flow(dinic_t *data, Network *aux_net, bool verbose) 
 
     {
         Flow current_flow = UINT_MAX;
-        next_node = &data->s;
+        next_node = data->s;
 
         result->path = path;
         if (path == NULL) {
@@ -376,7 +377,7 @@ DinicFlow *aux_network_find_flow(dinic_t *data, Network *aux_net, bool verbose) 
 }
 
 
-dinic_result *dinic(Network *network, Node s, Node t, bool verbose) {
+dinic_result *dinic(Network *network, Node *s, Node *t, bool verbose) {
     dinic_t data; /* Envoltorio principal que se pasa internamente */
     dinic_result *result = NULL;
     Network *aux_net = NULL;
@@ -387,8 +388,8 @@ dinic_result *dinic(Network *network, Node s, Node t, bool verbose) {
 
     /* Precondiciones */
     assert(network != NULL);
-    assert(network_has_node(network, s));
-    assert(network_has_node(network, t));
+    assert(network_has_node(network, *s));
+    assert(network_has_node(network, *t));
 
     /* Inicializando las estructuras */
     data.network = network;
@@ -429,7 +430,7 @@ dinic_result *dinic(Network *network, Node s, Node t, bool verbose) {
         memory_check(aux_net);
 
         /* 2 */
-        if (network_has_node(aux_net, t)) {
+        if (network_has_node(aux_net, *t)) {
             /* Buscamos flujo bloqueante */
 
             if (verbose) printf("N.A %u:\n", na_count);
@@ -473,9 +474,9 @@ dinic_result *dinic(Network *network, Node s, Node t, bool verbose) {
             /* El Corte Minimal son los nodos que quedan en el ultimo NA*/
             assert(aux_net != NULL);
 
-            if(!network_has_node(aux_net, s)) {
+            if(!network_has_node(aux_net, *s)) {
                 /* Parche para caso excepcional en nuestra implementacion */
-                result->min_cut = slist_prepend(result->min_cut, ((void*) &s));
+                result->min_cut = slist_prepend(result->min_cut, ((void*) s));
             } else {
                 result->min_cut = network_nodes(aux_net);
             }

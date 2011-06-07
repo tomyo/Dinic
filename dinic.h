@@ -29,12 +29,12 @@ typedef struct {
     /**
      * @brief Nodo origen
      */
-    Node s;
+    Node *s;
 
     /**
      * @brief Nodo destino
      */
-    Node t;
+    Node *t;
 
 } dinic_t;
 
@@ -97,7 +97,7 @@ typedef struct {
  * @param verbose imprime los flujos que se mandan en cada network auxiliar.
  * @returns dinic_result Con el resultado del algoritmo.
  */
-dinic_result *dinic(Network * n, Node s, Node t, bool verbose);
+dinic_result *dinic(Network *n, Node *s, Node *t, bool verbose);
 
 
 

@@ -77,7 +77,7 @@ int main(int argc, char *argv[]) {
     assert(network_has_node(network, t));
 
     /* Ya tenemos el network, ahora le corremos Dinic*/
-    result = dinic(network, s, t, options.verbose);
+    result = dinic(network, &s, &t, options.verbose);
     memory_check(result);
 
     print_output(result, options);

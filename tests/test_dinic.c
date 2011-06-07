@@ -590,14 +590,14 @@ START_TEST(test_dinic_net_small)
 
     fail_unless(result != NULL);
     {
-    SList *edges = NULL;
-    
-    edges = result->max_flow;
-    while(edges != NULL) {
-        edge_pprint(slist_head_data(edges));
+        SList *edges = NULL;
         
-        edges = slist_next(edges);
-    }
+        edges = result->max_flow;
+        while(edges != NULL) {
+            edge_pprint(slist_head_data(edges));
+            
+            edges = slist_next(edges);
+     }
     }
     fail_unless(result->flow_value == 3);
     fail_unless(slist_length(result->max_flow) == 7);
