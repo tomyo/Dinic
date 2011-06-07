@@ -448,7 +448,7 @@ dinic_result *dinic(Network *network, Node *s, Node *t, bool verbose) {
 
                 /* 2a */
                 /* Actualizamos el flujo enviado por el camino aumentante */
-                network_update(data.network, current->path,current->flow_value);
+                network_update(data.network, current->path, current->flow_value);
 
                 na_flow_value += current->flow_value;
 
