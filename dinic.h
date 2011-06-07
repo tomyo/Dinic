@@ -7,72 +7,121 @@
 #include "network.h"
 #include "node.h"
 
+
 /**
- * @struct s_dinic_result "dinic.h"
+ * @file dinic.h
+ * @brief Operaciones exportadas para el algoritmo dinic.
+ *
+ * Define la interfaz para correr el algortimo.
+ */
+
+/* ******************* Estructuras exportadas ******************* */
+
+/**
+ * @brief Estructura para almacenar variables de Dinic.
+ */
+typedef struct {
+    /**
+     * @brief El network original pasado al algoritmo.
+     */
+    Network *network;
+
+    /**
+     * @brief Nodo origen
+     */
+    Node s;
+
+    /**
+     * @brief Nodo destino
+     */
+    Node t;
+
+} dinic_t;
+
+/**
+ * @brief Estructura que contiene un flujo parcial.
+ */
+typedef struct {
+    /**
+     * @brief Lista de edges que forman el flujo.
+     *
+     * Formato: {Edge, Edge, ...}
+     */
+    SList *path;
+
+    /**
+     * @brief Valor del flujo.
+     */
+    Flow flow_value;
+} DinicFlow;
+
+
+
+/* ******************* Estructuras para debugueo ******************* */
+
+/**
  * @brief Paquete para devolver los resultados de dinic
  */
-typedef struct s_dinic_result {
+typedef struct {
     /**
-     * @brief valor del flujo maximal obtenido
+     * @brief Valor del flujo maximal obtenido
      */
     unsigned int flow_value;
 
     /**
      * @brief Lista con los valores de los flujos obtenidos.
+     *
      * Formato: {Edge, Edge, .... }
      */
     SList *max_flow;
 
     /**
-     * @brief Lista
+     * @brief Lista con el corte minimal
+     *
      * Formato: {Node, Node, ...}
      */
     SList *min_cut;
 
 } dinic_result;
 
+
+
+/* ******************* Funciones exportadas ******************* */
+
 /**
  * @brief Funcion que corre el algoritmo de Dinic en un Network.
- * @param Network network a partir del cual operar.
- * @param Node node origen (en network)  (s)
- * @param Node node destino (en network) (t)
- * @param Booleano para hacer el resultado mas verbose
- * @returns DinicResult
+ * @warning El resultado contiene punteros a las aristas del network pasado.
+ * @param n network a partir del cual operar.
+ * @param s Nodo origen (en network).
+ * @param t Nodo destino (en network).
+ * @param verbose imprime los flujos que se mandan en cada network auxiliar.
+ * @returns dinic_result Con el resultado del algoritmo.
  */
-dinic_result *dinic(Network * n, Node s, Node t, bool);
+dinic_result *dinic(Network * n, Node s, Node t, bool verbose);
 
-/* *********** TEMPORALMENTE MOVIDO ACA ESTO VA EN EL .c ************ */
+
+
+/* ******************* Funciones de debugueo ******************* */
 
 /**
- * @brief Estructura interna de Dinic
+ * @brief Devuelve el network auxiliar.
+ * @note La creacion del network auxiliar se basa en los flujos pasados.
+ * @warning El network devuelto tiene punteros a las aristas del network
+ * pasado.
+ * @param data dinit_t con los parametros necesarios para la funcion
+ * @returns Network con el network auxiliar.
  */
-typedef struct {
-    /** El network original que va a ir cambiando durante el algoritmo */
-    Network *network;
-
-    /** Nodo origen */
-    Node s;
-
-    /** Nodo destino */
-    Node t;
-
-} dinic_t;
+Network *aux_network_new(dinic_t *data);
 
 /**
- * @brief Estructura que contiene un flujo (camino y valor).
+ * @brief Funcion que busca caminos entre nodo origen y destino.
+ * @note Los caminos y los flujos son almacenados en s_dinic->result.
+ * @warning El path devuelto tiene punteros a las aristas del network pasado.
+ * @param data donde esta el network y los nodos origen-destino.
+ * @param network network auxiliar donde operar.
+ * @param verbose si va a imprimir la salida.
+ * @returns DinicFlow con el camino encontrado y su flujo.
  */
-typedef struct {
-    /** Lista de edges que forman el flujo. Tiene la forma [(a, b), (b, c)..] */
-    SList *path;
-
-    /** Valor del flujo */
-    Flow flow_value;
-} DinicFlow;
-
-Network *aux_network_new(dinic_t *);
-DinicFlow *aux_network_find_flow(dinic_t *, Network *, bool );
-
-/* *********** TEMPORALMENTE MOVIDO ACA ESTO VA EN EL .c ************ */
-
+DinicFlow *aux_network_find_flow(dinic_t *data, Network *network, bool verbose);
 
 #endif

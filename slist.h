@@ -1,13 +1,17 @@
 #ifndef SLIST_H
 #define SLIST_H
 
-/*
-Grupo x (?) Discreta 2011, como no nos dejan usar la GLib, he aqui el reinvento
-del automovil, siempre con la misma interfaz de usuario (ie. pedales volante,
-etc) pero implementado de manera distinta.
-*/
-
 #include <stdbool.h>
+
+/**
+ * @file slist.h
+ * @brief Interfaz del TAD slist (Listas Simples).
+ *
+ * La interfaz sigue la definida en GLib.
+ * Tambien sus comentarios.
+ *
+ * @warning Muchas funciones no estan implementadas.
+ */
 
 typedef struct _SList SList;
 #define CompareFunc(x) int (*x) (const void *, const void *)

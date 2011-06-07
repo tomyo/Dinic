@@ -6,13 +6,53 @@
 #include "parser.h"
 #include "defs.h"
 
-/* TODO: Ver donde se puede meter la documentación de modularizacion y todo eso */
-
 /**
  * @file main.c
  *
- * \brief Lee los datos de la entrada, carga el network, corre dinic y muestra
- * el resultado
+ * @brief Main del programa.
+ *
+ * Lee los datos de la entrada, carga el network, corre dinic y muestra
+ * el resultado.
+ */
+
+/**
+ * @mainpage Proyecto de Discreta
+ *
+ * Segundo Laboratorio de la materia Discreta II de FaMAF.
+ *
+ * @section usage Uso
+ * @subsection args Argumentos
+ *   - -f --flujo      Imprime una tabla con los valores del flujo
+ *   - -v --verbose    Imprime los caminos en cada network auxiliar
+ *   - -c --corte      Se muestra el corte al finalizar
+ *   - -h --help       Muestra la lista de argumentos validos
+ *
+ *
+ * @subsection input Entrada
+ * Toma de la entrada estandar las aristas pasadas para generar el network.
+ *
+ * Para ingresar una arista:
+ *     A -> B con capacidad C
+ *
+ * Se usara el siguiente formato:
+ *   A B C
+ *
+ * La lista de aristas ingresadas se separaran mediante un salto de linea.
+ *
+ * Tanto nodos como capacidades son enteros.
+ * No se aceptaran otros labels para los nodos.
+ *
+ * Para empezar el calculo (Se ha terminado de entrar el network), te terminara
+ * la entrada con cualquier arista no valida.
+ *
+ *
+ * @section authors Autores
+ *  - Andres Bordese
+ *  - Gisela Rossi
+ *  - Gonzalo Garcia Berrotaran
+ *  - Julia Medina
+ *  - Tomas Hayes
+ *
  */
 
 static void print_output(dinic_result *result, struct parse_result options);
@@ -49,7 +89,7 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
-/** Imprime la salida */
+/* Imprime la salida */
 static void print_output(dinic_result *result, struct parse_result options) {
     SList *max_flow = NULL;
     SList *min_cut = NULL;

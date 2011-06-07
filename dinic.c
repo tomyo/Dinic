@@ -11,9 +11,6 @@
 #include "defs.h"
 
 
-/* ******************* Estructuras internas ****************** */
-
-
 /* ******************* Funciones internas ******************** */
 
 bool aux_network_find_blocking_flow(dinic_t *, Network *, bool);
@@ -53,12 +50,6 @@ static bool can_send_flow(Edge *edge, char mode) {
 
 /* ************************ Funciones ************************ */
 
-/**
- * Funcion de creacion de un nuevo network auxiliar a partir de un
- * network y un par de nodos origen y destino (ambos dentro de s_dinic).
- * @param s_dinic data donde esta el network y los nodos origen y destino.
- * @returns network (network auxiliar)
- */
 Network *aux_network_new(dinic_t *data) {
     Network *main_network = NULL, *result = NULL;
     Queue *bfs_queue = NULL, *next_level = NULL;
@@ -156,10 +147,10 @@ Network *aux_network_new(dinic_t *data) {
     }
     queue_free(bfs_queue);
     queue_free(next_level);
-    
+
     /* Post Condiccion */
     /*assert(network_has_node(result, s)); -> chota implementacion*/
-    
+
     return result;
 }
 
@@ -191,14 +182,6 @@ static void flow_pretty_print(dinic_t *data, DinicFlow *to_print) {
     }
 }
 
-/**
- * Funcion que busca caminos entre nodo origen y destino.
- * @note Los caminos y los flujos son almacenados en s_dinic->result.
- * @param data donde esta el network y los nodos origen-destino.
- * @param network network auxiliar donde operar.
- * @param verbose si va a imprimir la salida.
- * @returns DinicFlow con el camino encontrado y su flujo
- */
 DinicFlow *aux_network_find_flow(dinic_t *data, Network *aux_net, bool verbose) {
 
     Node *next_node = NULL;
@@ -250,7 +233,7 @@ DinicFlow *aux_network_find_flow(dinic_t *data, Network *aux_net, bool verbose) 
                 _network_del_edge(aux_net, edge, 'f');
                 continue;
             }
-            
+
             next_node = &data->s;
         }
 
@@ -389,7 +372,7 @@ DinicFlow *aux_network_find_flow(dinic_t *data, Network *aux_net, bool verbose) 
 
     assert(result != NULL);
     assert(data->network != NULL);
-    
+
     return result;
 }
 
@@ -400,14 +383,14 @@ dinic_result *dinic(Network *network, Node s, Node t, bool verbose) {
     Network *aux_net = NULL;
     DinicFlow *current = NULL;
     bool found_max_flow = false;
-    unsigned int na_count = 1; /* Cuenta de los N.A.s (cuando verbose) */ 
+    unsigned int na_count = 1; /* Cuenta de los N.A.s (cuando verbose) */
     Flow flow_value = 0, na_flow_value = 0;
-    
+
     /* Precondiciones */
     assert(network != NULL);
     assert(network_has_node(network, s));
     assert(network_has_node(network, t));
-    
+
     /* Inicializando las estructuras */
     data.network = network;
     data.s = s;
@@ -417,69 +400,69 @@ dinic_result *dinic(Network *network, Node s, Node t, bool verbose) {
     result->flow_value = 0;
     result->max_flow = NULL;
     result->min_cut = NULL;
-    
+
     /* Pasos Basicos:
      * 1) Crear network auxiliar
      * 2) es un corte minimal?:
      *                         a) No -> Buscar flujo bloqueante.
      *                         b) Si -> terminamos.
-     *                            
-     *    a) 
+     *
+     *    a)
      *      i) Buscar camino aumentante.
      *      ii) Actualizar network con el flujo que se manda por el mismo.
      *      iii) Si piden verbose -> imprimir Info.
      *      iv) Actualizar contador de flujo total enviado.
      *      v) Goto 1)
-     *    
+     *
      *
      *    b) Guardar resultados en result y setear flag para salir.
-     *    
+     *
      */
-    
+
     while (!found_max_flow) {
         /* Verbose Info: */
-        
+
         /* 1 */
         aux_net = aux_network_new(&data);
         memory_check(aux_net);
-        
+
         /* 2 */
         if (network_has_node(aux_net, t)) {
             /* Buscamos flujo bloqueante */
-            
+
             if (verbose) printf("N.A %u:\n", na_count);
-            
+
             /* Inicializamos ciclo buscando el primer camino aumentante */
             current = aux_network_find_flow(&data, aux_net, verbose);
             memory_check(current);
-            
-            while (!slist_is_empty(current->path) && 
+
+            while (!slist_is_empty(current->path) &&
                   (current->flow_value > 0)) {
 
                 /* 2a */
                 /* Actualizamos el flujo enviado por el camino aumentante */
                 network_update(data.network, current->path,current->flow_value);
-                
+
                 na_flow_value += current->flow_value;
 
                 slist_free(current->path);
                 free(current); current = NULL;
-                
+
                 current = aux_network_find_flow(&data, aux_net, verbose);
                 memory_check(current);
             }
-            
+
             /* Tenemos flujo bloqueante en este NA */
             if (verbose) {
                 printf("El N.A. %u aumenta el flujo en %u.\n\n",\
                         na_count, na_flow_value);
                 na_count++;
             }
-            
+
             /* Actualizamos la cuenta del flujo global */
             flow_value += na_flow_value;
             na_flow_value = 0;
-            
+
             network_free(aux_net);
             aux_net = NULL;
 
@@ -487,7 +470,7 @@ dinic_result *dinic(Network *network, Node s, Node t, bool verbose) {
             /* 2b -> Terminamos */
             /* El Corte Minimal son los nodos que quedan en el ultimo NA*/
             assert(aux_net != NULL);
-        
+
             if(!network_has_node(aux_net, s)) {
                 /* Parche para caso excepcional en nuestra implementacion */
                 result->min_cut = slist_prepend(result->min_cut, ((void*) &s));
@@ -501,15 +484,15 @@ dinic_result *dinic(Network *network, Node s, Node t, bool verbose) {
         }
         /* 3 */
     }
-    
+
     network_free(aux_net);
     /* TODO: Cuando destruimos todo? */
-    
+
     /* Postcondicion */
     assert(result != NULL);
     assert(result->min_cut != NULL);
     assert(result->max_flow != NULL);
-    
+
     return result;
 }
 

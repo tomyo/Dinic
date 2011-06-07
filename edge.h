@@ -3,10 +3,10 @@
 
 /**
  * @file edge.h
- * @brief Modulo donde se define la estructura de una arista.
+ * @brief Interfaz del TAD edge.
  *
- * Basicamente va a ser una 4-upla que contiene 2 nodos, la
- * capacidad de la arista y el flujo actual.
+ * Una arista es:
+ * 2 nodos, una capacidad de la arista y el flujo actual.
  */
 
 #include <stdbool.h>
@@ -42,12 +42,8 @@ Node *edge_get_second(Edge *self);
 void edge_set_flow(Edge *self, Flow f);
 
 /**
- * Funcion para comparar dos aristas, o sea para saber si
- * dos aristas son iguales.
- *
- * @note Decimos que dos aristas de la forma xy, zw son iguales
- * si x == z e y == w. i.e son iguales si los nodos
- * son iguales, sin importar el peso.
+ * Funcion para comparar dos aristas.
+ * @note Decimos que dos aristas son iguales son iguales sus nodos.
  */
 bool edge_cmp(const Edge *e1, const Edge *e2);
 

@@ -3,8 +3,7 @@
 
 /**
  * @file network.h
- * @brief Define como va a ser representado un network, junto
- * con las operaciones que posee.
+ * @brief Interfaz del TAD network.
  */
 
 #include <stdio.h>
@@ -117,6 +116,7 @@ SList *network_forward_edges(Network *self);
 /**
  * @brief Pregunta si esta un nodo en el network.
  * @param self network donde ejecutar la operacion.
+ * @param n nodo del cual se pregunta.
  * @returns True si el nodo pertenece a los nodos.
  * @returns False en caso contrario.
  */
