@@ -95,6 +95,8 @@ void _network_add_edge(Network *network, Edge *edge, char mode) {
         memory_check(reference_counter_x1);
         *reference_counter_x1 = 0;
         neighbours_x1 = slist_prepend(neighbours_x1, reference_counter_x1);
+        
+        assert(!ht_has_key(network->node_to_edges, x1));
         ht_insert(network->node_to_edges, x1, neighbours_x1);
     }
     if (neighbours_x2 == NULL) {
@@ -104,6 +106,8 @@ void _network_add_edge(Network *network, Edge *edge, char mode) {
         memory_check(reference_counter_x2);
         *reference_counter_x2 = 0;
         neighbours_x2 = slist_prepend(neighbours_x2, reference_counter_x2);
+        
+        assert(!ht_has_key(network->node_to_edges, x2));
         ht_insert(network->node_to_edges, x2, neighbours_x2);
     }
     /* Actualizar Reference Counters */
@@ -119,12 +123,12 @@ void _network_add_edge(Network *network, Edge *edge, char mode) {
     }
 
     /* Si repetimos aristas, algo anda mal.. mmmmmmmm*/
-    assert((slist_find_custom(neighbours_x1, (void *) edge, compare_edges) == NULL) &&
-            "No soportamos aristas repetidas");
+    assert((slist_find_custom(neighbours_x1, (void *) edge, compare_edges) 
+            == NULL) &&  "No soportamos aristas repetidas");
 
     /* En la pos 0 de las listas esta el reference counter */
     /* En la pos 1 empieza la lista de vecinos */
-    slist_insert(neighbours_x1, (void *) edge, 1);
+    neighbours_x1 = slist_insert(neighbours_x1, (void *) edge, 1);
 
     /* Postcondicion, salteandome el primero (Ref counter) tiene que estar
      * el que yo quiero agregar */

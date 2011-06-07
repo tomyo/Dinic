@@ -107,7 +107,6 @@ Network *aux_network_new(dinic_t *data) {
             /* edges tiene todas las posibles aristas del proximo nivel */
             current_edges = edges;
 
-
             while (current_edges != NULL) {
                 char mode = 'f';
 
@@ -433,9 +432,11 @@ dinic_result *dinic(Network *network, Node s, Node t, bool verbose) {
      *    
      *
      *    b) Guardar resultados en result y setear flag para salir.
-     *    
+     * 
+     * 3) liberar estructuras temporales desechables, Goto 1) 
      */
-    
+
+    if (verbose) puts("");
     while (!found_max_flow) {
         /* Verbose Info: */
         
@@ -468,7 +469,10 @@ dinic_result *dinic(Network *network, Node s, Node t, bool verbose) {
                 current = aux_network_find_flow(&data, aux_net, verbose);
                 memory_check(current);
             }
-            
+            /* eliminamos el ultimo DinicFlow */
+            slist_free(current->path);
+            free(current); current = NULL;
+                
             /* Tenemos flujo bloqueante en este NA */
             if (verbose) {
                 printf("El N.A. %u aumenta el flujo en %u.\n\n",\
@@ -480,8 +484,7 @@ dinic_result *dinic(Network *network, Node s, Node t, bool verbose) {
             flow_value += na_flow_value;
             na_flow_value = 0;
             
-            network_free(aux_net);
-            aux_net = NULL;
+            
 
         } else {
             /* 2b -> Terminamos */
@@ -497,14 +500,16 @@ dinic_result *dinic(Network *network, Node s, Node t, bool verbose) {
             result->flow_value = flow_value;
             result->max_flow = network_forward_edges(network);
             found_max_flow = true;
-
+            
         }
         /* 3 */
+        network_free(aux_net);
+        aux_net = NULL;
     }
     
-    network_free(aux_net);
-    /* TODO: Cuando destruimos todo? */
     
+    assert(aux_net == NULL); /* deberia estar borrada */
+        
     /* Postcondicion */
     assert(result != NULL);
     assert(result->min_cut != NULL);

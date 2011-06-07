@@ -42,8 +42,10 @@ int main(int argc, char *argv[]) {
 
     print_output(result, options);
 
-    /* Liberar la memoria alocada por los programas */
+    /* Liberar la memoria alocada */
     network_destroy(network);
+    slist_free(result->max_flow);
+    slist_free(result->min_cut);
     free(result);
 
     return 0;
