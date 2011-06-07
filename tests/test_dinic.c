@@ -21,8 +21,8 @@ END_TEST
 
 START_TEST(test_dinic_net_null)
 {
-    dinic(NULL, 0, 1, false);
-
+    Node s = 0, t = 1;
+    dinic(NULL, &s, &t, false);
 }
 END_TEST
 
@@ -76,8 +76,8 @@ START_TEST(test_dinic_aux_net)
     /* Completo la estructura con los datos */
     dt = (dinic_t *) calloc(1, sizeof(*dt));
     dt->network = net;
-    dt->s = s;
-    dt->t = t;
+    dt->s = &s;
+    dt->t = &t;
 
     /* Creo el network auxiliar */
     aux_net = aux_network_new(dt);
@@ -182,8 +182,8 @@ START_TEST(test_dinic_aux_net_2)
     /* Completo la estructura con los datos */
     dt = (dinic_t *) calloc(1, sizeof(*dt));
     dt->network = net;
-    dt->s = s;
-    dt->t = t;
+    dt->s = &s;
+    dt->t = &t;
 
     /* Creo el network auxiliar */
     aux_net = aux_network_new(dt);
@@ -291,8 +291,8 @@ START_TEST(test_dinic_aux_net_backward)
     /* Completo la estructura con los datos */
     dt = (dinic_t *) calloc(1, sizeof(*dt));
     dt->network = net;
-    dt->s = s;
-    dt->t = t;
+    dt->s = &s;
+    dt->t = &t;
 
     /* Creo el network auxiliar */
     aux_net = aux_network_new(dt);
@@ -372,8 +372,8 @@ START_TEST(test_dinic_aux_net_no_t)
     /* Completo la estructura con los datos */
     dt = (dinic_t *) calloc(1, sizeof(*dt));
     dt->network = net;
-    dt->s = s;
-    dt->t = t; /* Not used. Not tested */
+    dt->s = &s;
+    dt->t = &t; /* Not used. Not tested */
 
     /* Creo el network auxiliar */
     aux_net = aux_network_new(dt);
@@ -479,8 +479,8 @@ START_TEST(test_dinic_aux_net_find_flow)
     /* Completo la estructura con los datos */
     dt = (dinic_t *) calloc(1, sizeof(*dt));
     dt->network = net;
-    dt->s = s;
-    dt->t = t;
+    dt->s = &s;
+    dt->t = &t;
     flow = aux_network_find_flow(dt, net, false);
 
     path = flow->path;
@@ -515,7 +515,7 @@ START_TEST(test_dinic_net_simple)
     net = network_create();
     single = edge_create(s, t, 1, 0);
     network_add_edge(net, single);
-    result = dinic(net, s, t, verbose_mode);
+    result = dinic(net, &s, &t, verbose_mode);
 
     fail_unless(result != NULL);
     fail_unless(result->flow_value == 1);
@@ -530,7 +530,7 @@ START_TEST(test_dinic_net_small)
     Edge *e1 = NULL, *e2 = NULL, *e3 = NULL, *e4 = NULL;
     Edge *e5 = NULL, *e6 = NULL, *e7 = NULL;
     Node s = 0, t = 1;
-    
+
     bool verbose_mode = false; /* EDITME */
 
     /*
@@ -585,17 +585,17 @@ START_TEST(test_dinic_net_small)
     network_add_edge(net, e6);
     network_add_edge(net, e7);
 
-    result = dinic(net, s, t, verbose_mode);
+    result = dinic(net, &s, &t, verbose_mode);
 
 
     fail_unless(result != NULL);
     {
         SList *edges = NULL;
-        
+
         edges = result->max_flow;
         while(edges != NULL) {
             edge_pprint(slist_head_data(edges));
-            
+
             edges = slist_next(edges);
      }
     }
