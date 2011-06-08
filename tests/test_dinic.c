@@ -594,8 +594,6 @@ START_TEST(test_dinic_net_small)
 
         edges = result->max_flow;
         while(edges != NULL) {
-            edge_pprint(slist_head_data(edges));
-
             edges = slist_next(edges);
      }
     }

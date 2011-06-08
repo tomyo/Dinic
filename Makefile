@@ -1,15 +1,16 @@
 TARGET=dinic
 CC=gcc
-CFLAGS+= -ansi -Wall -Wextra -Wdeclaration-after-statement -Wbad-function-cast -Wcast-qual -Wstrict-prototypes -Wmissing-declarations -Wmissing-prototypes -Wno-unused-parameter -pedantic -g -DNDEBUG -O3
+CFLAGS+= -ansi -Wall -Wextra -Wdeclaration-after-statement -Wbad-function-cast -Wcast-qual -Wstrict-prototypes -Wmissing-declarations -Wmissing-prototypes -Wno-unused-parameter -pedantic -g -O3
 SOURCES=$(shell echo *.c)
 OBJECTS= $(SOURCES:.c=.o)
 HASHOBJECTS=$(shell echo hashtable/*.o)
 NETFILE = example.network
 
-all: $(TARGET)
+all:
+	make -C hashtable
+	make $(TARGET)
 
 $(TARGET): $(OBJECTS)
-	make -C hashtable
 	$(CC) $^ $(HASHOBJECTS) -o $@
 
 clean:

@@ -27,7 +27,7 @@ $(TARGET_MEM): $(MEM_OBJECTS) $(TESTED_OBJECTS)
 	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
 
 clean:
-	rm -f $(TARGET) $(TARGET_MEM) $(OBJECTS) $(MEM_OBJECTS) test.log .depend *~
+	rm -f $(TARGET) $(TARGET_MEM) $(TEST_OBJECTS) $(MEM_OBJECTS) test.log .depend *~
 
 .depend: *.[ch]
 	$(CC) $(CFLAGS) -MM $(SOURCES) >.depend
