@@ -52,6 +52,28 @@ static void destroy_slist_internal(void *list, bool aux_mode) {
     } else {
         /* Liberando los edges */
 
+        /* <FIX> */
+        {
+            SList *neighbours = current;
+            Edge *last = slist_last(neighbours);
+            Node n = edge_get_first(n);
+            bool stop = false;
+
+
+            while (!stop || !slist_is_empty(neighbours)) {
+                Edge *head = slist_head_data(neighbours);
+
+                if (edge_get_first(head) != n) {
+                    neighbours = slist_next(neighbours);
+                } else {
+                    stop = true;
+                }
+            }
+
+
+        }
+        /* </FIX> */
+
         while (current != NULL) {
 
             edge = (Edge *)slist_head_data(current);
