@@ -36,7 +36,6 @@ static int compare_edges(const void *a, const void *b) {
 
 static void destroy_slist_internal(void *list, bool aux_mode) {
     SList *current = NULL;
-    Edge *edge = NULL;
 
     /* Precondicion */
     assert(list != NULL);
@@ -48,38 +47,24 @@ static void destroy_slist_internal(void *list, bool aux_mode) {
 
     if (!aux_mode) {
         /* Liberando los edges */
+        SList *neighbours = current;
+        Edge *last = slist_head_data(slist_last(neighbours));
+        Node *n = edge_get_first(last);
 
-        /* <FIX> */
-        {
-            SList *neighbours = current;
-            Edge *last = slist_last(neighbours);
-            Node *n = edge_get_first(last);
-
-            /* Avanzo hasta no dejar mas lados backward */
-            while (*edge_get_first(slist_head_data(neighbours)) != *n)  {
-                neighbours = slist_next(neighbours);
-            }
-
-            /* Ahora neighbours tiene todos lados forward  */
-            while(!slist_is_empty(neighbours)) {
-                edge_destroy(slist_head_data(neighbours));
-                neighbours = slist_next(neighbours);
-            }
+        /* Avanzo hasta no dejar mas lados backward */
+        while (*edge_get_first(slist_head_data(neighbours)) != *n)  {
+            neighbours = slist_next(neighbours);
         }
 
-        /* </FIX> */
-
-        while (current != NULL) {
-
-            edge = (Edge *)slist_head_data(current);
-            if (edge != NULL) {
-                edge_destroy(edge);
-            }
-            current = slist_next(current);
+        /* Ahora neighbours tiene todos lados forward  */
+        while(!slist_is_empty(neighbours)) {
+            edge_destroy(slist_head_data(neighbours));
+            neighbours = slist_next(neighbours);
         }
     }
+
     /* Liberando estructura de listas (ambos casos) */
-    slist_free((SList *) list);
+    slist_free(current);
 }
 
 /* Esta funcion no debe llamarse si son los vecinos de t los nodos a liberar */
