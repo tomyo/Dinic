@@ -9,6 +9,7 @@
 
 static void destroy_slist(void *list);
 static int compare_edges(const void *a, const void *b);
+void _remove_backwards(Node *nodo, SList *list);
 
 /**
  * \brief
@@ -45,21 +46,11 @@ static void destroy_slist_internal(void *list, bool aux_mode) {
     free(slist_head_data(current));
     current = slist_next(current); /* Liberamos el reference counter */
 
-    if (!aux_mode && !slist_is_empty(current)) {
+    if (!aux_mode) {
         /* Liberando los edges */
-        SList *neighbours = current;
-        Edge *last = slist_head_data(slist_last(neighbours));
-        Node *n = edge_get_first(last);
-
-        /* Avanzo hasta no dejar mas lados backward */
-        while (*edge_get_first(slist_head_data(neighbours)) != *n)  {
-            neighbours = slist_next(neighbours);
-        }
-
-        /* Ahora neighbours tiene todos lados forward  */
-        while(!slist_is_empty(neighbours)) {
-            edge_destroy(slist_head_data(neighbours));
-            neighbours = slist_next(neighbours);
+        while(!slist_is_empty(current)) {
+            edge_destroy(slist_head_data(current));
+            current = slist_next(current);
         }
     }
 
@@ -265,17 +256,33 @@ bool network_has_node(Network *self, const Node node) {
     return (ht_lookup(self->node_to_edges, &node) != NULL);
 }
 
+void _remove_backwards(Node *nodo, SList *list) {
+    SList *iter = NULL;
+    assert(!slist_is_empty(list));
+
+    /* Skipping reference counter */
+    iter = slist_next(list);
+    while (!slist_is_empty(iter) &&
+            (*edge_get_first((Edge *)slist_head_data(iter)) != *(Node *)nodo)) {
+        iter = slist_next(list);
+        slist_free_1(iter);
+    }
+    /* Hardcoding */
+    list->next = iter;
+}
+
 void network_destroy(Network *self) {
     assert(self != NULL);
 
     {
     /* <FIX> */
-        int t = 1;
-        SList *neighbours_t = NULL;
-        neighbours_t = ht_lookup(self->node_to_edges, &t);
-        if (!slist_is_empty(neighbours_t)) {
-            ht_steal(self->node_to_edges, &t);
-            destroy_slist_aux(neighbours_t);
+        Node *nodo = NULL;
+
+        ht_iter_keys_reset(self->node_to_edges);
+
+        while (!ht_iter_keys_is_done(self->node_to_edges)) {
+            nodo = (Node *) ht_iter_keys_next(self->node_to_edges);
+            _remove_backwards(nodo, ht_lookup(self->node_to_edges, nodo));
         }
     /* </FIX> */
     }
@@ -283,6 +290,7 @@ void network_destroy(Network *self) {
     ht_destroy(self->node_to_edges);
     free(self);
 }
+
 
 void network_free(Network *self) {
     assert(self != NULL);
