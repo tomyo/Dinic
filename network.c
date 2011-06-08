@@ -43,9 +43,9 @@ static void destroy_slist_internal(void *list, bool aux_mode) {
     current = (SList *) list;
 
     free(slist_head_data(current));
-    current = slist_next(current);
+    current = slist_next(current); /* Liberamos el reference counter */
 
-    if (!aux_mode) {
+    if (!aux_mode && !slist_is_empty(current)) {
         /* Liberando los edges */
         SList *neighbours = current;
         Edge *last = slist_head_data(slist_last(neighbours));
