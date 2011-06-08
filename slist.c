@@ -348,13 +348,13 @@ void *slist_nth_data(SList *self, int n) {
     return result;
 }
 
-SList *slist_remove(SList *self, const void *data) {
+SList *slist_remove(SList *self, const void *data, CompareDataFunc(fun)) {
     SList *current = NULL, *previous = NULL, *head = NULL;
 
     current = self;
     previous = current;
 
-    while(current != NULL && (current->data != data)) {
+    while(current != NULL && (fun(current->data, data) != 0)) {
         previous = current;
         current = slist_next(current);
     }

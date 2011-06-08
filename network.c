@@ -43,8 +43,9 @@ static void destroy_slist_internal(void *list, bool aux_mode) {
 
     current = (SList *) list;
 
+    /* Liberamos el reference counter */
     free(slist_head_data(current));
-    current = slist_next(current); /* Liberamos el reference counter */
+    current = slist_next(current);
 
     if (!aux_mode) {
         /* Liberando los edges */
@@ -55,7 +56,7 @@ static void destroy_slist_internal(void *list, bool aux_mode) {
     }
 
     /* Liberando estructura de listas (ambos casos) */
-    slist_free(current);
+    slist_free(list);
 }
 
 /* Esta funcion no debe llamarse si son los vecinos de t los nodos a liberar */
@@ -264,8 +265,9 @@ void _remove_backwards(Node *nodo, SList *list) {
     iter = slist_next(list);
     while (!slist_is_empty(iter) &&
             (*edge_get_first((Edge *)slist_head_data(iter)) != *(Node *)nodo)) {
-        iter = slist_next(list);
+        SList *iter_temp = slist_next(iter);
         slist_free_1(iter);
+        iter = iter_temp;
     }
     /* Hardcoding */
     list->next = iter;
@@ -332,7 +334,7 @@ Edge *_network_del_edge(Network *network, Edge *edge, char mode) {
     *rc_x2 = *rc_x2 - 1;
 
     assert(slist_find_custom(slist_next(neighbours_x1), edge, compare_edges));
-    slist_remove(neighbours_x1, edge);
+    neighbours_x1->next = slist_remove(slist_next(neighbours_x1), edge, compare_edges);
     if (*rc_x1 == 0) {
         /* Este nodo ya no existe mas en la Hash */
         ht_remove(network->node_to_edges, x1);

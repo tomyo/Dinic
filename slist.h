@@ -105,7 +105,7 @@ Removes an element from a SList. If two elements contain the same data, only
 the first is removed. If none of the elements contain the data, the SList is
 unchanged.
 */
-SList *slist_remove(SList *self, const void *data);
+SList *slist_remove(SList *self, const void *data, CompareDataFunc(func));
 
 /*
 Removes all list nodes with data equal to data. Returns the new head of
@@ -205,14 +205,6 @@ Like slist_sort(), but the sort function accepts a user data argument.
 */
 SList *slist_sort_with_data(SList *self, CompareDataFunc(compare_func),
 void *user_data);
-
-/*
-Removes an element from a SList. If two elements contain the same data, only
-the first is removed. If none of the elements contain the data, the SList is
-unchanged.
-Returns the head of the list.
-*/
-SList *slist_remove(SList *self, const void *data);
 
 /*
 Gets the data of the element at the given position.
