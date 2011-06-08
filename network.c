@@ -201,9 +201,7 @@ SList *network_nodes(Network *self) {
     /* Precondiciones */
     assert(self != NULL);
 
-    /* TODO: cambiar ht_iter_keys_reset por ht_iter_keys_init */
-
-    ht_iter_keys_reset(self->node_to_edges);
+    ht_iter_keys_init(self->node_to_edges);
 
     while (!ht_iter_keys_is_done(self->node_to_edges)) {
         current = (Node *) ht_iter_keys_next(self->node_to_edges);
@@ -280,7 +278,7 @@ void network_destroy(Network *self) {
     /* <FIX> */
         Node *nodo = NULL;
 
-        ht_iter_keys_reset(self->node_to_edges);
+        ht_iter_keys_init(self->node_to_edges);
 
         while (!ht_iter_keys_is_done(self->node_to_edges)) {
             nodo = (Node *) ht_iter_keys_next(self->node_to_edges);
