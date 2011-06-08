@@ -43,13 +43,10 @@ static void destroy_slist_internal(void *list, bool aux_mode) {
 
     current = (SList *) list;
 
-    if (aux_mode)
-    {/* Solo liberamos las listas y el reference_counter. */
-        /* Liberando el reference counter */
-        free(slist_head_data(current));
-        current = slist_next(current);
+    free(slist_head_data(current));
+    current = slist_next(current);
 
-    } else {
+    if (!aux_mode) {
         /* Liberando los edges */
 
         /* <FIX> */
