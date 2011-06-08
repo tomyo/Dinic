@@ -51,9 +51,9 @@ static void destroy_slist_internal(void *list, bool aux_mode) {
 
     } else {
         /* Liberando los edges */
-        
+
         while (current != NULL) {
-        
+
             edge = (Edge *)slist_head_data(current);
             if (edge != NULL) {
                 edge_destroy(edge);
@@ -65,6 +65,7 @@ static void destroy_slist_internal(void *list, bool aux_mode) {
     slist_free((SList *) list);
 }
 
+/* Esta funcion no debe llamarse si son los vecinos de t los nodos a liberar */
 static void destroy_slist(void *list) {
     destroy_slist_internal(list, false);
 }
@@ -115,8 +116,8 @@ void _network_add_edge(Network *network, Edge *edge, char mode) {
     if (neighbours_x1 == NULL) {
         /* No estaba en la Hash */
         unsigned int *reference_counter_x1 = NULL;
-        
-        reference_counter_x1 = (unsigned int *) calloc(1, 
+
+        reference_counter_x1 = (unsigned int *) calloc(1,
                                                 sizeof(*reference_counter_x1));
         memory_check(reference_counter_x1);
         *reference_counter_x1 = 0;
@@ -128,8 +129,8 @@ void _network_add_edge(Network *network, Edge *edge, char mode) {
     if (neighbours_x2 == NULL) {
         /* No estaba en la hash */
         unsigned int *reference_counter_x2 = NULL;
-        
-        reference_counter_x2 = (unsigned int *) calloc(1, 
+
+        reference_counter_x2 = (unsigned int *) calloc(1,
                                                 sizeof(*reference_counter_x2));
         memory_check(reference_counter_x2);
         *reference_counter_x2 = 0;
@@ -264,8 +265,21 @@ bool network_has_node(Network *self, const Node node) {
 
 void network_destroy(Network *self) {
     assert(self != NULL);
+
+    {
+    /* <FIX> */
+        int t = 1;
+        SList *neighbours_t = NULL;
+        neighbours_t = ht_lookup(self->node_to_edges, &t);
+        if (!slist_is_empty(neighbours_t)) {
+            ht_steal(self->node_to_edges, &t);
+            destroy_slist_aux(neighbours_t);
+        }
+    /* </FIX> */
+    }
+
     ht_destroy(self->node_to_edges);
-    free(self); self = NULL;
+    free(self);
 }
 
 void network_free(Network *self) {
@@ -307,7 +321,7 @@ Edge *_network_del_edge(Network *network, Edge *edge, char mode) {
     *rc_x1 = *rc_x1 - 1;
     *rc_x2 = *rc_x2 - 1;
 
-    assert(slist_find_custom(neighbours_x1, edge, compare_edges));
+    assert(slist_find_custom(slist_next(neighbours_x1), edge, compare_edges));
     slist_remove(neighbours_x1, edge);
     if (*rc_x1 == 0) {
         /* Este nodo ya no existe mas en la Hash */
