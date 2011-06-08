@@ -494,7 +494,7 @@ dinic_result *dinic(Network *network, Node *s, Node *t, bool verbose) {
 
         }
         /* 3 */
-        network_destroy(aux_net);
+        network_destroy(aux_net); 
         aux_net = NULL;
     }
 
