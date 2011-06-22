@@ -333,11 +333,11 @@ Edge *_network_del_edge(Network *network, Edge *edge, char mode) {
 
     assert(slist_find_custom(slist_next(neighbours_x1), edge, compare_edges));
     neighbours_x1->next = slist_remove(slist_next(neighbours_x1), edge, compare_edges);
+
     if (*rc_x1 == 0) {
         /* Este nodo ya no existe mas en la Hash */
         ht_remove(network->node_to_edges, x1);
     }
-
     if (*rc_x2 == 0) {
         /* Este nodo ya no existe mas en la Hash */
         ht_remove(network->node_to_edges, x2);
@@ -356,7 +356,7 @@ void network_update(Network *self, SList *path, Flow flow){
     assert(flow > 0);
 
     iter = path;
-
+    
     next_node = edge_get_first((Edge *)slist_head_data(iter));
     while (iter != NULL) {
         Edge *edge = slist_head_data(iter);
@@ -380,15 +380,14 @@ void network_update(Network *self, SList *path, Flow flow){
         } else {
             /* Backward */
             Flow new_flow = 0;
-
+            
+            assert(edge_get_flow(edge) >= flow);
             new_flow = edge_get_flow(edge) -  flow;
-            /* new_flow es mayor o igual a cero siempre por ser unsigned */
-
+            edge_set_flow(edge, new_flow);
+            
             if (new_flow == 0) {
                 /* El lado se vacio */
                 network_del_edge_backward(self, edge);
-            } else {
-                edge_set_flow(edge, new_flow);
             }
 
             next_node = edge_get_first(edge);
